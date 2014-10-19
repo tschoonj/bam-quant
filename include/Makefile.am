@@ -1,0 +1,7 @@
+bam_quantincludedir = ${includedir}/bam-quant
+
+bam_quantinclude_HEADERS = bam_file.h \
+			   bam_file_asr.h \
+			   bam_exception.h \
+			   bam_data_asr.h
+

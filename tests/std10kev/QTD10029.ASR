@@ -1,0 +1,33 @@
+File: C:\xrfdaten\2014KW30\chris\std10kev\std10029.spe
+Start: 21.07.2014 16:06:33
+Stop: 21.07.2014 16:08:13
+BESSY: 298.4314588 298.4551881
+IONI: 1.422787E-10 1.417558E-10
+ScanMotor1 exp_x: 1 1
+ScanMotor2 exp_y: 1 1
+Live: 66228
+Run: 100000
+Dead: 34
+ICR: 123840
+OCR: 0
+Accumulated BESSY: 59673.1083437
+Accumulated Ioni: 2.84681231E-08
+N Accumulation: 200
+Normfactor:  1.0607903e+008
+E_cal:      0.020000000
+E_cal_offset:      0.000000
+Comments: Cu
+exp_x 112.020401000977 112.0204
+exp_y 122.265808105469 122.2658
+exp_z 53.8899993896484 53.89
+exp_w 135 135.0001
+exp_Tisch 871.55 871.549999496
+dcm_theta 0 0
+det_y 52.85 52.85
+dmm_energy 10 10.0001
+dcm_energy 23 -184976.74536672
+S3_horSize 0.03 3.00000000000001E-02
+S3_verSize 0.03 0.03
+$PEAKS:   
+      1
+  29   1      8.041   7187233.      2682.     158.63
