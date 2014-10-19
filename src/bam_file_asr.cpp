@@ -4,9 +4,10 @@
 #include <sstream>
 
 using namespace BAM;
+using namespace BAM::File;
 using namespace std;
 
-FileASR::FileASR(string filename) : File::File(filename) {
+ASR::ASR(string filename) : File::File(filename) {
 	cout << "Entering BAM::FileASR constructor" << endl;
 	if (fs) {
 		this->Parse();
@@ -15,12 +16,12 @@ FileASR::FileASR(string filename) : File::File(filename) {
 	cout << "Leaving BAM::FileASR constructor" << endl;
 }
 
-FileASR::~FileASR() {
+ASR::~ASR() {
 	cout << "Entering BAM::FileASR destructor" << endl;
 
 }
 
-void FileASR::Parse() {
+void ASR::Parse() {
 	cout << "Entering BAM::FileASR Parse" << endl;
 
 	string line;
@@ -61,20 +62,20 @@ void FileASR::Parse() {
 				stringstream ss;
 				ss << line;
 				ss >> Z >> elem_line >> counts >> stddev >> chi >> bg;
-				data_asr.push_back(DataASR(Z, elem_line, counts, stddev, chi, bg));
+				data_asr.push_back(Data::ASR(Z, elem_line, counts, stddev, chi, bg));
 			}
 		}
 	}
 	catch (...) {}
 
 	if (!normfactor_found) {
-		throw bam_exception("Normfactor not found in "+filename);
+		throw Exception("Normfactor not found in "+filename);
 	}
 	else if (!peaks_found) {
-		throw bam_exception("No $PEAKS: found in "+filename);
+		throw Exception("No $PEAKS: found in "+filename);
 	}
 	else if (data_asr.size() == 0) {
-		throw bam_exception("No peaks found in "+filename);
+		throw Exception("No peaks found in "+filename);
 	}
 
 	cout << "Leaving BAM::FileASR Parse" << endl;

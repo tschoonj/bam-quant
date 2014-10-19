@@ -4,17 +4,17 @@
 
 int main(int argc, char **argv) {
 
-	BAM::FileASR *asr;
+	BAM::File::ASR *asr;
 
 	try {
-		asr = new BAM::FileASR(TEST_FILE_ASR);
+		asr = new BAM::File::ASR(TEST_FILE_ASR);
 	}
 	catch (ifstream::failure &e) {
 		cerr << "Exception reading in file: " << e.what() << endl;	
 		delete asr;
 		return 1;
 	}
-	catch (BAM::bam_exception &e) {
+	catch (BAM::Exception &e) {
 		cerr << "Some other exception detected: " << e.what() << endl;
 		delete asr;
 		return 1;

@@ -1,7 +1,7 @@
 #include "bam_file.h"
 #include <iostream>
 
-using namespace BAM;
+using namespace BAM::File;
 
 File::File(string filename) : filename(filename) {
 	cout << "Entering BAM::File constructor" << endl;
