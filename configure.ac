@@ -74,6 +74,7 @@ PKG_PROG_PKG_CONFIG
 #search for xraylib and other modules
 PKG_CHECK_MODULES([xraylib],libxrl >= 3.1.0)
 PKG_CHECK_MODULES([xmimsim],libxmimsim >= 5.0)
+PKG_CHECK_MODULES([gtkmm],gtkmm-3.0 >= 3.4.0)
 
 
 
@@ -81,6 +82,8 @@ AC_CONFIG_FILES([	Makefile
 			src/Makefile
 			include/Makefile
 			tests/Makefile
+			bin/Makefile
+			bin/app1/Makefile
 			])
 AC_CONFIG_HEADERS([config.h])
 
