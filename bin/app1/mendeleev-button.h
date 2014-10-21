@@ -15,7 +15,7 @@ class MendeleevButton : public Gtk::Button {
 		}
 	public:
 		MendeleevButton(int Z) : Z(Z), element(AtomicNumberToSymbol(Z)) {
-			set_label(Glib::ustring::ustring(element));
+			set_label(Glib::ustring(element));
 			signal_clicked().connect( sigc::mem_fun(*this,
 			              &MendeleevButton::on_button_clicked) );
 		}
