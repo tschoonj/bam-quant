@@ -16,10 +16,10 @@ class Application : public Gtk::Application {
 		void load_ui();
 		void show_about_dialog();
 		void hide_all_windows();
-		void about_clicked(int buttonid);
+		void on_about_dialog_response(int buttonid);
 
 		Window *window;
-		Gtk::AboutDialog *about_dialog;
+		Gtk::AboutDialog about_dialog;
 };
 
 

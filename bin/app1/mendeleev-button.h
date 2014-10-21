@@ -2,6 +2,7 @@
 #define MENDELEEV_BUTTON_H
 
 #include <gtkmm/button.h>
+#include <gtkmm/grid.h>
 #include <xraylib.h>
 #include <glibmm/ustring.h>
 #include <iostream>
@@ -11,7 +12,7 @@ class MendeleevButton : public Gtk::Button {
 		int Z;
 		char *element;
 		void on_button_clicked() {
-			std::cout << "Button with element: " << element << "clicked" << std::endl;
+			std::cout << "Button with element: " << element << " clicked" << std::endl;
 		}
 	public:
 		MendeleevButton(int Z) : Z(Z), element(AtomicNumberToSymbol(Z)) {

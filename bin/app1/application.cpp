@@ -30,26 +30,6 @@ void Application::on_startup() {
 
 }
 
-void Application::about_clicked(int buttonid) {
-	about_dialog->hide();
-}
-
-void Application::show_about_dialog() {
-  if (!about_dialog) {
-    about_dialog = new Gtk::AboutDialog();
-    about_dialog->set_program_name(PACKAGE_NAME);
-    about_dialog->set_version(PACKAGE_VERSION);
-    about_dialog->set_website(PACKAGE_URL);
-    about_dialog->set_copyright("Copyright © 2014 Tom Schoonjans");
-    about_dialog->set_license_type(Gtk::LICENSE_GPL_3_0);
-    about_dialog->set_modal();
-    // Destroy the dialog when the close button is clicked.
-    about_dialog->signal_response().connect(sigc::mem_fun(*this, &Application::about_clicked));
-  }
-  about_dialog->set_transient_for(*get_active_window());
-  about_dialog->present();
-}
-
 void Application::hide_all_windows() {
   //for (Gtk::Window* window : get_windows())
   //  window->hide();
@@ -83,4 +63,36 @@ void Application::load_ui() {
 	window = new Window();
 	add_window(*window);
 	window->show();
+
+	//construct about dialog
+	about_dialog.set_transient_for(*window);
+    	about_dialog.set_program_name(PACKAGE_NAME);
+   	about_dialog.set_version(PACKAGE_VERSION);
+    	about_dialog.set_website(PACKAGE_URL);
+    	about_dialog.set_copyright("Copyright © 2014 Tom Schoonjans");
+    	about_dialog.set_license_type(Gtk::LICENSE_GPL_3_0);
+    	about_dialog.set_modal();
+    	// Destroy the dialog when the close button is clicked.
+    	about_dialog.signal_response().connect(sigc::mem_fun(*this, &Application::on_about_dialog_response));
+}
+
+void Application::on_about_dialog_response(int response_id) {
+	/*std::cout << response_id
+	<< ", close=" << Gtk::RESPONSE_CLOSE
+	<< ", cancel=" << Gtk::RESPONSE_CANCEL
+	<< ", delete_event=" << Gtk::RESPONSE_DELETE_EVENT
+	<< std::endl;*/
+
+	//if((response_id == Gtk::RESPONSE_CLOSE) ||
+	//(response_id == Gtk::RESPONSE_CANCEL) ) {
+		//std::cout << "Hiding dialog" << std::endl;
+		about_dialog.hide();
+	//}
+}
+
+void Application::show_about_dialog() {
+	about_dialog.show();
+
+	//Bring it to the front, in case it was already shown:
+	about_dialog.present();
 }
