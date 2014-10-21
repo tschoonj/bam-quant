@@ -1,6 +1,7 @@
 #include "config.h"
 #include "application.h"
 #include <gtkmm/builder.h>
+#include <giomm/menu.h>
 
 #include <iostream>
 
