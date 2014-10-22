@@ -59,6 +59,16 @@ void Application::load_ui() {
 	builder->add_from_string(app_menu_string);
 	set_app_menu(Glib::RefPtr<Gio::Menu>::cast_dynamic(builder->get_object("app-menu")));
 
+	//menu bar -> with actual coding!
+	Glib::RefPtr<Gio::Menu> win_menu = Gio::Menu::create();
+	Glib::RefPtr<Gio::Menu> submenu_file = Gio::Menu::create();
+	Glib::RefPtr<Gio::MenuItem> item = Gio::MenuItem::create("_New project", "win.new");
+	item->set_attribute_value("accel", Glib::Variant<Glib::ustring>::create("<Primary>n"));
+	submenu_file->append_item(item);
+	win_menu->append_submenu("File", submenu_file);
+	
+	set_menubar(win_menu);
+
 	//construct window here
 	window = new Window();
 	add_window(*window);
@@ -96,3 +106,4 @@ void Application::show_about_dialog() {
 	//Bring it to the front, in case it was already shown:
 	about_dialog.present();
 }
+

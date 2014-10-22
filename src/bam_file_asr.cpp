@@ -9,21 +9,21 @@ using namespace BAM::File;
 using namespace std;
 
 ASR::ASR(string filename) : File::File(filename) {
-	cout << "Entering BAM::File::ASR constructor" << endl;
+	//cout << "Entering BAM::File::ASR constructor" << endl;
 	if (fs) {
 		this->Parse();
 	}
 	this->Close();
-	cout << "Leaving BAM::File::ASR constructor" << endl;
+	//cout << "Leaving BAM::File::ASR constructor" << endl;
 }
 
 ASR::~ASR() {
-	cout << "Entering BAM::File::ASR destructor" << endl;
+	//cout << "Entering BAM::File::ASR destructor" << endl;
 
 }
 
 void ASR::Parse() {
-	cout << "Entering BAM::FileASR Parse" << endl;
+	//cout << "Entering BAM::FileASR Parse" << endl;
 
 	string line;
 	bool peaks_found = false;
@@ -46,7 +46,7 @@ void ASR::Parse() {
 			ss >> identifier;
 			if (identifier.compare(0, 7, "$PEAKS:") == 0) {
 				peaks_found = true;
-				cout << "peaks found!" << endl;
+				//cout << "peaks found!" << endl;
 				//basically we ignore the line with the number of peaks
 				getline(fs,line);
 				continue;
@@ -93,6 +93,6 @@ void ASR::Parse() {
 		throw BAM::Exception("BAM::ASR::Parse -> No peaks found in "+filename);
 	}
 
-	cout << "Leaving BAM::FileASR Parse" << endl;
+	//cout << "Leaving BAM::FileASR Parse" << endl;
 
 }

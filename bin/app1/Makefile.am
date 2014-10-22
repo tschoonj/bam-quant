@@ -4,9 +4,11 @@ AM_CPPFLAGS = -I${top_srcdir}/include -I${top_builddir}/include -I${top_srcdir}/
 
 app1_SOURCES = main.cpp \
 	       window.h \
+	       window.cpp \
 	       application.cpp \
 	       application.h \
-	       mendeleev-button.h
+	       mendeleev-button.h \
+	       mendeleev-button.cpp
 
 
 

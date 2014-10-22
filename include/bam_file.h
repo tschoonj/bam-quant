@@ -13,13 +13,13 @@ namespace BAM {
 				ifstream fs;
 				string filename;
 			public:
-			//constructor
-			File(string);
-			//destructor
-			virtual ~File();
-			void Open();
-			void Close();
-			virtual void Parse() = 0;
+				//constructor
+				File(string);
+				//destructor
+				virtual ~File();
+				virtual void Open();
+				virtual void Close();
+				virtual void Parse() = 0;
 		};
 	}
 }
