@@ -3,11 +3,12 @@
 
 #include <xmi_msim.h>
 #include "bam_file.h"
+#include "bam_data_xmsi.h"
 #include <iostream>
 
 namespace BAM {
 	namespace File {
-		class XMSI : public File{
+		class XMSI : public File {
 			private:
 				struct xmi_input *input;
 			public:
@@ -20,7 +21,7 @@ namespace BAM {
 				void Write();
 				void Write(string filename);
 				friend std::ostream& operator<< (std::ostream &out, const XMSI &xmsi);
-				//void ReplaceComposition()
+				void ReplaceComposition(const BAM::Data::XMSI::Composition &composition_new);
 		};
 	}
 }

@@ -104,3 +104,23 @@ namespace BAM {
 		}
 	}
 }
+
+void XMSI::ReplaceComposition(const BAM::Data::XMSI::Composition &composition_new) {
+	//make sure input is valid
+	if (composition_new.layers.size() == 0) {
+		throw BAM::Exception("BAM::File::XMSI::ReplaceComposition -> No layers found in composition");
+	}
+	else if (composition_new.reference_layer < 1 || composition_new.reference_layer > composition_new.layers.size()) {
+		throw BAM::Exception("BAM::File::XMSI::ReplaceComposition -> Invalid reference layer detected");
+	}
+
+	//first clear the current composition
+	if (input->composition)
+		xmi_free_composition(input->composition);
+	struct xmi_composition composition;
+	composition.reference_layer = composition_new.reference_layer;
+	composition.layers = (struct xmi_layer*) xmi_memdup(&composition_new.layers[0], sizeof(struct xmi_layer)*composition_new.layers.size());
+	composition.n_layers = composition_new.layers.size();
+	xmi_copy_composition(&composition, &input->composition);
+}
+
