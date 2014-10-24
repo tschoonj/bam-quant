@@ -37,7 +37,8 @@ void XMSI::Parse() {
 		throw BAM::Exception("BAM::File::XMSI::Parse -> Could not load XMI-MSIM XML catalog");
 	}
 	if (xmi_read_input_xml((char*)(filename.c_str()), &input) == 0) {
-		throw BAM::Exception("BAM::File::XMSI::Parse -> Could not read file "+filename);
+		//std::cout << "BAM::File::XMSI::Parse -> Could not read file "+filename << std::endl;
+		throw BAM::Exception(string("BAM::File::XMSI::Parse -> Could not read file ")+filename);
 	}
 }
 
