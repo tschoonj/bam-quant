@@ -11,12 +11,10 @@ int main(int argc, char **argv) {
 	}
 	catch (ifstream::failure &e) {
 		cerr << "Exception reading in file: " << e.what() << endl;	
-		delete asr;
 		return 1;
 	}
 	catch (BAM::Exception &e) {
 		cerr << "Some other exception detected: " << e.what() << endl;
-		delete asr;
 		return 1;
 	}
 

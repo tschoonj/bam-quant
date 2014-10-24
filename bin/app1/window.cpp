@@ -118,7 +118,6 @@ void Window::new_project() {
 			Gtk::MessageDialog dialog(*this, "Error reading in "+*it, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   			dialog.set_secondary_text(Glib::ustring("I/O error: ")+e.what());
   			dialog.run();
-			delete asr_file;
 			//reset everything in window!
 			reset_project();
 			return;
@@ -127,7 +126,6 @@ void Window::new_project() {
 			Gtk::MessageDialog dialog(*this, "Error reading in "+*it, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   			dialog.set_secondary_text(e.what());
   			dialog.run();
-			delete asr_file;
 			//reset everything in window!
 			reset_project();
 			return;

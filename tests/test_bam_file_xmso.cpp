@@ -11,7 +11,8 @@ int main(int argc, char *argv[]) {
 	}
 	catch (BAM::Exception &e) {
 		std::cerr << "Exception occurred while reading in " << TEST_FILE_XMSO << " -> " << e.what();
-		delete xmso_file;
 		return 1;
 	}
+	delete xmso_file;
+	return 0;
 }

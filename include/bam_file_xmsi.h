@@ -30,11 +30,9 @@ namespace BAM {
 				}
 				//copy constructor
 				XMSI(const XMSI &xmsi) : File(xmsi.filename) {
-					std::cout << "Calling copy constructor" << std::endl;
 					xmi_copy_input(xmsi.input, &input);
 				}
 				XMSI& operator= (const XMSI &xmsi) {
-					std::cout << "Calling assignment overloader" << std::endl;
 					if (this == &xmsi)
 						return *this;
 					if (input)

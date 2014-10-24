@@ -12,7 +12,6 @@ int main(int argc, char *argv[]) {
 	}
 	catch (BAM::Exception &e) {
 		std::cerr << "Exception occurred while reading in " << TEST_FILE_XMSI << " -> " << e.what();
-		delete xmsi_file;
 		return 1;
 	}
 
@@ -38,8 +37,8 @@ int main(int argc, char *argv[]) {
 	catch (BAM::Exception &e) {
 		std::cerr << "Exception occurred while creating a new layer -> " << e.what() << endl;;
 		delete xmsi_file;
-		delete layer;
-		delete composition;
+		//delete layer;
+		//delete composition;
 		return 1;
 	}
 
