@@ -1,10 +1,11 @@
-#include <window.h>
+#include "window.h"
 #include <gtkmm/filechooser.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/stylecontext.h>
 #include <unistd.h>
 #include <glibmm/miscutils.h>
+#include "xmi-msim-dialog.h"
 
 
 Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
@@ -218,6 +219,12 @@ void Window::new_project() {
 			
 	}
 	delete xmsi_file;
+
+	//now launch the XMI-MSIM dialog
+	XmiMsimDialog *xmi_msim_dialog = new XmiMsimDialog(*this, true, buttonMap);
+	xmi_msim_dialog->run();
+
+	delete xmi_msim_dialog;
 }
 
 void Window::reset_project() {
