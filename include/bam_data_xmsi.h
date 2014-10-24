@@ -6,6 +6,7 @@
 #include <iterator>
 #include <iostream>
 #include <numeric>
+#include <algorithm>
 #include "bam_file_xmsi.h"
 
 
