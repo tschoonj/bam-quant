@@ -5,6 +5,7 @@
 #include "mendeleev-button.h"
 #include <iostream>
 #include <gtkmm/grid.h>
+#include <gtkmm/box.h>
 #include <gtkmm/cssprovider.h>
 
 class Window: public Gtk::ApplicationWindow {
@@ -19,6 +20,7 @@ class Window: public Gtk::ApplicationWindow {
 
 	private:
 		//MendeleevButton test_button;
+		Gtk::Box big_box;
 		Gtk::Grid buttonGrid;
 		std::map<int, MendeleevButton*> buttonMap;
 		void new_project();

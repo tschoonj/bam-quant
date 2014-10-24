@@ -7,7 +7,7 @@
 #include <glibmm/miscutils.h>
 
 
-Window::Window()  {
+Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
 	//menu signals
 	add_action("new", sigc::mem_fun(*this, &Window::new_project));
 
@@ -25,7 +25,8 @@ Window::Window()  {
 	//initialize grid
 	buttonGrid.set_row_spacing(10);
 	buttonGrid.set_column_spacing(10);
-	add(buttonGrid);
+	big_box.pack_start(buttonGrid, false, false, 10);
+	add(big_box);
 
 	int row = 0, column = 0;
 
@@ -124,7 +125,7 @@ void Window::new_project() {
 		}
 		catch (BAM::Exception &e) {
 			Gtk::MessageDialog dialog(*this, "Error reading in "+*it, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
-  			dialog.set_secondary_text(Glib::ustring("Parser error: ")+ e.what());
+  			dialog.set_secondary_text(e.what());
   			dialog.run();
 			delete asr_file;
 			//reset everything in window!
@@ -192,11 +193,10 @@ void Window::new_project() {
 	}
 	catch (BAM::Exception &e) {
 		Gtk::MessageDialog dialog(*this, "Error reading in "+filename, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
-		Glib::ustring error_message = Glib::ustring("Parser error: ")+e.what();
+		Glib::ustring error_message = Glib::ustring(e.what());
 		std::cout << e.what() << std::endl;
   		dialog.set_secondary_text(error_message);
   		dialog.run();
-		delete xmsi_file;
 		//reset everything in window!
 		reset_project();
 		return;

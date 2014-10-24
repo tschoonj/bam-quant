@@ -38,7 +38,7 @@ void XMSI::Parse() {
 	}
 	if (xmi_read_input_xml((char*)(filename.c_str()), &input) == 0) {
 		//std::cout << "BAM::File::XMSI::Parse -> Could not read file "+filename << std::endl;
-		throw BAM::Exception(string("BAM::File::XMSI::Parse -> Could not read file ")+filename);
+		throw BAM::Exception("BAM::File::XMSI::Parse -> Could not read file ");
 	}
 }
 
@@ -50,7 +50,7 @@ void XMSI::Write() {
 		throw BAM::Exception("BAM::File::XMSI::Write -> Invalid filename");
 	}
 	if (xmi_write_input_xml((char*)filename.c_str(), input) == 0) {
-		throw BAM::Exception("BAM::File::XMSI::Write -> Could not write to file "+filename);
+		throw BAM::Exception("BAM::File::XMSI::Write -> Could not write to file ");
 	}	
 }
 

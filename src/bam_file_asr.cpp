@@ -77,20 +77,20 @@ void ASR::Parse() {
 				elem_line = LA_LINE;
 			}
 			else {
-				throw BAM::Exception("BAM::File::ASR::Parse -> Invalid line identifier found in "+filename+": "+ static_cast<ostringstream*>( &(ostringstream() << elem_line) )->str());
+				throw BAM::Exception("BAM::File::ASR::Parse -> Invalid line identifier found");
 			}
 			data_asr.push_back(Data::ASR(Z, elem_line, counts, stddev, chi, bg));
 		}
 	}
 
 	if (!normfactor_found) {
-		throw BAM::Exception("BAM::File::ASR::Parse -> Normfactor not found in "+filename);
+		throw BAM::Exception("BAM::File::ASR::Parse -> Normfactor not found");
 	}
 	else if (!peaks_found) {
-		throw BAM::Exception("BAM::File::ASR::Parse -> No $PEAKS: found in "+filename);
+		throw BAM::Exception("BAM::File::ASR::Parse -> No $PEAKS: found");
 	}
 	else if (data_asr.size() == 0) {
-		throw BAM::Exception("BAM::File::ASR::Parse -> No peaks found in "+filename);
+		throw BAM::Exception("BAM::File::ASR::Parse -> No peaks found");
 	}
 
 	//cout << "Leaving BAM::FileASR Parse" << endl;
