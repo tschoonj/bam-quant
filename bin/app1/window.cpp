@@ -104,10 +104,13 @@ void Window::new_project() {
       			break;
 		case(Gtk::RESPONSE_CANCEL):
 		default:
+			delete dialog;
 			return;
 	}
 
 	delete dialog;
+
+	std::vector<MendeleevButton*> buttonVector;
 
 	for (std::vector<std::string>::iterator it = filenames.begin() ; it != filenames.end() ; ++it)  {
 		std::cout << "Selected file: " << *it << std::endl;
@@ -153,6 +156,7 @@ void Window::new_project() {
 			return;
 		}
 		buttonMap[Z]->asr_file = asr_file;
+		buttonVector.push_back(buttonMap[Z]);
 		//change color of element
 		//buttonMap[Z]->override_background_color(Gdk::RGBA("Chartreuse"));
 		Glib::RefPtr<Gtk::StyleContext> csscontext = buttonMap[Z]->get_style_context();
@@ -180,6 +184,7 @@ void Window::new_project() {
       			break;
 		case(Gtk::RESPONSE_CANCEL):
 		default:
+			delete dialog;
 			return;
 	}
 
@@ -214,6 +219,10 @@ void Window::new_project() {
 		composition.AddLayer(layer);
 		composition.SetReferenceLayer(1);
 		buttonMap[i]->xmsi_file->ReplaceComposition(composition);
+		string temp_xmso_filename = buttonMap[i]->temp_xmsi_filename;
+		temp_xmso_filename.replace(temp_xmso_filename.end()-1,temp_xmso_filename.end(), "o");
+		buttonMap[i]->xmsi_file->SetOutputFile(temp_xmso_filename);
+		buttonMap[i]->xmsi_file->SetFilename(buttonMap[i]->temp_xmsi_filename);
 
 
 			
@@ -221,9 +230,21 @@ void Window::new_project() {
 	delete xmsi_file;
 
 	//now launch the XMI-MSIM dialog
-	XmiMsimDialog *xmi_msim_dialog = new XmiMsimDialog(*this, true, buttonMap);
-	xmi_msim_dialog->run();
-
+	XmiMsimDialog *xmi_msim_dialog = new XmiMsimDialog(*this, true, buttonVector);
+	try {
+		xmi_msim_dialog->run();
+	}
+	catch (BAM::Exception &e) {
+		delete xmi_msim_dialog;
+		Gtk::MessageDialog dialog(*this, "Error occurred in XMI-MSIM dialog", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+		Glib::ustring error_message = Glib::ustring(e.what());
+		std::cout << e.what() << std::endl;
+  		dialog.set_secondary_text(error_message);
+  		dialog.run();
+		//reset everything in window!
+		reset_project();
+		return;
+	}
 	delete xmi_msim_dialog;
 }
 

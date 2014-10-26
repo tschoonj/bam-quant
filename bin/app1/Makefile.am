@@ -9,7 +9,8 @@ app1_SOURCES = main.cpp \
 	       application.h \
 	       mendeleev-button.h \
 	       mendeleev-button.cpp \
-	       xmi-msim-dialog.h
+	       xmi-msim-dialog.h \
+	       xmi-msim-dialog.cpp
 
 
 

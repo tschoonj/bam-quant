@@ -6,11 +6,23 @@
 #include <gtkmm/treeview.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/liststore.h>
+#include <gtkmm/textview.h>
+#include <glibmm/timer.h>
+#include <glibmm/iochannel.h>
+#include <iomanip>
+#include <iostream>
 #include "window.h"
 
 class XmiMsimDialog : public Gtk::Dialog {
+	private:
+		bool xmimsim_paused;
+		GPid xmimsim_pid;
+		Glib::Timer *timer;
+		vector<std::string> argv;
+		int buttonIndex;
+
 	public:
-		std::map<int, MendeleevButton*> buttonMap;
+		std::vector<MendeleevButton*> buttonVector;
 		Gtk::Button playButton;
 		Gtk::Button stopButton;
 		Gtk::Button pauseButton;
@@ -26,48 +38,46 @@ class XmiMsimDialog : public Gtk::Dialog {
 		};
 		MyColumns mycolumns;	
 		Gtk::Box hbox;
-		Gtk::ScrolledWindow sw;
+		Gtk::ScrolledWindow sw_tree;
+		Gtk::ScrolledWindow sw_text;
 		Gtk::TreeView tv;
 		Glib::RefPtr<Gtk::ListStore> model;
+		Glib::RefPtr<Gtk::TextBuffer> console_buffer;
+		Gtk::TextView console_view;
+		Glib::RefPtr<Glib::IOChannel> xmimsim_stderr;
+		Glib::RefPtr<Glib::IOChannel> xmimsim_stdout;
 
 
-		XmiMsimDialog(Window &window, bool modal, std::map<int, MendeleevButton*> &buttonMap) : 
-			Gtk::Dialog(Glib::ustring("XMI-MSIM control panel"), window, modal),
-			buttonMap(buttonMap),
-			buttons(Gtk::ORIENTATION_VERTICAL),
-			hbox(Gtk::ORIENTATION_HORIZONTAL)
-			 {
 
-			add_button("_Cancel", Gtk::RESPONSE_CANCEL);
-			add_button("Select", Gtk::RESPONSE_OK);
-			pauseButton.set_image_from_icon_name("gtk-media-pause", Gtk::ICON_SIZE_DIALOG);	
-			stopButton.set_image_from_icon_name("gtk-media-stop", Gtk::ICON_SIZE_DIALOG);	
-			playButton.set_image_from_icon_name("gtk-media-play", Gtk::ICON_SIZE_DIALOG);	
-			buttons.pack_start(playButton);
-			buttons.pack_start(pauseButton);
-			buttons.pack_start(stopButton);
-
-			hbox.pack_start(buttons, false, false, 5);
-			set_default_size(300, 300);
-		
-			model = Gtk::ListStore::create(mycolumns);
-			tv.set_model(model);
-
-			for (std::map<int, MendeleevButton*>::iterator it = buttonMap.begin(); it != buttonMap.end(); ++it) {
-				if (it->second->asr_file) {
-					Gtk::TreeModel::Row row = *(model->append());
-					row[mycolumns.col_element] = it->second->GetElement();
-					row[mycolumns.col_status] = Glib::ustring("not started");
-				}
-			}
-			tv.append_column("Element", mycolumns.col_element);
-			tv.append_column("Status", mycolumns.col_status);
-			sw.add(tv);
-			sw.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-			hbox.pack_start(sw, true, true, 5);
-			get_content_area()->pack_start(hbox, true, true, 3);
-			show_all_children();
+		XmiMsimDialog(Window &window, bool modal, std::vector<MendeleevButton*> &buttonVector);
+		~XmiMsimDialog() {
+			if (timer)
+				delete timer;
 		}
+		void on_play_clicked();
+		void on_pause_clicked();
+		void on_stop_clicked();
+		void xmimsim_child_watcher(GPid pid, int child_status);
+		bool xmimsim_stdout_watcher(Glib::IOCondition cond);
+		bool xmimsim_stderr_watcher(Glib::IOCondition cond);
+		bool xmimsim_iochannel_watcher(Glib::IOCondition cond, Glib::RefPtr<Glib::IOChannel> iochannel);
+		void xmimsim_start_recursive();
+		string get_elapsed_time() {
+			if (!timer)
+				return string("timer error");
+
+			long time_elapsed = (long) timer->elapsed();
+			long hours = time_elapsed / 3600;
+			time_elapsed = time_elapsed % 3600;
+			long minutes = time_elapsed / 60;
+			long seconds = time_elapsed % 60;
+			stringstream ss;
+			ss.fill('0');
+			ss << setw(2) << hours << ":" << setw(2) << minutes << ":" << setw(2) << seconds << " ";
+			string rv = ss.str();
+			return rv; 
+		}
+		void update_console(string line, string tag="");
 };
 
 

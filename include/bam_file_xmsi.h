@@ -28,6 +28,9 @@ namespace BAM {
 						free(input->general->outputfile);
 					input->general->outputfile = (char *) xmi_memdup(file.c_str(), sizeof(char)*(file.length()+1));
 				}
+				string GetOutputFile() {
+					return string(input->general->outputfile);
+				}
 				//copy constructor
 				XMSI(const XMSI &xmsi) : File(xmsi.filename) {
 					xmi_copy_input(xmsi.input, &input);

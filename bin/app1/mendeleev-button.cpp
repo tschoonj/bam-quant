@@ -19,6 +19,7 @@ MendeleevButton::MendeleevButton(int Z) : Z(Z), element(AtomicNumberToSymbol(Z))
 	              &MendeleevButton::on_button_clicked) );
 	asr_file = 0;
 	xmsi_file = 0;
+	xmso_file = 0;
 }
 
 MendeleevButton::~MendeleevButton() {
@@ -27,6 +28,8 @@ MendeleevButton::~MendeleevButton() {
 		delete asr_file;
 	if (xmsi_file)
 		delete xmsi_file;
+	if (xmso_file)
+		delete xmso_file;
 }
 
 void MendeleevButton::reset_button() {
@@ -37,6 +40,10 @@ void MendeleevButton::reset_button() {
 	if (xmsi_file) {
 		delete xmsi_file;
 		xmsi_file = 0;
+	}
+	if (xmso_file) {
+		delete xmso_file;
+		xmso_file = 0;
 	}
 
 	Glib::RefPtr<Gtk::StyleContext> csscontext = get_style_context();
