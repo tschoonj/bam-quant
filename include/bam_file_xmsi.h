@@ -7,7 +7,15 @@
 #include <iostream>
 #include <cstdlib>
 
+//class BAM::Data::XMSI::Composition;
+
 namespace BAM {
+	namespace Data {
+		namespace XMSI {
+			//forward declaration
+			class Composition;
+		}
+	}
 	namespace File {
 		class XMSI : public File {
 			private:

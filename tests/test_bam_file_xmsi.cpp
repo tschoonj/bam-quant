@@ -23,15 +23,20 @@ int main(int argc, char *argv[]) {
 	BAM::Data::XMSI::Composition *composition;
 
 	try {
+		composition = new BAM::Data::XMSI::Composition();
+		layer = new BAM::Data::XMSI::Layer("Air, Dry (near sea level)", 5.0);
+		composition->AddLayer(*layer);
+		delete layer;
+
 		layer = new BAM::Data::XMSI::Layer(2.0, 0.5);
 		layer->AddElement(26, 70.0);
 		layer->AddElement(24, 18.0);
 		layer->AddElement(28, 12.0);
-		composition = new BAM::Data::XMSI::Composition();
 		composition->AddLayer(*layer);
-		composition->SetReferenceLayer(1);
-		xmsi_file->ReplaceComposition(*composition);
 		delete layer;
+
+		composition->SetReferenceLayer(2);
+		xmsi_file->ReplaceComposition(*composition);
 		delete composition;
 	}
 	catch (BAM::Exception &e) {
