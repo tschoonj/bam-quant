@@ -19,7 +19,7 @@ test_bam_file_xmso_CPPFLAGS = -DTEST_FILE_XMSO=\"$(srcdir)/In.xmso\" $(AM_CPPFLA
 
 TESTS = $(check_PROGRAMS)
 
-EXTRA_DIST = In.xmsi std20keV
+EXTRA_DIST = In.xmsi std20kev In.xmso
 
 clean-local:
 	rm -rf In_copy.xmsi

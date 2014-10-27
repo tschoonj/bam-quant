@@ -12,6 +12,14 @@
 #include <iomanip>
 #include <iostream>
 #include "window.h"
+#include <glib.h>
+#ifdef G_OS_UNIX
+	#include <sys/types.h>
+	#include <sys/wait.h>
+	#include <signal.h>
+#elif defined(G_OS_WIN32)
+	#include <windows.h>
+#endif
 
 class XmiMsimDialog : public Gtk::Dialog {
 	private:
@@ -53,6 +61,20 @@ class XmiMsimDialog : public Gtk::Dialog {
 		~XmiMsimDialog() {
 			if (timer)
 				delete timer;
+			if (xmimsim_pid) {
+				//a process is still running!
+#ifdef G_OS_UNIX
+				int kill_rv;
+				kill_rv = kill((pid_t) xmimsim_pid, SIGTERM);
+#if !GLIB_CHECK_VERSION (2, 35, 0)
+				waitpid(xmimsim_pid, NULL, WNOHANG);
+#endif
+#elif defined(G_OS_WIN32)
+				BOOL terminate_rv;
+				terminate_rv = TerminateProcess((HANDLE) xmimsim_pid, (UINT) 1);
+#endif
+
+			}
 		}
 		void on_play_clicked();
 		void on_pause_clicked();

@@ -28,7 +28,8 @@ XmiMsimDialog::XmiMsimDialog(Window &window, bool modal, std::vector<MendeleevBu
 	{
 
 	timer = 0;
-	add_button("Ok", Gtk::RESPONSE_OK);
+	add_button("Close", Gtk::RESPONSE_OK);
+	set_response_sensitive(Gtk::RESPONSE_OK, false);
 	pauseButton.set_image_from_icon_name("gtk-media-pause", Gtk::ICON_SIZE_DIALOG);	
 	stopButton.set_image_from_icon_name("gtk-media-stop", Gtk::ICON_SIZE_DIALOG);	
 	playButton.set_image_from_icon_name("gtk-media-play", Gtk::ICON_SIZE_DIALOG);	
@@ -222,11 +223,17 @@ void XmiMsimDialog::on_stop_clicked() {
 	}
 #endif
 
+	set_response_sensitive(Gtk::RESPONSE_OK, true);
 	return;
 }
 
 void XmiMsimDialog::xmimsim_start_recursive() {
 	int out_fh, err_fh;
+
+
+	//let's start work with a nap!
+	g_usleep(G_USEC_PER_SEC/2);
+
 
 	MendeleevButton *myButton = buttonVector[buttonIndex];
 
@@ -256,7 +263,7 @@ void XmiMsimDialog::xmimsim_start_recursive() {
 	
 
 	ss.str("");
-	ss << get_elapsed_time() << argv.back() << "was started with process id " << real_xmimsim_pid << std::endl;
+	ss << get_elapsed_time() << argv.back() << " was started with process id " << real_xmimsim_pid << std::endl;
 	update_console(ss.str());
 
 	xmimsim_paused = false;
@@ -266,13 +273,13 @@ void XmiMsimDialog::xmimsim_start_recursive() {
 	xmimsim_stderr = Glib::IOChannel::create_from_fd(err_fh);
 	xmimsim_stdout = Glib::IOChannel::create_from_fd(out_fh);
 
-	//xmimsim_stderr->set_close_on_unref(true);
-	//xmimsim_stdout->set_close_on_unref(true);
+	xmimsim_stderr->set_close_on_unref(true);
+	xmimsim_stdout->set_close_on_unref(true);
 
 	//add watchers
 	Glib::signal_child_watch().connect(sigc::mem_fun(*this, &XmiMsimDialog::xmimsim_child_watcher), xmimsim_pid);
-	Glib::signal_io().connect(sigc::mem_fun(*this, &XmiMsimDialog::xmimsim_stdout_watcher), xmimsim_stdout,Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL); 
-	Glib::signal_io().connect(sigc::mem_fun(*this, &XmiMsimDialog::xmimsim_stderr_watcher), xmimsim_stderr,Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL); 
+	Glib::signal_io().connect(sigc::mem_fun(*this, &XmiMsimDialog::xmimsim_stdout_watcher), xmimsim_stdout,Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
+	Glib::signal_io().connect(sigc::mem_fun(*this, &XmiMsimDialog::xmimsim_stderr_watcher), xmimsim_stderr,Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
 
 
 
@@ -348,6 +355,7 @@ void XmiMsimDialog::xmimsim_child_watcher(GPid pid, int status) {
 		playButton.set_sensitive(false);
 		stopButton.set_sensitive(false);
 		pauseButton.set_sensitive(false);
+		set_response_sensitive(Gtk::RESPONSE_OK, true);
 	}
 	else if (++buttonIndex == buttonVector.size()) {
 		//last simulation
@@ -368,6 +376,7 @@ void XmiMsimDialog::xmimsim_child_watcher(GPid pid, int status) {
 		playButton.set_sensitive(false);
 		stopButton.set_sensitive(false);
 		pauseButton.set_sensitive(false);
+		set_response_sensitive(Gtk::RESPONSE_OK, true);
 		xmimsim_pid = 0;
 		//delete temparary XMI-MSIM files
 		//g_unlink(buttonVector[buttonIndex-1]->xmsi_file->GetOutputFile().c_str());
@@ -417,6 +426,7 @@ bool XmiMsimDialog::xmimsim_iochannel_watcher(Glib::IOCondition condition, Glib:
 				stringstream ss;
 				ss << get_elapsed_time() << pipe_string;
 				update_console(ss.str());
+				std::cout << pipe_string;
 			}
 			else
 				return false;

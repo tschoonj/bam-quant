@@ -25,6 +25,7 @@ class Window: public Gtk::ApplicationWindow {
 		std::map<int, MendeleevButton*> buttonMap;
 		void new_project();
 		void reset_project();
+		MendeleevButton *refButton;
 
 };
 

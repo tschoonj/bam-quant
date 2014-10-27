@@ -213,11 +213,16 @@ void Window::new_project() {
 		buttonMap[i]->xmsi_file = new BAM::File::XMSI(*xmsi_file);
 		
 		//now change its composition
-		BAM::Data::XMSI::Layer layer(ElementDensity(buttonMap[i]->GetZ()), 5.0);
-		layer.AddElement(buttonMap[i]->GetZ(), 1.0);
 		BAM::Data::XMSI::Composition composition;
-		composition.AddLayer(layer);
-		composition.SetReferenceLayer(1);
+
+		BAM::Data::XMSI::Layer layer1("Air, Dry (near sea level)", 5.0);
+		composition.AddLayer(layer1);
+
+		BAM::Data::XMSI::Layer layer2(ElementDensity(buttonMap[i]->GetZ()), 5.0);
+		layer2.AddElement(buttonMap[i]->GetZ(), 1.0);
+		composition.AddLayer(layer2);
+
+		composition.SetReferenceLayer(2);
 		buttonMap[i]->xmsi_file->ReplaceComposition(composition);
 		string temp_xmso_filename = buttonMap[i]->temp_xmsi_filename;
 		temp_xmso_filename.replace(temp_xmso_filename.end()-1,temp_xmso_filename.end(), "o");
@@ -232,7 +237,7 @@ void Window::new_project() {
 	//now launch the XMI-MSIM dialog
 	XmiMsimDialog *xmi_msim_dialog = new XmiMsimDialog(*this, true, buttonVector);
 	try {
-		xmi_msim_dialog->run();
+		result = xmi_msim_dialog->run();
 	}
 	catch (BAM::Exception &e) {
 		delete xmi_msim_dialog;
@@ -245,6 +250,12 @@ void Window::new_project() {
 		reset_project();
 		return;
 	}
+	if (result == Gtk::RESPONSE_DELETE_EVENT) {
+		//delete event caught
+		delete xmi_msim_dialog;
+		reset_project();
+		return;
+	}
 	delete xmi_msim_dialog;
 }
 
@@ -252,4 +263,5 @@ void Window::reset_project() {
 	for (std::map<int, MendeleevButton*>::iterator it = buttonMap.begin(); it != buttonMap.end(); ++it) {
 		(it->second)->reset_button();
 	}
+	refButton = 0;
 }
