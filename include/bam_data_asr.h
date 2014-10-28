@@ -13,10 +13,10 @@ namespace BAM {
 				double counts;
 				double stddev;
 				double chi;
-				double bg;
+				//double bg;
 			public:
-				ASR(int Z, int line, double counts, double stddev, double chi, double bg) :
-					Z(Z), line(line), counts(counts), stddev(stddev), chi(chi), bg(bg) {}
+				ASR(int Z, int line, double counts, double stddev, double chi/*, double bg*/) :
+					Z(Z), line(line), counts(counts), stddev(stddev), chi(chi)/*, bg(bg)*/ {}
 				int GetZ() {
 					return Z;
 				}
@@ -32,9 +32,9 @@ namespace BAM {
 				double GetChi() {
 					return chi;
 				}
-				double GetBG() {
+				/*double GetBG() {
 					return bg;
-				}
+				}*/
 		};
 	}
 }

@@ -27,6 +27,9 @@ namespace BAM {
 					}			
 					return data_asr[i];
 				}
+				double GetNormfactor() {
+					return normfactor;
+				}
 		};
 	}
 }

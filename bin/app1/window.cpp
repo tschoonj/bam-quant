@@ -1,5 +1,7 @@
 #include "window.h"
 #include <gtkmm/filechooser.h>
+#include <gtkmm/label.h>
+#include <gtkmm/comboboxtext.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/stylecontext.h>
@@ -11,6 +13,8 @@
 Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
 	//menu signals
 	add_action("new", sigc::mem_fun(*this, &Window::new_project));
+	settings_action = add_action("settings", sigc::mem_fun(*this, &Window::settings));
+	settings_action->set_enabled(false);
 
 	set_title("app1");
 	set_size_request(400, 200);
@@ -114,6 +118,7 @@ void Window::new_project() {
 
 	for (std::vector<std::string>::iterator it = filenames.begin() ; it != filenames.end() ; ++it)  {
 		std::cout << "Selected file: " << *it << std::endl;
+
 		BAM::File::ASR *asr_file;
 		try {
 			asr_file = new BAM::File::ASR(*it);
@@ -156,12 +161,22 @@ void Window::new_project() {
 			return;
 		}
 		buttonMap[Z]->asr_file = asr_file;
+		if (asr_data.GetLine() == KA_LINE) {
+			buttonMap[Z]->asr_counts_KA = asr_data.GetCounts();
+		}
+		else if (asr_data.GetLine() == LA_LINE) {
+			buttonMap[Z]->asr_counts_LA = asr_data.GetCounts();
+		}
 		buttonVector.push_back(buttonMap[Z]);
+
 		//change color of element
 		//buttonMap[Z]->override_background_color(Gdk::RGBA("Chartreuse"));
 		Glib::RefPtr<Gtk::StyleContext> csscontext = buttonMap[Z]->get_style_context();
 		csscontext->add_provider(cssprovider, 600);
 			
+		if (it == filenames.begin())
+			refButton = buttonMap[Z];
+
 
 	}
 
@@ -256,7 +271,47 @@ void Window::new_project() {
 		reset_project();
 		return;
 	}
+	else {
+		//check if simulation was not stopped
+		for (std::vector<MendeleevButton *>::iterator it = buttonVector.begin() ; it != buttonVector.end(); ++it) {
+			if ((*it)->asr_file && !(*it)->xmso_file) {
+				delete xmi_msim_dialog;
+				reset_project();
+				return;
+			}
+		}
+	}
 	delete xmi_msim_dialog;
+
+	//let's calculate the normalization factor
+	for (std::vector<MendeleevButton *>::iterator it = buttonVector.begin() ; it != buttonVector.end(); ++it) {
+		cout << "asr_counts_KA: " << (*it)->asr_counts_KA << endl;
+		cout << "asr_counts_LA: " << (*it)->asr_counts_LA << endl;
+		cout << "xmso_counts_KA: " << (*it)->xmso_counts_KA << endl;
+		cout << "xmso_counts_LA: " << (*it)->xmso_counts_LA << endl;
+		if ((*it)->asr_counts_KA > 0 && (*it)->xmso_counts_KA > 0) {
+			(*it)->phi = (*it)->asr_counts_KA * (*it)->asr_file->GetNormfactor() / refButton->asr_file->GetNormfactor() / (*it)->xmso_counts_KA;
+		}
+		else if((*it)->asr_counts_LA > 0 && (*it)->xmso_counts_LA > 0) {
+			(*it)->phi = (*it)->asr_counts_LA * (*it)->asr_file->GetNormfactor() / refButton->asr_file->GetNormfactor() / (*it)->xmso_counts_LA;
+		}
+		else {
+			Gtk::MessageDialog dialog(*this, string("Error detected while calculating phi for ")+(*it)->GetElement(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+  			dialog.run();
+			dialog.hide();
+			//reset everything in window!
+			reset_project();
+			return;
+		}
+		phi += (*it)->phi;
+		cout << "Phi for element " << (*it)->GetElement() << ": " << (*it)->phi << endl;
+	}
+	phi /= buttonVector.size();
+	cout << "Average phi: " << phi << endl;
+
+	//update menu
+	settings_action->set_enabled();
+	
 }
 
 void Window::reset_project() {
@@ -264,4 +319,46 @@ void Window::reset_project() {
 		(it->second)->reset_button();
 	}
 	refButton = 0;
+	phi = 0;
+	settings_action->set_enabled(false);
+}
+
+void Window::settings() {
+	cout << "Settings activated" << endl;
+
+	Gtk::Dialog dialog("Settings panel", *this, true);
+	dialog.add_button("Apply", Gtk::RESPONSE_OK);
+
+	Gtk::Box hbox(Gtk::ORIENTATION_HORIZONTAL);
+	Gtk::Label label("Reference element");
+	hbox.pack_start(label, false, false, 3);
+	Gtk::ComboBoxText combo;
+	
+	int counter = 0;
+	for (int Z = 1 ; Z <= 94 ; Z++) {
+		if (buttonMap[Z]->asr_file) {
+			combo.append(buttonMap[Z]->GetElement());
+			if (buttonMap[Z] == refButton) {
+				combo.set_active(counter);
+			}
+			counter++;
+		}
+	}
+	hbox.pack_end(combo, false, false, 3);
+
+	dialog.get_content_area()->pack_start(hbox, true, true, 3);
+	dialog.show_all_children();
+
+	int result = dialog.run();
+	if (result == Gtk::RESPONSE_OK) {
+		//update refButton
+		Glib::ustring selected = combo.get_active_text();
+		for (int Z = 1 ; Z <= 94 ; Z++) {
+			if (buttonMap[Z]->asr_file && buttonMap[Z]->GetElement() == selected) {
+				refButton = buttonMap[Z];
+				break;
+			}
+		}
+	}
+	dialog.hide();
 }

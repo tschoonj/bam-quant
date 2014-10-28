@@ -63,11 +63,12 @@ void ASR::Parse() {
 			double counts;
 			double stddev;
 			double chi;
-			double bg;
+			//double bg;
+			double energy;
 		
 			stringstream ss;
 			ss << line;
-			ss >> Z >> elem_line >> counts >> stddev >> chi >> bg;
+			ss >> Z >> elem_line >> energy >> counts >> stddev >> chi/* >> bg*/;
 			//switch to xraylib's lines
 			
 			if (elem_line == 1) {
@@ -79,7 +80,7 @@ void ASR::Parse() {
 			else {
 				throw BAM::Exception("BAM::File::ASR::Parse -> Invalid line identifier found");
 			}
-			data_asr.push_back(Data::ASR(Z, elem_line, counts, stddev, chi, bg));
+			data_asr.push_back(Data::ASR(Z, elem_line, counts, stddev, chi));
 		}
 	}
 

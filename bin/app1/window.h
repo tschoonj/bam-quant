@@ -7,6 +7,7 @@
 #include <gtkmm/grid.h>
 #include <gtkmm/box.h>
 #include <gtkmm/cssprovider.h>
+#include <giomm/simpleaction.h>
 
 class Window: public Gtk::ApplicationWindow {
 
@@ -24,8 +25,11 @@ class Window: public Gtk::ApplicationWindow {
 		Gtk::Grid buttonGrid;
 		std::map<int, MendeleevButton*> buttonMap;
 		void new_project();
+		void settings();
 		void reset_project();
 		MendeleevButton *refButton;
+		Glib::RefPtr<Gio::SimpleAction> settings_action;
+		double phi; //average value
 
 };
 

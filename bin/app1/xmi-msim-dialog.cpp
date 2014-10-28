@@ -18,6 +18,7 @@
 	static pNtResumeProcess NtResumeProcess = NULL;
 #endif
 
+
 XmiMsimDialog::XmiMsimDialog(Window &window, bool modal, std::vector<MendeleevButton*> &buttonVector) : 
 	Gtk::Dialog(Glib::ustring("XMI-MSIM control panel"), window, modal),
 	xmimsim_paused(false),
@@ -367,7 +368,24 @@ void XmiMsimDialog::xmimsim_child_watcher(GPid pid, int status) {
 			throw BAM::Exception("XmiMsimDialog::xmimsim_start_recursive -> Could not read XMSO file");
 		}
 		buttonVector[buttonIndex-1]->xmso_file = xmso_file;
-			
+
+		try {
+			buttonVector[buttonIndex-1]->xmso_counts_KA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "KL2");
+		}
+		catch (BAM::Exception &e) { /*ignore*/}
+		try {
+			buttonVector[buttonIndex-1]->xmso_counts_KA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "KL3");
+		}
+		catch (BAM::Exception &e) { /*ignore*/}
+		try {
+			buttonVector[buttonIndex-1]->xmso_counts_LA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "L3M4");
+		}
+		catch (BAM::Exception &e) { /*ignore*/}
+		try {
+			buttonVector[buttonIndex-1]->xmso_counts_LA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "L3M5");
+		}
+		catch (BAM::Exception &e) { /*ignore*/}
+
 		stringstream ss;
 		ss << buttonIndex-1;
 		Gtk::TreeModel::iterator iter = model->get_iter(ss.str());
@@ -392,6 +410,23 @@ void XmiMsimDialog::xmimsim_child_watcher(GPid pid, int status) {
 		}
 		buttonVector[buttonIndex-1]->xmso_file = xmso_file;
 			
+		try {
+			buttonVector[buttonIndex-1]->xmso_counts_KA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "KL2");
+		}
+		catch (BAM::Exception &e) { /*ignore*/}
+		try {
+			buttonVector[buttonIndex-1]->xmso_counts_KA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "KL3");
+		}
+		catch (BAM::Exception &e) { /*ignore*/}
+		try {
+			buttonVector[buttonIndex-1]->xmso_counts_LA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "L3M4");
+		}
+		catch (BAM::Exception &e) { /*ignore*/}
+		try {
+			buttonVector[buttonIndex-1]->xmso_counts_LA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "L3M5");
+		}
+		catch (BAM::Exception &e) { /*ignore*/}
+
 		stringstream ss;
 		ss << buttonIndex-1;
 		Gtk::TreeModel::iterator iter = model->get_iter(ss.str());
