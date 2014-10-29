@@ -28,11 +28,11 @@ void MendeleevButton::on_button_clicked() {
 			stringstream ss;
 			if (asr_counts_KA > 0) {
 				ss << "Kα: ";
-				ss << asr_counts_KA * asr_file->GetNormfactor() / (dynamic_cast<Window*>(get_toplevel()))->refButton->asr_file->GetNormfactor();
+				ss << asr_counts_KA * asr_file->GetNormfactor() / ASR_SCALE_FACTOR;
 			}
 			else {
 				ss << "Lα: ";
-				ss << asr_counts_LA * asr_file->GetNormfactor() / (dynamic_cast<Window*>(get_toplevel()))->refButton->asr_file->GetNormfactor();
+				ss << asr_counts_LA * asr_file->GetNormfactor() / ASR_SCALE_FACTOR;
 			}
 			string label_text;
 			ss >> label_text;

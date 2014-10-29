@@ -10,13 +10,16 @@
 #include "xmi-msim-dialog.h"
 
 
+
+
 Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
 	xmi_msim_dialog = 0;
 
 	//menu signals
 	add_action("new", sigc::mem_fun(*this, &Window::new_project));
-	settings_action = add_action("settings", sigc::mem_fun(*this, &Window::settings));
+	/*settings_action = add_action("settings", sigc::mem_fun(*this, &Window::settings));
 	settings_action->set_enabled(false);
+	*/
 
 	set_title("app1");
 	set_size_request(400, 200);
@@ -175,8 +178,8 @@ void Window::new_project() {
 		Glib::RefPtr<Gtk::StyleContext> csscontext = buttonMap[Z]->get_style_context();
 		csscontext->add_provider(cssprovider, 600);
 			
-		if (it == filenames.begin())
-			refButton = buttonMap[Z];
+		/*if (it == filenames.begin())
+			refButton = buttonMap[Z];*/
 
 
 	}
@@ -289,7 +292,7 @@ void Window::new_project() {
 	update_phis();
 
 	//update menu
-	settings_action->set_enabled();
+	//settings_action->set_enabled();
 	
 }
 
@@ -301,10 +304,10 @@ void Window::update_phis() {
 		cout << "xmso_counts_KA: " << (*it)->xmso_counts_KA << endl;
 		cout << "xmso_counts_LA: " << (*it)->xmso_counts_LA << endl;
 		if ((*it)->asr_counts_KA > 0 && (*it)->xmso_counts_KA > 0) {
-			(*it)->phi = (*it)->asr_counts_KA * (*it)->asr_file->GetNormfactor() / refButton->asr_file->GetNormfactor() / (*it)->xmso_counts_KA;
+			(*it)->phi = (*it)->asr_counts_KA * (*it)->asr_file->GetNormfactor() / ASR_SCALE_FACTOR / (*it)->xmso_counts_KA;
 		}
 		else if((*it)->asr_counts_LA > 0 && (*it)->xmso_counts_LA > 0) {
-			(*it)->phi = (*it)->asr_counts_LA * (*it)->asr_file->GetNormfactor() / refButton->asr_file->GetNormfactor() / (*it)->xmso_counts_LA;
+			(*it)->phi = (*it)->asr_counts_LA * (*it)->asr_file->GetNormfactor() / ASR_SCALE_FACTOR / (*it)->xmso_counts_LA;
 		}
 		else {
 			Gtk::MessageDialog dialog(*this, string("Error detected while calculating phi for ")+(*it)->GetElement(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
@@ -322,16 +325,17 @@ void Window::update_phis() {
 
 }
 
+
 void Window::reset_project() {
 	for (std::map<int, MendeleevButton*>::iterator it = buttonMap.begin(); it != buttonMap.end(); ++it) {
 		(it->second)->reset_button();
 	}
-	refButton = 0;
 	phi = 0;
-	settings_action->set_enabled(false);
+	//settings_action->set_enabled(false);
 	buttonVector.clear();
 }
 
+/*
 void Window::settings() {
 	cout << "Settings activated" << endl;
 
@@ -371,4 +375,4 @@ void Window::settings() {
 	}
 	dialog.hide();
 	update_phis();
-}
+}*/

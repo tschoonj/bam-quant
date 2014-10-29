@@ -10,6 +10,8 @@
 #include <giomm/simpleaction.h>
 #include "xmi-msim-dialog.h"
 
+#define ASR_SCALE_FACTOR 1E9
+
 class XmiMsimDialog;
 
 class Window: public Gtk::ApplicationWindow {
@@ -21,7 +23,7 @@ class Window: public Gtk::ApplicationWindow {
 	   			delete it->second;
 		}
 		Glib::RefPtr<Gtk::CssProvider> cssprovider;
-		MendeleevButton *refButton;
+		//MendeleevButton *refButton;
 		double GetPhi() {return phi;}
 		XmiMsimDialog *xmi_msim_dialog;
 
@@ -31,7 +33,7 @@ class Window: public Gtk::ApplicationWindow {
 		Gtk::Grid buttonGrid;
 		std::map<int, MendeleevButton*> buttonMap; //all buttons!
 		void new_project();
-		void settings();
+		//void settings();
 		void reset_project();
 		void update_phis();
 		Glib::RefPtr<Gio::SimpleAction> settings_action;
