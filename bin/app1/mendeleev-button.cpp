@@ -22,25 +22,48 @@ void MendeleevButton::on_button_clicked() {
 		//label->show();
 		Gtk::Box *box = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
 		Gtk::Label *label = Gtk::manage(new Gtk::Label("", Gtk::ALIGN_START));
-		label->set_markup("<big>ASR counts</big>");
+		label->set_markup("<b><big>ASR counts</big></b>");
 		box->pack_start(*label, false, false, 5);
 		if (asr_file) {
-			BAM::Data::ASR asr_data = asr_file->GetData(0);
 			stringstream ss;
-			if (asr_data.GetLine() == KA_LINE) {
+			if (asr_counts_KA > 0) {
 				ss << "Kα: ";
+				ss << asr_counts_KA * asr_file->GetNormfactor() / (dynamic_cast<Window*>(get_toplevel()))->refButton->asr_file->GetNormfactor();
 			}
 			else {
 				ss << "Lα: ";
+				ss << asr_counts_LA * asr_file->GetNormfactor() / (dynamic_cast<Window*>(get_toplevel()))->refButton->asr_file->GetNormfactor();
 			}
-			ss << asr_data.GetCounts(); 
 			string label_text;
 			ss >> label_text;
 			label = Gtk::manage(new Gtk::Label(ss.str(), Gtk::ALIGN_START));
 		}
 		else {
-			label = Gtk::manage(new Gtk::Label("No data", Gtk::ALIGN_START));
+			label = Gtk::manage(new Gtk::Label("Not available", Gtk::ALIGN_START));
 		}
+		box->pack_start(*label, false, false, 5);
+
+		label = Gtk::manage(new Gtk::Label("", Gtk::ALIGN_START));
+		label->set_markup("<b><big>XMSO counts</big></b>");
+		box->pack_start(*label, false, false, 5);
+		if (xmso_file) {
+			stringstream ss;
+			if (asr_counts_KA > 0) {
+				ss << "Kα: ";
+				ss << xmso_counts_KA * (dynamic_cast<Window*>(get_toplevel()))->GetPhi();
+			}
+			else {
+				ss << "Lα: ";
+				ss << xmso_counts_LA * (dynamic_cast<Window*>(get_toplevel()))->GetPhi();
+			}
+			string label_text;
+			ss >> label_text;
+			label = Gtk::manage(new Gtk::Label(ss.str(), Gtk::ALIGN_START));
+		}
+		else {
+			label = Gtk::manage(new Gtk::Label("Not available", Gtk::ALIGN_START));
+		}
+
 		box->pack_start(*label, false, false, 5);
 		popover.add(*box);
 		box->show_all();

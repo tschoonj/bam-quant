@@ -11,6 +11,8 @@
 
 
 Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
+	xmi_msim_dialog = 0;
+
 	//menu signals
 	add_action("new", sigc::mem_fun(*this, &Window::new_project));
 	settings_action = add_action("settings", sigc::mem_fun(*this, &Window::settings));
@@ -114,7 +116,6 @@ void Window::new_project() {
 
 	delete dialog;
 
-	std::vector<MendeleevButton*> buttonVector;
 
 	for (std::vector<std::string>::iterator it = filenames.begin() ; it != filenames.end() ; ++it)  {
 		std::cout << "Selected file: " << *it << std::endl;
@@ -250,7 +251,7 @@ void Window::new_project() {
 	delete xmsi_file;
 
 	//now launch the XMI-MSIM dialog
-	XmiMsimDialog *xmi_msim_dialog = new XmiMsimDialog(*this, true, buttonVector);
+	xmi_msim_dialog = new XmiMsimDialog(*this, true, buttonVector);
 	try {
 		result = xmi_msim_dialog->run();
 	}
@@ -262,12 +263,14 @@ void Window::new_project() {
   		dialog.set_secondary_text(error_message);
   		dialog.run();
 		//reset everything in window!
+		xmi_msim_dialog = 0;
 		reset_project();
 		return;
 	}
 	if (result == Gtk::RESPONSE_DELETE_EVENT) {
 		//delete event caught
 		delete xmi_msim_dialog;
+		xmi_msim_dialog = 0;
 		reset_project();
 		return;
 	}
@@ -283,6 +286,14 @@ void Window::new_project() {
 	}
 	delete xmi_msim_dialog;
 
+	update_phis();
+
+	//update menu
+	settings_action->set_enabled();
+	
+}
+
+void Window::update_phis() {
 	//let's calculate the normalization factor
 	for (std::vector<MendeleevButton *>::iterator it = buttonVector.begin() ; it != buttonVector.end(); ++it) {
 		cout << "asr_counts_KA: " << (*it)->asr_counts_KA << endl;
@@ -309,9 +320,6 @@ void Window::new_project() {
 	phi /= buttonVector.size();
 	cout << "Average phi: " << phi << endl;
 
-	//update menu
-	settings_action->set_enabled();
-	
 }
 
 void Window::reset_project() {
@@ -321,6 +329,7 @@ void Window::reset_project() {
 	refButton = 0;
 	phi = 0;
 	settings_action->set_enabled(false);
+	buttonVector.clear();
 }
 
 void Window::settings() {
@@ -361,4 +370,5 @@ void Window::settings() {
 		}
 	}
 	dialog.hide();
+	update_phis();
 }
