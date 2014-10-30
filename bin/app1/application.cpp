@@ -62,12 +62,19 @@ void Application::load_ui() {
 	//menu bar -> with actual coding!
 	Glib::RefPtr<Gio::Menu> win_menu = Gio::Menu::create();
 	Glib::RefPtr<Gio::Menu> submenu_file = Gio::Menu::create();
+
 	Glib::RefPtr<Gio::MenuItem> item = Gio::MenuItem::create("_New project", "win.new");
 	item->set_attribute_value("accel", Glib::Variant<Glib::ustring>::create("<Primary>n"));
 	submenu_file->append_item(item);
+
+	item = Gio::MenuItem::create("_Open project", "win.open");
+	item->set_attribute_value("accel", Glib::Variant<Glib::ustring>::create("<Primary>o"));
+	submenu_file->append_item(item);
+
 	item = Gio::MenuItem::create("_Save project", "win.save");
 	item->set_attribute_value("accel", Glib::Variant<Glib::ustring>::create("<Primary>s"));
 	submenu_file->append_item(item);
+
 	win_menu->append_submenu("File", submenu_file);
 
 	/*Glib::RefPtr<Gio::Menu> submenu_options = Gio::Menu::create();

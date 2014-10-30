@@ -7,7 +7,7 @@ bam-quant-cat.xml:
 	$(XMLCATALOG) --noout --create bam-quant-cat.xml 
 	$(XMLCATALOG) --noout --add rewriteURI \
 	"http://www.bam.de/xml/" \
-	"file:///$(xmimsimdir)/" bam-quant-cat.xml
+	"file:///$(bamdir)/" bam-quant-cat.xml
 
 clean-local:
 	rm -rf bam-quant-cat.xml

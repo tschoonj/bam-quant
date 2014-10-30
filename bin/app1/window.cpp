@@ -10,8 +10,10 @@
 #include "xmi-msim-dialog.h"
 #include <libxml++/libxml++.h>
 #include <libxml/xmlwriter.h>
+#include <libxml/catalog.h>
 
 
+bool Window::bam_catalog_loaded = false;
 
 
 Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
@@ -19,6 +21,7 @@ Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
 
 	//menu signals
 	add_action("new", sigc::mem_fun(*this, &Window::new_project));
+	add_action("open", sigc::mem_fun(*this, &Window::open_project));
 	save_action = add_action("save", sigc::mem_fun(*this, &Window::save_project));
 	/*settings_action = add_action("settings", sigc::mem_fun(*this, &Window::settings));
 	settings_action->set_enabled(false);
@@ -208,6 +211,7 @@ void Window::new_project() {
 		case(Gtk::RESPONSE_CANCEL):
 		default:
 			delete dialog;
+			reset_project();
 			return;
 	}
 
@@ -438,7 +442,7 @@ void Window::save_project() {
 					ss << it->second->asr_counts_KA;
 				else
 					ss << it->second->asr_counts_LA;
-				xmlpp::Element *counts = asrfile->add_child("counts");
+				xmlpp::Element *counts = asrfile->add_child("axil_counts");
 				counts->add_child_text(ss.str());
 				ss.str("");
 				ss.clear();
@@ -473,3 +477,63 @@ void Window::save_project() {
 	return;
 }
 
+void Window::open_project() {
+	//fire up a filechooserdialog
+	Gtk::FileChooserDialog *dialog = new Gtk::FileChooserDialog(*this, "Please select a BAM-QUANT project 1 file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+	Glib::RefPtr<Gtk::FileFilter> filter_bqp1 = Gtk::FileFilter::create();
+	filter_bqp1->set_name("BAM-QUANT project 1 files");
+	filter_bqp1->add_pattern("*.bqp1");
+	filter_bqp1->add_pattern("*.BQP1");
+	dialog->add_filter(filter_bqp1);
+	dialog->add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+	dialog->add_button("Select", Gtk::RESPONSE_OK);
+	
+	int result = dialog->run();
+	string filename;
+	switch(result) {
+		case(Gtk::RESPONSE_OK):
+			filename = dialog->get_filename();
+			std::cout << "Open clicked: " << filename << std::endl;
+      			break;
+		case(Gtk::RESPONSE_CANCEL):
+		default:
+			delete dialog;
+			return;
+	}
+	delete dialog;
+
+	reset_project();
+
+	//load our catalog file
+	if (!bam_catalog_loaded) {
+		if (xmlLoadCatalog(BAM_CATALOG) != 0) {
+			std::cerr << "Could not load catalog: " << BAM_CATALOG << std::endl;
+			return;
+		}
+		else
+			bam_catalog_loaded = true;
+	}
+	if (xmi_xmlLoadCatalog() == 0) {
+		std::cerr << "Could not load XMI-MSIM XML catalog" << std::endl;
+	}
+	try {
+		xmlpp::DomParser parser;
+		parser.set_validate();
+		parser.parse_file(filename);
+
+	}
+	catch (const std::exception &e) {
+		std::cerr << "Error message while parsing: " << e.what();
+		return;
+	} 
+	catch (xmlpp::validity_error &e) {
+		std::cerr << "Error message while checking document validity: " << e.what();
+		return;
+	} 
+	catch (...) {
+		std::cerr << "Some other exception caught";
+		return;
+	}
+	
+
+}

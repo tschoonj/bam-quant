@@ -9,5 +9,6 @@
 <!ATTLIST element_data datatype (experimental|interpolated) #REQUIRED> 
 <!ATTLIST element_data element CDATA #REQUIRED> 
 <!ATTLIST element_data linetype (KA_LINE|LA_LINE) #REQUIRED> 
-<!ELEMENT asrfile (counts, normfactor)>
+<!ELEMENT asrfile (axil_counts, normfactor)>
 <!ELEMENT normfactor (#PCDATA)>
+<!ELEMENT axil_counts (#PCDATA)>
