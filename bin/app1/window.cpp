@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <glibmm/miscutils.h>
 #include "xmi-msim-dialog.h"
+#include <libxml++/libxml++.h>
+#include <libxml/xmlwriter.h>
 
 
 
@@ -17,9 +19,11 @@ Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
 
 	//menu signals
 	add_action("new", sigc::mem_fun(*this, &Window::new_project));
+	save_action = add_action("save", sigc::mem_fun(*this, &Window::save_project));
 	/*settings_action = add_action("settings", sigc::mem_fun(*this, &Window::settings));
 	settings_action->set_enabled(false);
 	*/
+	save_action->set_enabled(false);
 
 	set_title("app1");
 	set_size_request(400, 200);
@@ -293,6 +297,7 @@ void Window::new_project() {
 
 	//update menu
 	//settings_action->set_enabled();
+	save_action->set_enabled();
 	
 }
 
@@ -332,6 +337,7 @@ void Window::reset_project() {
 	}
 	phi = 0;
 	//settings_action->set_enabled(false);
+	save_action->set_enabled(false);
 	buttonVector.clear();
 }
 
@@ -376,3 +382,94 @@ void Window::settings() {
 	dialog.hide();
 	update_phis();
 }*/
+
+
+void Window::save_project() {
+	//fire up a filechooserdialog
+	Gtk::FileChooserDialog *dialog = new Gtk::FileChooserDialog(*this, "Please select a BAM-QUANT project 1 file", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	Glib::RefPtr<Gtk::FileFilter> filter_bqp1 = Gtk::FileFilter::create();
+	filter_bqp1->set_name("BAM-QUANT project 1 files");
+	filter_bqp1->add_pattern("*.bqp1");
+	filter_bqp1->add_pattern("*.BQP1");
+	dialog->add_filter(filter_bqp1);
+	dialog->add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+	dialog->add_button("Select", Gtk::RESPONSE_OK);
+	
+	int result = dialog->run();
+	string filename;
+	switch(result) {
+		case(Gtk::RESPONSE_OK):
+			filename = dialog->get_filename();
+			if (filename.compare(filename.length()-5, string::npos, ".bqp1") != 0)
+				filename += ".bqp1";
+			std::cout << "Open clicked: " << filename << std::endl;
+      			break;
+		case(Gtk::RESPONSE_CANCEL):
+		default:
+			delete dialog;
+			return;
+	}
+	delete dialog;
+	
+	try {
+		xmlpp::Document document;
+
+		document.set_internal_subset("bam-quant-app1", "", "http://www.bam.de/xml/bam-quant-app1.dtd");
+		//document.add_comment("this is a comment");
+		xmlDocPtr doc = document.cobj();
+		xmlTextWriterPtr writer = xmlNewTextWriterTree(doc, 0, 0);
+		if (xmi_write_default_comments(writer) == 0) {
+			throw BAM::Exception("Could not write XMI-MSIM default comments");
+		}
+
+		//
+		xmlTextWriterFlush(writer);
+		xmlFreeTextWriter(writer);
+		xmlpp::Element *rootnode = document.create_root_node("bam-quant-app1");
+		for (std::map<int, MendeleevButton*>::iterator it = buttonMap.begin(); it != buttonMap.end(); ++it) {
+			if (it->second->asr_file) {
+				xmlpp::Element *element_data = rootnode->add_child("element_data");
+				element_data->set_attribute("datatype", "experimental");
+				element_data->set_attribute("element", it->second->GetElement());
+				element_data->set_attribute("linetype", it->second->asr_counts_KA > 0.0 ? "KA_LINE": "LA_LINE");
+				xmlpp::Element *asrfile = element_data->add_child("asrfile");
+				stringstream ss;
+				if (it->second->asr_counts_KA > 0.0)
+					ss << it->second->asr_counts_KA;
+				else
+					ss << it->second->asr_counts_LA;
+				xmlpp::Element *counts = asrfile->add_child("counts");
+				counts->add_child_text(ss.str());
+				ss.str("");
+				ss.clear();
+				ss << it->second->asr_file->GetNormfactor();
+				xmlpp::Element *normfactor = asrfile->add_child("normfactor");
+				normfactor->add_child_text(ss.str());
+				
+				xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(element_data);
+				xmlNodePtr node = nodepp->cobj();
+				writer = xmlNewTextWriterTree(doc, node, 0);
+				struct xmi_output *xmso_raw = it->second->xmso_file->GetInternalCopy();
+				if (xmi_write_output_xml_body(writer, xmso_raw, -1, -1, 0) == 0) {
+					throw BAM::Exception("Could not write XMI-MSIM output body");
+				}
+				xmlTextWriterFlush(writer);
+				xmlFreeTextWriter(writer);
+				xmi_free_output(xmso_raw);
+			}
+		}
+
+		document.write_to_file_formatted(filename);
+	}
+	catch (std::exception& ex) {
+		//error handling
+		std::cerr << "Exception occurred: " << ex.what() << std::endl;
+		return;
+	}
+	catch (...) {
+		std::cerr << "some other exception occurred" << std::endl;
+	}
+	cout << "end of save_project reached" << endl;
+	return;
+}
+

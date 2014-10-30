@@ -73,9 +73,15 @@ PKG_PROG_PKG_CONFIG
 
 #search for xraylib and other modules
 PKG_CHECK_MODULES([xraylib],libxrl >= 3.1.0)
-PKG_CHECK_MODULES([xmimsim],libxmimsim >= 5.0)
+PKG_CHECK_MODULES([xmimsim],libxmimsim >= 5.1)
 PKG_CHECK_MODULES([gtkmm],gtkmm-3.0 >= 3.4.0)
+PKG_CHECK_MODULES([libxmlmm], libxml++-2.6 >= 2.30.0)
 
+#search for xmlcatalog
+AC_CHECK_PROG([XMLCATALOG],[xmlcatalog],[xmlcatalog],[fail])
+if test x$XMLCATALOG = xfail ; then
+	AC_MSG_ERROR([xmlcatalog was not found. This should be a part of the libxml2 installation which was detected on the system. Consider verifying your PATH variable.])
+fi
 
 
 AC_CONFIG_FILES([	Makefile
@@ -84,6 +90,7 @@ AC_CONFIG_FILES([	Makefile
 			tests/Makefile
 			bin/Makefile
 			bin/app1/Makefile
+			xml/Makefile
 			])
 AC_CONFIG_HEADERS([config.h])
 

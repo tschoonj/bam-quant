@@ -33,10 +33,12 @@ class Window: public Gtk::ApplicationWindow {
 		Gtk::Grid buttonGrid;
 		std::map<int, MendeleevButton*> buttonMap; //all buttons!
 		void new_project();
+		void save_project();
 		//void settings();
 		void reset_project();
 		void update_phis();
-		Glib::RefPtr<Gio::SimpleAction> settings_action;
+		//Glib::RefPtr<Gio::SimpleAction> settings_action;
+		Glib::RefPtr<Gio::SimpleAction> save_action;
 		double phi; //average value
 		std::vector<MendeleevButton*> buttonVector; //only those buttons with an ASR file
 

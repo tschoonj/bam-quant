@@ -18,6 +18,11 @@ namespace BAM {
 				void Open();
 				void Close();
 				void Parse();
+				struct xmi_output *GetInternalCopy() {
+					struct xmi_output *rv;
+					xmi_copy_output(output, &rv);
+					return rv;
+				}
 				vector<int> GetElements() {
 					vector<int> elements;
 					for (int i = 0 ; i < output->nvar_red_history ; i++) {

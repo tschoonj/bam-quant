@@ -1,0 +1,13 @@
+
+<!-- import from xmimsim-1.0.dtd -->
+<!-- let's hope this works with libxml!!! -->
+<!ENTITY % xmso SYSTEM "http://www.xmi.UGent.be/xml/xmimsim-1.0.dtd">
+%xmso;
+
+<!ELEMENT bam-quant-app1 (element_data+)>
+<!ELEMENT element_data (asrfile*, xmimsim-results)>
+<!ATTLIST element_data datatype (experimental|interpolated) #REQUIRED> 
+<!ATTLIST element_data element CDATA #REQUIRED> 
+<!ATTLIST element_data linetype (KA_LINE|LA_LINE) #REQUIRED> 
+<!ELEMENT asrfile (counts, normfactor)>
+<!ELEMENT normfactor (#PCDATA)>
