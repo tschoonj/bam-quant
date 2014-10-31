@@ -520,6 +520,38 @@ void Window::open_project() {
 		xmlpp::DomParser parser;
 		parser.set_validate();
 		parser.parse_file(filename);
+		xmlpp::Document *document = parser.get_document();
+		xmlpp::Element *root = document->get_root_node();
+		xmlpp::Node::NodeList list = root->get_children("element_data");
+		cout << "list size: " << list.size() << endl;
+		for (xmlpp::Node::NodeList::iterator it = list.begin() ; it != list.end() ; ++it) {
+			//get attributes first
+			Glib::ustring element = dynamic_cast<xmlpp::Element*>(*it)->get_attribute_value("element");
+			cout << "element: " << element << endl;
+			Glib::ustring datatype= dynamic_cast<xmlpp::Element*>(*it)->get_attribute_value("datatype");
+			cout << "datatype: " << datatype << endl;
+			Glib::ustring linetype = dynamic_cast<xmlpp::Element*>(*it)->get_attribute_value("linetype");
+			cout << "linetype: " << linetype << endl;
+			if (datatype == "experimental") {
+				//read asrfile
+				xmlpp::Node *asrfile = (*it)->get_first_child("asrfile");
+				if (asrfile == 0) {
+					cerr << "experimental datatype requires asrfile child!!!" << endl;
+					reset_project();
+					return;
+				}
+				Glib::ustring axil_counts_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("axil_counts"))->get_child_text()->get_content();
+				cout << "axil_counts: " << axil_counts_str << endl;
+				Glib::ustring normfactor_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("normfactor"))->get_child_text()->get_content();
+				cout << "normfactor: " << normfactor_str << endl;
+			}
+			xmlpp::Node *xmimsim_results = (*it)->get_first_child("xmimsim-results");
+			struct xmi_output *output = (struct xmi_output*) malloc(sizeof(struct xmi_output));
+			if (xmi_read_output_xml_body(document->cobj(), xmimsim_results->cobj(), output, 0, 0) == 0) {
+				cerr << "Error in xmi_read_output_xml_body" << endl;
+			}
+
+		}
 
 	}
 	catch (const std::exception &e) {
