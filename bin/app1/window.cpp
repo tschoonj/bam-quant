@@ -517,10 +517,10 @@ void Window::open_project() {
 		std::cerr << "Could not load XMI-MSIM XML catalog" << std::endl;
 	}
 	try {
-		xmlpp::DomParser parser;
-		parser.set_validate();
-		parser.parse_file(filename);
-		xmlpp::Document *document = parser.get_document();
+		xmlpp::DomParser *parser = new xmlpp::DomParser;
+		parser->set_validate();
+		parser->parse_file(filename);
+		xmlpp::Document *document = parser->get_document();
 		xmlpp::Element *root = document->get_root_node();
 		xmlpp::Node::NodeList list = root->get_children("element_data");
 		cout << "list size: " << list.size() << endl;
@@ -545,13 +545,17 @@ void Window::open_project() {
 				Glib::ustring normfactor_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("normfactor"))->get_child_text()->get_content();
 				cout << "normfactor: " << normfactor_str << endl;
 			}
+			
 			xmlpp::Node *xmimsim_results = (*it)->get_first_child("xmimsim-results");
 			struct xmi_output *output = (struct xmi_output*) malloc(sizeof(struct xmi_output));
 			if (xmi_read_output_xml_body(document->cobj(), xmimsim_results->cobj(), output, 0, 0) == 0) {
 				cerr << "Error in xmi_read_output_xml_body" << endl;
+				reset_project();
+				return;
 			}
-
+			
 		}
+		delete parser;
 
 	}
 	catch (const std::exception &e) {
