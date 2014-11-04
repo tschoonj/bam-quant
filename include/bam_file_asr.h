@@ -17,6 +17,7 @@ namespace BAM {
 				void Parse();
 			public:
 				ASR(string);
+				ASR(double normfactor);
 				~ASR();
 				int GetNPeaks() {
 					return static_cast<int> (data_asr.size());

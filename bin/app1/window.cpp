@@ -532,6 +532,8 @@ void Window::open_project() {
 			cout << "datatype: " << datatype << endl;
 			Glib::ustring linetype = dynamic_cast<xmlpp::Element*>(*it)->get_attribute_value("linetype");
 			cout << "linetype: " << linetype << endl;
+			int Z = SymbolToAtomicNumber((char *) element.c_str());
+			cout << "Z: " << Z << endl;
 			if (datatype == "experimental") {
 				//read asrfile
 				xmlpp::Node *asrfile = (*it)->get_first_child("asrfile");
@@ -544,6 +546,34 @@ void Window::open_project() {
 				cout << "axil_counts: " << axil_counts_str << endl;
 				Glib::ustring normfactor_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("normfactor"))->get_child_text()->get_content();
 				cout << "normfactor: " << normfactor_str << endl;
+				Glib::RefPtr<Gtk::StyleContext> csscontext = buttonMap[Z]->get_style_context();
+				csscontext->add_provider(cssprovider, 600);
+				stringstream ss;
+				if (linetype == "KA_LINE") {
+					ss << axil_counts_str;
+					ss >> buttonMap[Z]->asr_counts_KA;
+					buttonMap[Z]->asr_counts_LA = 0.0;
+				}
+				else if (linetype == "LA_LINE") {
+					ss << axil_counts_str;
+					ss >> buttonMap[Z]->asr_counts_LA;
+					buttonMap[Z]->asr_counts_KA = 0.0;
+				}
+				else {
+					cerr << "Unknown linetype detected!!" << endl;
+					reset_project();
+					return;
+				}
+				cout << "before reseting stringstream" << endl;
+				ss.str("");
+				ss.clear();
+				ss << normfactor_str;
+				double normfactor;
+				ss >> normfactor;
+				cout << "Normfactor as double: " << normfactor << endl;
+				BAM::File::ASR *asr_file = new BAM::File::ASR(normfactor);
+				buttonMap[Z]->asr_file = asr_file;
+				cout << "after constructing asr_file: " << asr_file->GetNormfactor() << endl;
 			}
 			
 			xmlpp::Node *xmimsim_results = (*it)->get_first_child("xmimsim-results");
@@ -553,23 +583,48 @@ void Window::open_project() {
 				reset_project();
 				return;
 			}
+			BAM::File::XMSO *xmso_file;
+			xmso_file = new BAM::File::XMSO(output);
+			xmi_free_output(output);
+			buttonMap[Z]->xmso_file = xmso_file;
+			try {
+				buttonMap[Z]->xmso_counts_KA += xmso_file->GetCountsForElementForLine(Z, "KL2");
+			}
+			catch (BAM::Exception &e) { /*ignore*/}
+			try {
+				buttonMap[Z]->xmso_counts_KA += xmso_file->GetCountsForElementForLine(Z, "KL2");
+			}
+			catch (BAM::Exception &e) { /*ignore*/}
+			try {
+				buttonMap[Z]->xmso_counts_LA += xmso_file->GetCountsForElementForLine(Z, "L3M4");
+			}
+			catch (BAM::Exception &e) { /*ignore*/}
+			try {
+				buttonMap[Z]->xmso_counts_LA += xmso_file->GetCountsForElementForLine(Z, "L3M5");
+			}
+			catch (BAM::Exception &e) { /*ignore*/}
+
+			buttonVector.push_back(buttonMap[Z]);
+
 			
 		}
 		delete parser;
 
 	}
-	catch (const std::exception &e) {
-		std::cerr << "Error message while parsing: " << e.what();
+	catch (xmlpp::validity_error &e) {
+		std::cerr << "Error message while checking document validity: " << e.what() << endl;
 		return;
 	} 
-	catch (xmlpp::validity_error &e) {
-		std::cerr << "Error message while checking document validity: " << e.what();
+	catch (const std::exception &e) {
+		std::cerr << "Error message while parsing: " << e.what() << endl;
 		return;
 	} 
 	catch (...) {
-		std::cerr << "Some other exception caught";
+		std::cerr << "Some other exception caught" << endl;
 		return;
 	}
+	//ok, so now everything is processed, add it to the view
+	update_phis();
 	
 
 }

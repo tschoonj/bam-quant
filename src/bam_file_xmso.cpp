@@ -12,7 +12,7 @@ XMSO::XMSO(string filename) : File::File(filename) {
 	Close();
 }
 
-XMSO::XMSO(struct xmi_output *new_output, string filename="") : File::File(filename) {
+XMSO::XMSO(struct xmi_output *new_output, string filename) : File::File(filename) {
 	xmi_copy_output(new_output, &output);
 }
 

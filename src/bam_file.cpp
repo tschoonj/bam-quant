@@ -15,9 +15,11 @@ File::~File() {
 
 void File::Open(){
 	//cout << "Entering BAM::File Open" << endl;
-	fs.exceptions(ifstream::failbit | ifstream::badbit);
-	fs.open(filename.c_str());
-	//cout << "Leaving BAM::File Open" << endl;
+	if (filename != "") {
+		fs.exceptions(ifstream::failbit | ifstream::badbit);
+		fs.open(filename.c_str());
+		//cout << "Leaving BAM::File Open" << endl;
+	}
 }
 
 

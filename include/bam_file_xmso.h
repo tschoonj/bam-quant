@@ -13,7 +13,7 @@ namespace BAM {
 				struct xmi_output *output;
 			public:
 				XMSO(string);
-				XMSO(struct xmi_output *, string);
+				XMSO(struct xmi_output *, string filename="");
 				~XMSO();
 				void Open();
 				void Close();

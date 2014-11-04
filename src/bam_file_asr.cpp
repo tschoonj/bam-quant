@@ -19,7 +19,10 @@ ASR::ASR(string filename) : File::File(filename) {
 
 ASR::~ASR() {
 	//cout << "Entering BAM::File::ASR destructor" << endl;
+}
 
+ASR::ASR(double normfactor) : File::File(""), normfactor(normfactor) {
+	cout << "ASR constructor normfactor: " << normfactor << endl;	
 }
 
 void ASR::Parse() {
