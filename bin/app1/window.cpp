@@ -523,17 +523,12 @@ void Window::open_project() {
 		xmlpp::Document *document = parser->get_document();
 		xmlpp::Element *root = document->get_root_node();
 		xmlpp::Node::NodeList list = root->get_children("element_data");
-		cout << "list size: " << list.size() << endl;
 		for (xmlpp::Node::NodeList::iterator it = list.begin() ; it != list.end() ; ++it) {
 			//get attributes first
 			Glib::ustring element = dynamic_cast<xmlpp::Element*>(*it)->get_attribute_value("element");
-			cout << "element: " << element << endl;
 			Glib::ustring datatype= dynamic_cast<xmlpp::Element*>(*it)->get_attribute_value("datatype");
-			cout << "datatype: " << datatype << endl;
 			Glib::ustring linetype = dynamic_cast<xmlpp::Element*>(*it)->get_attribute_value("linetype");
-			cout << "linetype: " << linetype << endl;
 			int Z = SymbolToAtomicNumber((char *) element.c_str());
-			cout << "Z: " << Z << endl;
 			if (datatype == "experimental") {
 				//read asrfile
 				xmlpp::Node *asrfile = (*it)->get_first_child("asrfile");
@@ -543,9 +538,7 @@ void Window::open_project() {
 					return;
 				}
 				Glib::ustring axil_counts_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("axil_counts"))->get_child_text()->get_content();
-				cout << "axil_counts: " << axil_counts_str << endl;
 				Glib::ustring normfactor_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("normfactor"))->get_child_text()->get_content();
-				cout << "normfactor: " << normfactor_str << endl;
 				Glib::RefPtr<Gtk::StyleContext> csscontext = buttonMap[Z]->get_style_context();
 				csscontext->add_provider(cssprovider, 600);
 				stringstream ss;
@@ -564,16 +557,13 @@ void Window::open_project() {
 					reset_project();
 					return;
 				}
-				cout << "before reseting stringstream" << endl;
 				ss.str("");
 				ss.clear();
 				ss << normfactor_str;
 				double normfactor;
 				ss >> normfactor;
-				cout << "Normfactor as double: " << normfactor << endl;
 				BAM::File::ASR *asr_file = new BAM::File::ASR(normfactor);
 				buttonMap[Z]->asr_file = asr_file;
-				cout << "after constructing asr_file: " << asr_file->GetNormfactor() << endl;
 			}
 			
 			xmlpp::Node *xmimsim_results = (*it)->get_first_child("xmimsim-results");

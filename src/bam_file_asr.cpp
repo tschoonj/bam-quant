@@ -21,9 +21,7 @@ ASR::~ASR() {
 	//cout << "Entering BAM::File::ASR destructor" << endl;
 }
 
-ASR::ASR(double normfactor) : File::File(""), normfactor(normfactor) {
-	cout << "ASR constructor normfactor: " << normfactor << endl;	
-}
+ASR::ASR(double normfactor) : File::File(""), normfactor(normfactor) {}
 
 void ASR::Parse() {
 	//cout << "Entering BAM::FileASR Parse" << endl;
