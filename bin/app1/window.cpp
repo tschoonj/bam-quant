@@ -18,6 +18,7 @@ bool Window::bam_catalog_loaded = false;
 
 Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
 	xmi_msim_dialog = 0;
+	phi = 0;
 
 	//menu signals
 	add_action("new", sigc::mem_fun(*this, &Window::new_project));
@@ -26,18 +27,12 @@ Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
 	/*settings_action = add_action("settings", sigc::mem_fun(*this, &Window::settings));
 	settings_action->set_enabled(false);
 	*/
-	save_action->set_enabled(false);
+	launch_action = add_action("start", sigc::mem_fun(*this, &Window::launch_simulations));
+	launch_action->set_enabled(false);
 
 	set_title("app1");
 	set_size_request(400, 200);
 	set_border_width(10);
-
-	//cssprovider stuff
-	cssprovider = Gtk::CssProvider::create();
-	Glib::ustring cssdata = "GtkButton {color: red}";
-	if (not cssprovider->load_from_data(cssdata)) {
-		std::cerr << "Failed to load css" << std::endl;
-	}
 
 	//initialize grid
 	buttonGrid.set_row_spacing(10);
@@ -178,12 +173,11 @@ void Window::new_project() {
 		else if (asr_data.GetLine() == LA_LINE) {
 			buttonMap[Z]->asr_counts_LA = asr_data.GetCounts();
 		}
-		buttonVector.push_back(buttonMap[Z]);
+		buttonVectorASR.push_back(buttonMap[Z]);
 
 		//change color of element
 		//buttonMap[Z]->override_background_color(Gdk::RGBA("Chartreuse"));
-		Glib::RefPtr<Gtk::StyleContext> csscontext = buttonMap[Z]->get_style_context();
-		csscontext->add_provider(cssprovider, 600);
+		buttonMap[Z]->SetRed();
 			
 		/*if (it == filenames.begin())
 			refButton = buttonMap[Z];*/
@@ -255,14 +249,11 @@ void Window::new_project() {
 		temp_xmso_filename.replace(temp_xmso_filename.end()-1,temp_xmso_filename.end(), "o");
 		buttonMap[i]->xmsi_file->SetOutputFile(temp_xmso_filename);
 		buttonMap[i]->xmsi_file->SetFilename(buttonMap[i]->temp_xmsi_filename);
-
-
-			
 	}
 	delete xmsi_file;
 
 	//now launch the XMI-MSIM dialog
-	xmi_msim_dialog = new XmiMsimDialog(*this, true, buttonVector);
+	xmi_msim_dialog = new XmiMsimDialog(*this, true, buttonVectorASR);
 	try {
 		result = xmi_msim_dialog->run();
 	}
@@ -287,7 +278,7 @@ void Window::new_project() {
 	}
 	else {
 		//check if simulation was not stopped
-		for (std::vector<MendeleevButton *>::iterator it = buttonVector.begin() ; it != buttonVector.end(); ++it) {
+		for (std::vector<MendeleevButton *>::iterator it = buttonVectorASR.begin() ; it != buttonVectorASR.end(); ++it) {
 			if ((*it)->asr_file && !(*it)->xmso_file) {
 				delete xmi_msim_dialog;
 				reset_project();
@@ -307,7 +298,7 @@ void Window::new_project() {
 
 void Window::update_phis() {
 	//let's calculate the normalization factor
-	for (std::vector<MendeleevButton *>::iterator it = buttonVector.begin() ; it != buttonVector.end(); ++it) {
+	for (std::vector<MendeleevButton *>::iterator it = buttonVectorASR.begin() ; it != buttonVectorASR.end(); ++it) {
 		cout << "asr_counts_KA: " << (*it)->asr_counts_KA << endl;
 		cout << "asr_counts_LA: " << (*it)->asr_counts_LA << endl;
 		cout << "xmso_counts_KA: " << (*it)->xmso_counts_KA << endl;
@@ -329,7 +320,7 @@ void Window::update_phis() {
 		phi += (*it)->phi;
 		cout << "Phi for element " << (*it)->GetElement() << ": " << (*it)->phi << endl;
 	}
-	phi /= buttonVector.size();
+	phi /= buttonVectorASR.size();
 	cout << "Average phi: " << phi << endl;
 
 }
@@ -342,7 +333,9 @@ void Window::reset_project() {
 	phi = 0;
 	//settings_action->set_enabled(false);
 	save_action->set_enabled(false);
-	buttonVector.clear();
+	launch_action->set_enabled(false);
+	buttonVectorASR.clear();
+	buttonVectorXMSO.clear();
 }
 
 /*
@@ -461,6 +454,22 @@ void Window::save_project() {
 				xmlFreeTextWriter(writer);
 				xmi_free_output(xmso_raw);
 			}
+			else if (it->second->xmso_file) {
+				xmlpp::Element *element_data = rootnode->add_child("element_data");
+				element_data->set_attribute("datatype", "interpolated");
+				element_data->set_attribute("element", it->second->GetElement());
+				element_data->set_attribute("linetype", it->second->xmso_counts_KA > 0.0 ? "KA_LINE": "LA_LINE");
+				xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(element_data);
+				xmlNodePtr node = nodepp->cobj();
+				writer = xmlNewTextWriterTree(doc, node, 0);
+				struct xmi_output *xmso_raw = it->second->xmso_file->GetInternalCopy();
+				if (xmi_write_output_xml_body(writer, xmso_raw, -1, -1, 0) == 0) {
+					throw BAM::Exception("Could not write XMI-MSIM output body");
+				}
+				xmlTextWriterFlush(writer);
+				xmlFreeTextWriter(writer);
+				xmi_free_output(xmso_raw);
+			}
 		}
 
 		document.write_to_file_formatted(filename);
@@ -523,6 +532,7 @@ void Window::open_project() {
 		xmlpp::Document *document = parser->get_document();
 		xmlpp::Element *root = document->get_root_node();
 		xmlpp::Node::NodeList list = root->get_children("element_data");
+		BAM::File::XMSI *xmsi_file;
 		for (xmlpp::Node::NodeList::iterator it = list.begin() ; it != list.end() ; ++it) {
 			//get attributes first
 			Glib::ustring element = dynamic_cast<xmlpp::Element*>(*it)->get_attribute_value("element");
@@ -539,8 +549,7 @@ void Window::open_project() {
 				}
 				Glib::ustring axil_counts_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("axil_counts"))->get_child_text()->get_content();
 				Glib::ustring normfactor_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("normfactor"))->get_child_text()->get_content();
-				Glib::RefPtr<Gtk::StyleContext> csscontext = buttonMap[Z]->get_style_context();
-				csscontext->add_provider(cssprovider, 600);
+				buttonMap[Z]->SetRed();
 				stringstream ss;
 				if (linetype == "KA_LINE") {
 					ss << axil_counts_str;
@@ -564,6 +573,11 @@ void Window::open_project() {
 				ss >> normfactor;
 				BAM::File::ASR *asr_file = new BAM::File::ASR(normfactor);
 				buttonMap[Z]->asr_file = asr_file;
+				buttonVectorASR.push_back(buttonMap[Z]);
+			}
+			else {
+				buttonMap[Z]->SetGreen();
+				buttonVectorXMSO.push_back(buttonMap[Z]);
 			}
 			
 			xmlpp::Node *xmimsim_results = (*it)->get_first_child("xmimsim-results");
@@ -573,6 +587,14 @@ void Window::open_project() {
 				reset_project();
 				return;
 			}
+			if (it == list.begin()) {
+				//first file only
+				cout << "Before constructing xmsi_file" << endl;
+				xmsi_file = new BAM::File::XMSI(output->input);
+				cout << "After constructing xmsi_file" << endl;
+			}
+
+
 			BAM::File::XMSO *xmso_file;
 			xmso_file = new BAM::File::XMSO(output);
 			xmi_free_output(output);
@@ -594,12 +616,35 @@ void Window::open_project() {
 			}
 			catch (BAM::Exception &e) { /*ignore*/}
 
-			buttonVector.push_back(buttonMap[Z]);
 
 			
 		}
 		delete parser;
 
+		for (int i = 1 ; i <= 94 ; i++) {
+			buttonMap[i]->temp_xmsi_filename = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<ostringstream*>( &(ostringstream() << getpid()))->str() + buttonMap[i]->GetElement()+ ".xmsi");
+			buttonMap[i]->xmsi_file = new BAM::File::XMSI(*xmsi_file);
+			
+			//now change its composition
+			BAM::Data::XMSI::Composition composition;
+
+			BAM::Data::XMSI::Layer layer1("Air, Dry (near sea level)", 5.0);
+			composition.AddLayer(layer1);
+
+			BAM::Data::XMSI::Layer layer2(ElementDensity(buttonMap[i]->GetZ()), 5.0);
+			layer2.AddElement(buttonMap[i]->GetZ(), 1.0);
+			composition.AddLayer(layer2);
+
+			composition.SetReferenceLayer(2);
+			buttonMap[i]->xmsi_file->ReplaceComposition(composition);
+			string temp_xmso_filename = buttonMap[i]->temp_xmsi_filename;
+			temp_xmso_filename.replace(temp_xmso_filename.end()-1,temp_xmso_filename.end(), "o");
+			buttonMap[i]->xmsi_file->SetOutputFile(temp_xmso_filename);
+			buttonMap[i]->xmsi_file->SetFilename(buttonMap[i]->temp_xmsi_filename);
+		}
+
+
+		delete xmsi_file;
 	}
 	catch (xmlpp::validity_error &e) {
 		std::cerr << "Error message while checking document validity: " << e.what() << endl;
@@ -615,6 +660,55 @@ void Window::open_project() {
 	}
 	//ok, so now everything is processed, add it to the view
 	update_phis();
+
+	save_action->set_enabled();
 	
+}
+
+void Window::launch_simulations() {
+	std::vector<MendeleevButton*> buttonVectorXMSO_added;
+	
+	for (std::vector<MendeleevButton*>::iterator it = buttonVectorXMSO.begin() ; it != buttonVectorXMSO.end() ; ++it) {
+		if (!(*it)->xmso_file)
+			buttonVectorXMSO_added.push_back(*it);
+	}
+
+	xmi_msim_dialog = new XmiMsimDialog(*this, true, buttonVectorXMSO_added);
+	int result;
+	try {
+		result = xmi_msim_dialog->run();
+	}
+	catch (BAM::Exception &e) {
+		delete xmi_msim_dialog;
+		Gtk::MessageDialog dialog(*this, "Error occurred in XMI-MSIM dialog", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+		Glib::ustring error_message = Glib::ustring(e.what());
+		std::cout << e.what() << std::endl;
+  		dialog.set_secondary_text(error_message);
+  		dialog.run();
+		//reset everything in window!
+		xmi_msim_dialog = 0;
+		//reset only those that were added as XMSO
+		//reset_project();
+		return;
+	}
+	if (result == Gtk::RESPONSE_DELETE_EVENT) {
+		//delete event caught
+		delete xmi_msim_dialog;
+		xmi_msim_dialog = 0;
+		//reset_project();
+		return;
+	}
+	else {
+		//check if simulation was not stopped
+		for (std::vector<MendeleevButton *>::iterator it = buttonVectorXMSO.begin() ; it != buttonVectorXMSO.end(); ++it) {
+			if (!(*it)->xmso_file) {
+				delete xmi_msim_dialog;
+				//reset_project();
+				return;
+			}
+		}
+	}
+	delete xmi_msim_dialog;
+	launch_action->set_enabled(false);
 
 }

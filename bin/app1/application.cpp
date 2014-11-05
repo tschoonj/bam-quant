@@ -77,10 +77,10 @@ void Application::load_ui() {
 
 	win_menu->append_submenu("File", submenu_file);
 
-	/*Glib::RefPtr<Gio::Menu> submenu_options = Gio::Menu::create();
-	item = Gio::MenuItem::create("Settings", "win.settings");
+	Glib::RefPtr<Gio::Menu> submenu_options = Gio::Menu::create();
+	item = Gio::MenuItem::create("Launch simulations", "win.start");
 	submenu_options->append_item(item);
-	win_menu->append_submenu("Options", submenu_options);*/
+	win_menu->append_submenu("Options", submenu_options);
 	
 
 	set_menubar(win_menu);

@@ -22,7 +22,7 @@ namespace BAM {
 				struct xmi_input *input;
 			public:
 				XMSI(string);
-				XMSI(struct xmi_input *, string);
+				XMSI(struct xmi_input *, string filename="");
 				~XMSI();
 				void Open();
 				void Close();

@@ -7,12 +7,18 @@
 #include "bam_file_xmsi.h"
 #include "bam_file_xmso.h"
 #include <gtkmm/label.h>
+#include <gtkmm/cssprovider.h>
 
 class MendeleevButton : public Gtk::Button {
 	private:
 		int Z;
 		char *element;
 		void on_button_clicked();
+		void on_add_button_clicked();
+		Glib::RefPtr<Gtk::CssProvider> cssprovider_red;
+		Glib::RefPtr<Gtk::CssProvider> cssprovider_blue;
+		Glib::RefPtr<Gtk::CssProvider> cssprovider_green;
+		Glib::RefPtr<Gtk::CssProvider> cssprovider_current;
 	public:
 		MendeleevButton(int Z);
 		~MendeleevButton();
@@ -32,6 +38,21 @@ class MendeleevButton : public Gtk::Button {
 		}
 		std::string GetElement() {
 			return std::string(element);
+		}
+		void SetRed() {
+			Glib::RefPtr<Gtk::StyleContext> csscontext = get_style_context();
+			csscontext->add_provider(cssprovider_red, 600);
+			cssprovider_current = cssprovider_red;
+		}
+		void SetGreen() {
+			Glib::RefPtr<Gtk::StyleContext> csscontext = get_style_context();
+			csscontext->add_provider(cssprovider_green, 600);
+			cssprovider_current = cssprovider_green;
+		}
+		void SetBlue() {
+			Glib::RefPtr<Gtk::StyleContext> csscontext = get_style_context();
+			csscontext->add_provider(cssprovider_blue, 600);
+			cssprovider_current = cssprovider_blue;
 		}
 
 };

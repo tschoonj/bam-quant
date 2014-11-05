@@ -13,7 +13,7 @@ XMSI::XMSI(string filename) : File::File(filename) {
 	Close();
 }
 
-XMSI::XMSI(struct xmi_input *new_input, string filename="") : File::File(filename) {
+XMSI::XMSI(struct xmi_input *new_input, string filename) : File::File(filename) {
 	if (xmi_validate_input(new_input) != 0) {
 		throw BAM::Exception("BAM::File::XMSI::XMSI -> Could not validate input");
 	}
