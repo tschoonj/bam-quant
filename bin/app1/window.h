@@ -7,6 +7,7 @@
 #include <gtkmm/box.h>
 #include <gtkmm/cssprovider.h>
 #include <giomm/simpleaction.h>
+#include <gtkmm/comboboxtext.h>
 #include "xmi-msim-dialog.h"
 
 #define ASR_SCALE_FACTOR 1E9
@@ -27,6 +28,7 @@ class Window: public Gtk::ApplicationWindow {
 		std::vector<MendeleevButton*> buttonVectorASR; //only those buttons with an ASR file
 		std::vector<MendeleevButton*> buttonVectorXMSO; //only those buttons with just an XMSO file
 		Glib::RefPtr<Gio::SimpleAction> launch_action;
+		Glib::RefPtr<Gio::SimpleAction> multiple_add_action;
 
 	private:
 		//MendeleevButton test_button;
@@ -38,12 +40,16 @@ class Window: public Gtk::ApplicationWindow {
 		void save_project();
 		void open_project();
 		void launch_simulations();
+		void multiple_add();
 		//void settings();
 		void reset_project();
 		void update_phis();
 		//Glib::RefPtr<Gio::SimpleAction> settings_action;
 		Glib::RefPtr<Gio::SimpleAction> save_action;
 		double phi; //average value
+		void on_combo_from_changed();
+		Gtk::ComboBoxText *combo_from;
+		Gtk::ComboBoxText *combo_to;
 
 };
 

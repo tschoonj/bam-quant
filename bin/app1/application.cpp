@@ -80,6 +80,8 @@ void Application::load_ui() {
 	Glib::RefPtr<Gio::Menu> submenu_options = Gio::Menu::create();
 	item = Gio::MenuItem::create("Launch simulations", "win.start");
 	submenu_options->append_item(item);
+	item = Gio::MenuItem::create("Add multiple elements", "win.multiple_add");
+	submenu_options->append_item(item);
 	win_menu->append_submenu("Options", submenu_options);
 	
 

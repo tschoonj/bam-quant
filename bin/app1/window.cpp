@@ -30,6 +30,11 @@ Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
 	launch_action = add_action("start", sigc::mem_fun(*this, &Window::launch_simulations));
 	launch_action->set_enabled(false);
 
+	multiple_add_action = add_action("multiple_add", sigc::mem_fun(*this, &Window::multiple_add));
+	multiple_add_action->set_enabled(false);
+
+	save_action->set_enabled(false);
+
 	set_title("app1");
 	set_size_request(400, 200);
 	set_border_width(10);
@@ -293,6 +298,7 @@ void Window::new_project() {
 	//update menu
 	//settings_action->set_enabled();
 	save_action->set_enabled();
+	multiple_add_action->set_enabled();
 	
 }
 
@@ -334,6 +340,7 @@ void Window::reset_project() {
 	//settings_action->set_enabled(false);
 	save_action->set_enabled(false);
 	launch_action->set_enabled(false);
+	multiple_add_action->set_enabled(false);
 	buttonVectorASR.clear();
 	buttonVectorXMSO.clear();
 }
@@ -662,7 +669,80 @@ void Window::open_project() {
 	update_phis();
 
 	save_action->set_enabled();
+	multiple_add_action->set_enabled(true);
 	
+}
+
+void Window::multiple_add() {
+
+	Gtk::Dialog *dialog = new Gtk::Dialog("Select elements to add", *this, true);
+
+	dialog->add_button("Ok", Gtk::RESPONSE_OK);
+	dialog->add_button("Cancel", Gtk::RESPONSE_CANCEL);
+	Gtk::Box *vbox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
+	Gtk::Box *hbox; 
+	Gtk::Label *label;
+
+	hbox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL));
+	label = Gtk::manage(new Gtk::Label("From"));
+	hbox->pack_start(*label, false, false, 3);
+
+	combo_from = Gtk::manage(new Gtk::ComboBoxText);
+
+	combo_to= Gtk::manage(new Gtk::ComboBoxText);
+
+	for (int Z = 1 ; Z <= 93 ; Z++) {
+		char *element = AtomicNumberToSymbol(Z);
+		combo_from->append(element);
+		xrlFree(element);
+	}
+	combo_from->set_active(0);
+	hbox->pack_end(*combo_from, false, false, 3);
+	vbox->pack_start(*hbox, false, false, 5);
+
+	hbox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL));
+	label = Gtk::manage(new Gtk::Label("To"));
+	hbox->pack_start(*label, false, false, 3);
+
+	for (int Z = 2 ; Z <= 94 ; Z++) {
+		char *element = AtomicNumberToSymbol(Z);
+		combo_to->append(element);
+		xrlFree(element);
+	}
+	combo_to->set_active(92);
+	hbox->pack_end(*combo_to, false, false, 3);
+	vbox->pack_start(*hbox, false, false, 5);
+	dialog->get_content_area()->pack_start(*vbox, true, false, 5);
+	dialog->show_all_children();
+	combo_from->signal_changed().connect(sigc::mem_fun(*this, &Window::on_combo_from_changed));
+
+	int result = dialog->run();
+	if (result == Gtk::RESPONSE_OK) {
+		//read values from comboboxes
+		Glib::ustring element_from = combo_from->get_active_text();
+		Glib::ustring element_to = combo_to->get_active_text();
+		std::vector<MendeleevButton*> buttonVectorAll;
+		buttonVectorAll.reserve(buttonVectorXMSO.size() + buttonVectorASR.size());
+		buttonVectorAll.insert(buttonVectorAll.end(), buttonVectorXMSO.begin(), buttonVectorXMSO.end());
+		buttonVectorAll.insert(buttonVectorAll.end(), buttonVectorASR.begin(), buttonVectorASR.end());
+		for (int Z = SymbolToAtomicNumber((char*) element_from.c_str()) ; Z <= SymbolToAtomicNumber((char*) element_to.c_str()) ; Z++) {
+			bool match = false;
+			//check if it's not already in buttonVectorXMSO
+			for (std::vector<MendeleevButton*>::iterator it = buttonVectorAll.begin() ; it != buttonVectorAll.end() ; ++it) {
+				if ((*it)->GetZ() == Z) {
+					match = true;
+					break;
+				}
+			}
+			if (!match) {
+				buttonVectorXMSO.push_back(buttonMap[Z]);
+				buttonMap[Z]->SetGreen();
+			}
+		}
+		launch_action->set_enabled();
+	}
+	delete dialog;
+
 }
 
 void Window::launch_simulations() {
@@ -710,5 +790,30 @@ void Window::launch_simulations() {
 	}
 	delete xmi_msim_dialog;
 	launch_action->set_enabled(false);
+	multiple_add_action->set_enabled(true);
 
+}
+
+void Window::on_combo_from_changed() {
+	cout << "on_combo_from_changed" << endl;
+	//when combo_from is changed, combo_to may need to be updated
+	const char *element_from = combo_from->get_active_text().c_str();
+	int Z_from = SymbolToAtomicNumber((char *) element_from);
+	const char *element_to = combo_to->get_active_text().c_str();
+	int Z_to = SymbolToAtomicNumber((char *) element_to);
+
+	combo_to->remove_all();
+	for (int Z = Z_from+1 ; Z <= 94 ; Z++) {
+		char *element = AtomicNumberToSymbol(Z);
+		combo_to->append(element);
+		xrlFree(element);
+	}
+	if (Z_to <= Z_from) {
+		combo_to->set_active_text("Pu");
+	}
+	else {
+		char *element_to2 = AtomicNumberToSymbol(Z_to);
+		combo_to->set_active_text(element_to2);
+		xrlFree((void*) element_to2);
+	}
 }
