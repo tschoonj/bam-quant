@@ -31,9 +31,9 @@ XmiMsimDialog::XmiMsimDialog(Window &window, bool modal, std::vector<MendeleevBu
 	timer = 0;
 	add_button("Close", Gtk::RESPONSE_OK);
 	set_response_sensitive(Gtk::RESPONSE_OK, false);
-	pauseButton.set_image_from_icon_name("gtk-media-pause", Gtk::ICON_SIZE_DIALOG);	
-	stopButton.set_image_from_icon_name("gtk-media-stop", Gtk::ICON_SIZE_DIALOG);	
-	playButton.set_image_from_icon_name("gtk-media-play", Gtk::ICON_SIZE_DIALOG);	
+	pauseButton.set_image_from_icon_name("media-playback-pause", Gtk::ICON_SIZE_DIALOG);	
+	stopButton.set_image_from_icon_name("media-playback-stop", Gtk::ICON_SIZE_DIALOG);	
+	playButton.set_image_from_icon_name("media-playback-start", Gtk::ICON_SIZE_DIALOG);	
 	buttons.pack_start(playButton);
 	buttons.pack_start(pauseButton);
 	buttons.pack_start(stopButton);

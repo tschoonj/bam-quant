@@ -15,6 +15,7 @@ namespace BAM {
 				double chi;
 				//double bg;
 			public:
+				ASR() : Z(0), line(0), counts(0.0), stddev(0), chi(0) {}
 				ASR(int Z, int line, double counts, double stddev, double chi/*, double bg*/) :
 					Z(Z), line(line), counts(counts), stddev(stddev), chi(chi)/*, bg(bg)*/ {}
 				int GetZ() {

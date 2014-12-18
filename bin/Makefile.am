@@ -1,1 +1,2 @@
-SUBDIRS = app1
+SUBDIRS = app1 \
+	  app2
