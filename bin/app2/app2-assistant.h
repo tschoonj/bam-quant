@@ -48,6 +48,25 @@ private:
 	void on_second_page_open_clicked();
 	bool on_second_page_backspace_clicked(GdkEventKey *key);
 
+	Gtk::ScrolledWindow third_page_sw;
+	Gtk::TreeView third_page_tv;
+	Glib::RefPtr<Gtk::ListStore> third_page_model;
+	Gtk::Grid third_page;
+	class ThirdPageColumns : public Gtk::TreeModel::ColumnRecord {
+		public:
+			ThirdPageColumns() {
+				add(col_filename);
+				add(col_bam_file_asr);
+			}
+			Gtk::TreeModelColumn<Glib::ustring> col_filename;
+			Gtk::TreeModelColumn<BAM::File::ASR*> col_bam_file_asr;
+	};
+	ThirdPageColumns third_page_columns;	
+	Gtk::Button third_page_open;
+	void on_third_page_open_clicked();
+	bool on_third_page_backspace_clicked(GdkEventKey *key);
+
+
 };
 
 
