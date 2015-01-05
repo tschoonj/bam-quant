@@ -55,9 +55,11 @@ private:
 	class ThirdPageColumns : public Gtk::TreeModel::ColumnRecord {
 		public:
 			ThirdPageColumns() {
+				add(col_elements);
 				add(col_filename);
 				add(col_bam_file_asr);
 			}
+			Gtk::TreeModelColumn<Glib::ustring> col_elements;
 			Gtk::TreeModelColumn<Glib::ustring> col_filename;
 			Gtk::TreeModelColumn<BAM::File::ASR*> col_bam_file_asr;
 	};
