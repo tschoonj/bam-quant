@@ -91,6 +91,30 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 	third_page_tv.signal_key_press_event().connect(sigc::mem_fun(*this, &App2Assistant::on_third_page_backspace_clicked));
 	third_page_tv.get_selection()->set_mode(Gtk::SELECTION_MULTIPLE);
 
+	
+	//fourth page
+	xmsi_file = 0; //set to zero when initializing
+	label = Gtk::manage(new Gtk::Label("Select an XMI-MSIM input-file\nthat properly describes the\nexcitation conditions as well as the\nexperimental geometry"));
+	fourth_page.attach(*label, 0, 0, 1, 1);
+	fourth_page.set_column_spacing(5);
+	fourth_page.set_row_spacing(5);
+	fourth_page.set_row_homogeneous(false);
+	fourth_page.set_column_homogeneous(false);
+	//label->set_vexpand();
+	label->set_hexpand();
+	label->set_margin_bottom(10);
+	label->set_margin_top(10);
+	
+	fourth_page_xmsi_entry.set_icon_from_icon_name("Logo_xmi_msim");
+	fourth_page.attach(fourth_page_xmsi_entry, 0, 1, 1, 1);
+	fourth_page.set_vexpand();
+	fourth_page.set_hexpand();
+	append_page(fourth_page);
+	set_page_type(fourth_page, Gtk::ASSISTANT_PAGE_CONTENT);
+	set_page_title(fourth_page, "Select XMSI file");
+	fourth_page_xmsi_entry.signal_icon_press().connect(sigc::mem_fun(*this, &App2Assistant::on_fourth_page_open_clicked));
+	fourth_page_xmsi_entry.set_editable(false);
+
 
 	signal_cancel().connect(sigc::mem_fun(*this, &App2Assistant::on_assistant_cancel));
 	signal_delete_event().connect(sigc::mem_fun(*this, &App2Assistant::on_delete_event));
@@ -338,4 +362,55 @@ bool App2Assistant::on_third_page_backspace_clicked(GdkEventKey *event) {
 
         return FALSE;
 
+}
+void App2Assistant::on_fourth_page_open_clicked(Gtk::EntryIconPosition icon_position, const GdkEventButton* event) {
+	//launch dialog
+	Gtk::FileChooserDialog *dialog = new Gtk::FileChooserDialog(*this, "Please select an XMI-MSIM input-file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+	Glib::RefPtr<Gtk::FileFilter> filter_asr = Gtk::FileFilter::create();
+	filter_asr->set_name("XMSI files");
+	filter_asr->add_pattern("*.XMSI");
+	filter_asr->add_pattern("*.xmsi");
+	dialog->add_filter(filter_asr);
+	dialog->add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+	dialog->add_button("Select", Gtk::RESPONSE_OK);
+	
+	int result = dialog->run();
+	Glib::ustring filename;
+	switch(result) {
+		case(Gtk::RESPONSE_OK):
+			std::cout << "Open clicked." << std::endl;
+			filename = dialog->get_filename();
+
+      			break;
+		case(Gtk::RESPONSE_CANCEL):
+		default:
+			delete dialog;
+			return;
+	}
+
+	delete dialog;
+	std::cout << "Selected file: " << filename << std::endl;
+	BAM::File::XMSI *temp_xmsi_file;
+	try {
+		temp_xmsi_file = new BAM::File::XMSI(filename);
+	}
+	catch (ifstream::failure &e) {
+		Gtk::MessageDialog dialog(*this, "Error reading in "+filename, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+  		dialog.set_secondary_text(Glib::ustring("I/O error: ")+e.what());
+  		dialog.run();
+		return;
+	}
+	catch (BAM::Exception &e) {
+		Gtk::MessageDialog dialog(*this, "Error reading in "+filename, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+  		dialog.set_secondary_text(e.what());
+  		dialog.run();
+		return;
+	}
+	if (xmsi_file)
+		delete xmsi_file;
+
+	xmsi_file = temp_xmsi_file;
+
+	set_page_complete(fourth_page, true);	
+	fourth_page_xmsi_entry.set_text(filename);
 }

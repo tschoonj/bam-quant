@@ -10,7 +10,9 @@
 #include <gtkmm/button.h>
 #include <gtkmm/box.h>
 #include <gtkmm/grid.h>
+#include <gtkmm/entry.h>
 #include "bam_file_asr.h"
+#include "bam_file_xmsi.h"
 #include "bam_data_asr.h"
 
 class App2Assistant : public Gtk::Assistant {
@@ -26,6 +28,7 @@ private:
 	void on_assistant_close();
 	bool on_delete_event(GdkEventAny* event);
 	Gtk::Label first_page;
+
 	Gtk::ScrolledWindow second_page_sw;
 	Gtk::TreeView second_page_tv;
 	Glib::RefPtr<Gtk::ListStore> second_page_model;
@@ -68,6 +71,10 @@ private:
 	void on_third_page_open_clicked();
 	bool on_third_page_backspace_clicked(GdkEventKey *key);
 
+	BAM::File::XMSI *xmsi_file;
+	Gtk::Grid fourth_page;
+	Gtk::Entry fourth_page_xmsi_entry;
+	void on_fourth_page_open_clicked(Gtk::EntryIconPosition icon_position, const GdkEventButton* event);
 
 };
 
