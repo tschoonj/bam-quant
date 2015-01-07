@@ -11,9 +11,14 @@
 #include <gtkmm/box.h>
 #include <gtkmm/grid.h>
 #include <gtkmm/entry.h>
+#include <gtkmm/buttonbox.h>
+#include <glibmm/timer.h>
 #include "bam_file_asr.h"
 #include "bam_file_xmsi.h"
+#include "bam_file_xmso.h"
 #include "bam_data_asr.h"
+#include <iomanip>
+#include <iostream>
 
 class App2Assistant : public Gtk::Assistant {
 public:
@@ -26,9 +31,13 @@ private:
 	void on_assistant_apply();
 	void on_assistant_cancel();
 	void on_assistant_close();
+	void on_assistant_prepare(Gtk::Widget *page);
 	bool on_delete_event(GdkEventAny* event);
+
+	//first page: introduction
 	Gtk::Label first_page;
 
+	//second page: ASR files of standards
 	Gtk::ScrolledWindow second_page_sw;
 	Gtk::TreeView second_page_tv;
 	Glib::RefPtr<Gtk::ListStore> second_page_model;
@@ -51,6 +60,7 @@ private:
 	void on_second_page_open_clicked();
 	bool on_second_page_backspace_clicked(GdkEventKey *key);
 
+	//third page: ASR files of samples 
 	Gtk::ScrolledWindow third_page_sw;
 	Gtk::TreeView third_page_tv;
 	Glib::RefPtr<Gtk::ListStore> third_page_model;
@@ -61,20 +71,83 @@ private:
 				add(col_elements);
 				add(col_filename);
 				add(col_bam_file_asr);
+				add(col_elements_int);
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_elements;
 			Gtk::TreeModelColumn<Glib::ustring> col_filename;
 			Gtk::TreeModelColumn<BAM::File::ASR*> col_bam_file_asr;
+			Gtk::TreeModelColumn<std::vector<int>* > col_elements_int;
 	};
 	ThirdPageColumns third_page_columns;	
 	Gtk::Button third_page_open;
 	void on_third_page_open_clicked();
 	bool on_third_page_backspace_clicked(GdkEventKey *key);
 
-	BAM::File::XMSI *xmsi_file;
+	//fourth page: XMSI file 
+	BAM::File::XMSI *fourth_page_xmsi_file;
 	Gtk::Grid fourth_page;
 	Gtk::Entry fourth_page_xmsi_entry;
 	void on_fourth_page_open_clicked(Gtk::EntryIconPosition icon_position, const GdkEventButton* event);
+
+	//fifth page: run MC simulations if necessary
+	Gtk::Button fifth_page_play_button;
+	Gtk::Button fifth_page_stop_button;
+	Gtk::Button fifth_page_pause_button;
+	Gtk::ButtonBox fifth_page_buttons;
+	class FifthPageColumns : public Gtk::TreeModel::ColumnRecord {
+		public:
+			FifthPageColumns() {
+				add(col_element);
+				add(col_status);
+				add(col_xmsi_file);
+				add(col_xmso_file);
+				add(col_xmsi_filename);
+				add(col_xmso_filename);
+			}
+			Gtk::TreeModelColumn<Glib::ustring> col_element;
+			Gtk::TreeModelColumn<Glib::ustring> col_status;
+			Gtk::TreeModelColumn<BAM::File::XMSI *> col_xmsi_file;
+                	Gtk::TreeModelColumn<BAM::File::XMSO *> col_xmso_file;
+			Gtk::TreeModelColumn<Glib::ustring> col_xmsi_filename;
+			Gtk::TreeModelColumn<Glib::ustring> col_xmso_filename;
+	};
+	FifthPageColumns fifth_page_columns;	
+	Gtk::Grid fifth_page;
+	Gtk::ScrolledWindow fifth_page_sw;
+	Gtk::TreeView fifth_page_tv;
+	Glib::RefPtr<Gtk::ListStore> fifth_page_model;
+
+	Glib::RefPtr<Glib::IOChannel> xmimsim_stderr;
+	Glib::RefPtr<Glib::IOChannel> xmimsim_stdout;
+	bool xmimsim_paused;
+	GPid xmimsim_pid;
+	Glib::Timer *timer;
+	vector<std::string> argv;
+	Gtk::TreeModel::Children::iterator fifth_page_iter;
+	void on_fifth_page_play_clicked();
+	void on_fifth_page_pause_clicked();
+	void on_fifth_page_stop_clicked();
+	void xmimsim_child_watcher(GPid pid, int child_status);
+	bool xmimsim_stdout_watcher(Glib::IOCondition cond);
+	bool xmimsim_stderr_watcher(Glib::IOCondition cond);
+	bool xmimsim_iochannel_watcher(Glib::IOCondition cond, Glib::RefPtr<Glib::IOChannel> iochannel);
+	void xmimsim_start_recursive();
+	string get_elapsed_time() {
+		if (!timer)
+			return string("timer error");
+
+		long time_elapsed = (long) timer->elapsed();
+		long hours = time_elapsed / 3600;
+		time_elapsed = time_elapsed % 3600;
+		long minutes = time_elapsed / 60;
+		long seconds = time_elapsed % 60;
+		stringstream ss;
+		ss.fill('0');
+		ss << setw(2) << hours << ":" << setw(2) << minutes << ":" << setw(2) << seconds << " ";
+		string rv = ss.str();
+		return rv; 
+	}
+	void update_console(string line, string tag="");
 
 };
 

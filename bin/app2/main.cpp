@@ -3,6 +3,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include "app2-assistant.h"
+#include <xmi_msim.h>
 
 
 
@@ -19,6 +20,10 @@ int main(int argc, char **argv) {
 	Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc, argv, "de.bam.app2");
 
 	App2Assistant window;
+
+	if (xmi_xmlLoadCatalog() == 0) {
+		std::cerr << "Could not load XMI-MSIM XML catalog" << std::endl;
+	}
 
 	return app->run(window);
 }
