@@ -4,6 +4,7 @@
 #include <gtkmm/main.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/messagedialog.h>
+#include <gtkmm/cellrendererprogress.h>
 #include <xraylib.h>
 #include <glibmm/miscutils.h>
 #include <glib.h>
@@ -152,7 +153,12 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 	fifth_page_model = Gtk::ListStore::create(fifth_page_columns);
 	fifth_page_tv.set_model(fifth_page_model);
 	fifth_page_tv.append_column("Element", fifth_page_columns.col_element);
-	fifth_page_tv.append_column("Status", fifth_page_columns.col_status);
+	//fifth_page_tv.append_column("Status", fifth_page_columns.col_status);
+	Gtk::CellRendererProgress* cell = Gtk::manage(new Gtk::CellRendererProgress);
+	int cols_count = fifth_page_tv.append_column("Status", *cell);
+	Gtk::TreeViewColumn* temp_column = fifth_page_tv.get_column(cols_count-1);
+	temp_column->add_attribute(cell->property_value(), fifth_page_columns.col_progress);
+	temp_column->add_attribute(cell->property_text(), fifth_page_columns.col_status);
 	fifth_page_sw.add(fifth_page_tv);
 	fifth_page_sw.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 	fifth_page_sw.set_vexpand();
@@ -298,7 +304,8 @@ void App2Assistant::on_assistant_prepare(Gtk::Widget *page) {
 		char *element = AtomicNumberToSymbol(*it);
 		Gtk::TreeModel::Row row = *(fifth_page_model->append());
 		row[fifth_page_columns.col_element] = Glib::ustring(element);
-		row[fifth_page_columns.col_status] = Glib::ustring("not started");
+		row[fifth_page_columns.col_status] = Glib::ustring("Not started");
+		row[fifth_page_columns.col_progress] = 0;
 		xrlFree(element);
 		
 		//create xmsi files
@@ -781,7 +788,7 @@ void App2Assistant::xmimsim_start_recursive() {
 	}
 
 	//update treemodel
-	row[fifth_page_columns.col_status] = Glib::ustring("running");
+	row[fifth_page_columns.col_status] = Glib::ustring("0 %");
 	
 
 	stringstream ss;
@@ -906,7 +913,7 @@ void App2Assistant::xmimsim_child_watcher(GPid pid, int status) {
 		}
 		catch (BAM::Exception &e) {}
 		*/
-		row[fifth_page_columns.col_status] = Glib::ustring("completed");
+		row[fifth_page_columns.col_status] = Glib::ustring("Completed");
 		fifth_page_play_button.set_sensitive(false);
 		fifth_page_stop_button.set_sensitive(false);
 		fifth_page_pause_button.set_sensitive(false);
@@ -947,7 +954,7 @@ void App2Assistant::xmimsim_child_watcher(GPid pid, int status) {
 		catch (BAM::Exception &e) {}
 		*/
 
-		row[fifth_page_columns.col_status] = Glib::ustring("completed");
+		row[fifth_page_columns.col_status] = Glib::ustring("Completed");
 		//g_unlink(buttonVector[buttonIndex-1]->xmsi_file->GetOutputFile().c_str());
 		//g_unlink(buttonVector[buttonIndex-1]->xmsi_file->GetFilename().c_str());
 		//
@@ -968,15 +975,26 @@ bool App2Assistant::xmimsim_stderr_watcher(Glib::IOCondition cond) {
 bool App2Assistant::xmimsim_iochannel_watcher(Glib::IOCondition condition, Glib::RefPtr<Glib::IOChannel> iochannel) {
 	Glib::IOStatus pipe_status;
 	Glib::ustring pipe_string;
+	int progress;
 
 	if (condition & (Glib::IO_IN | Glib::IO_PRI)) {
 		try {
 			pipe_status = iochannel->read_line(pipe_string);	
 			if (pipe_status == Glib::IO_STATUS_NORMAL) {
-				stringstream ss;
-				ss << get_elapsed_time() << pipe_string;
-				update_console(ss.str());
-				std::cout << pipe_string;
+				if (sscanf(pipe_string.c_str(), "Simulating interactions at %i",&progress) == 1) {
+					Gtk::TreeModel::Row row = *fifth_page_iter;
+					stringstream ss;
+					ss << progress << " %";
+					row[fifth_page_columns.col_status] = ss.str();
+					row[fifth_page_columns.col_progress] = progress;
+					
+				}
+				else {
+					stringstream ss;
+					ss << get_elapsed_time() << pipe_string;
+					update_console(ss.str());
+					std::cout << pipe_string;
+				}
 			}
 			else
 				return false;

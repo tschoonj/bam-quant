@@ -99,6 +99,7 @@ private:
 			FifthPageColumns() {
 				add(col_element);
 				add(col_status);
+				add(col_progress);
 				add(col_xmsi_file);
 				add(col_xmso_file);
 				add(col_xmsi_filename);
@@ -106,6 +107,7 @@ private:
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_element;
 			Gtk::TreeModelColumn<Glib::ustring> col_status;
+			Gtk::TreeModelColumn<int> col_progress;
 			Gtk::TreeModelColumn<BAM::File::XMSI *> col_xmsi_file;
                 	Gtk::TreeModelColumn<BAM::File::XMSO *> col_xmso_file;
 			Gtk::TreeModelColumn<Glib::ustring> col_xmsi_filename;
