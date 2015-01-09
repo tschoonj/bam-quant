@@ -12,6 +12,9 @@
 #include <glibmm/main.h>
 #include <glibmm/convert.h>
 #include <algorithm>
+#include <libxml++/libxml++.h>
+#include <libxml/xmlwriter.h>
+#include <libxml/catalog.h>
 
 #ifdef G_OS_UNIX
 	#include <sys/types.h>
@@ -35,7 +38,8 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 		xmimsim_paused(false),
 		xmimsim_pid(0),
 		timer(0),
-		fifth_page_buttons(Gtk::ORIENTATION_VERTICAL)
+		fifth_page_buttons(Gtk::ORIENTATION_VERTICAL),
+		seventh_page("Just one more thing to do!\n\nClick the apply button and the file will be saved...")
 	{
 
 	set_border_width(12);
@@ -184,12 +188,40 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 	fifth_page_play_button.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_fifth_page_play_clicked));
 	fifth_page_stop_button.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_fifth_page_stop_clicked));
 		
-	
+	//sixth page -> save it all	
+	label = Gtk::manage(new Gtk::Label("Select a file that will be created to store\nthe relative X-ray intensities"));
+	append_page(sixth_page);
+	set_page_type(sixth_page, Gtk::ASSISTANT_PAGE_CONTENT);
+	set_page_title(sixth_page, "Save the results");
+	sixth_page.attach(*label, 0, 0, 2, 1);
+	sixth_page.set_column_spacing(5);
+	sixth_page.set_row_spacing(5);
+	sixth_page.set_row_homogeneous(false);
+	sixth_page.set_column_homogeneous(false);
+	//label->set_vexpand();
+	label->set_hexpand();
+	label->set_margin_bottom(10);
+	label->set_margin_top(10);
+	sixth_page_save.set_image_from_icon_name("document-save");
+	sixth_page_save.set_vexpand(false);
+	sixth_page_save.set_hexpand(false);
+	sixth_page_save.set_valign(Gtk::ALIGN_CENTER);
+	sixth_page.attach(sixth_page_save, 0, 1, 1, 1);
+	sixth_page.attach(sixth_page_bpq2_entry, 1, 1, 1, 1);
+	sixth_page_bpq2_entry.set_editable(false);
+	sixth_page_bpq2_entry.set_hexpand();
+	sixth_page_save.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_sixth_page_open_clicked));
 
+	//last page
+	append_page(seventh_page);
+	set_page_type(seventh_page, Gtk::ASSISTANT_PAGE_CONFIRM);
+	set_page_title(seventh_page, "The end...");
+	set_page_complete(seventh_page, true);
 
 	signal_cancel().connect(sigc::mem_fun(*this, &App2Assistant::on_assistant_cancel));
 	signal_delete_event().connect(sigc::mem_fun(*this, &App2Assistant::on_delete_event));
 	signal_prepare().connect(sigc::mem_fun(*this, &App2Assistant::on_assistant_prepare));
+	signal_close().connect(sigc::mem_fun(*this, &App2Assistant::on_assistant_close));
 	
 
 	show_all_children();
@@ -245,6 +277,183 @@ void App2Assistant::on_assistant_cancel() {
 	get_application()->remove_window(*this);
 }
 
+void App2Assistant::on_assistant_close() {
+	std::cout << "Close button clicked" << std::endl;
+
+	double phi = 0.0;
+
+
+	//let's try saving our data
+	//if it works we close the program
+	//otherwise we ask the user to change the filename
+	try {
+		if (fifth_page_diff_elements.size() > 0) {
+			//estimate the phi factor
+			Gtk::TreeModel::Children pure_kids = fifth_page_model->children();
+			for (Gtk::TreeModel::Children::iterator iter = pure_kids.begin() ; iter != pure_kids.end() ; ++iter) {
+				Gtk::TreeModel::Row row = *iter;
+				if (row[fifth_page_columns.col_bam_file_asr] == 0)
+					continue;
+				double local_phi = 0.0;
+				BAM::File::ASR *col_bam_file_asr = row[fifth_page_columns.col_bam_file_asr];
+				std::cout << "Element for phi: " << col_bam_file_asr->GetData(0).GetZ() << std::endl;
+				if (col_bam_file_asr->GetData(0).GetLine() == KA_LINE && row[fifth_page_columns.col_xmso_counts_KA] > 0.0) {
+					local_phi = col_bam_file_asr->GetData(0).GetCounts() * col_bam_file_asr->GetNormfactor() / row[fifth_page_columns.col_xmso_counts_KA]; 
+				}
+				else if (col_bam_file_asr->GetData(0).GetLine() == LA_LINE && row[fifth_page_columns.col_xmso_counts_LA] > 0.0) {
+					local_phi = col_bam_file_asr->GetData(0).GetCounts() * col_bam_file_asr->GetNormfactor() / row[fifth_page_columns.col_xmso_counts_LA];
+				}
+				else {
+					throw BAM::Exception(std::string("Mismatch found: counts in ASR file and corresponding simulation result must both be positive values! Problem detected for element:")+row[fifth_page_columns.col_element]);
+				}
+				std::cout << "local_phi: " << local_phi << std::endl;
+				phi += local_phi;
+			}
+			phi /= second_page_model->children().size();
+			std::cout << "average phi: " << phi << std::endl;
+		}	
+		xmlpp::Document document;
+
+		document.set_internal_subset("bam-quant-app2", "", "http://www.bam.de/xml/bam-quant-app2.dtd");
+		//document.add_comment("this is a comment");
+		xmlDocPtr doc = document.cobj();
+		xmlTextWriterPtr writer = xmlNewTextWriterTree(doc, 0, 0);
+		if (xmi_write_default_comments(writer) == 0) {
+			throw BAM::Exception("Could not write XMI-MSIM default comments");
+		}
+
+		xmlTextWriterFlush(writer);
+		xmlFreeTextWriter(writer);
+		xmlpp::Element *rootnode = document.create_root_node("bam-quant-app2");
+
+		//loop over all samples from page three
+		Gtk::TreeModel::Children kids = third_page_model->children();
+		for (Gtk::TreeModel::Children::iterator iter = kids.begin() ; iter != kids.end() ; ++iter) {
+			Gtk::TreeModel::Row row = *iter;
+			xmlpp::Element *samples = rootnode->add_child("samples");
+			
+			//loop over all elements in the sample
+			std::vector<int> *col_elements_int = row[third_page_columns.col_elements_int];
+			BAM::File::ASR *col_bam_file_asr = row[third_page_columns.col_bam_file_asr];
+			double norm_factor_sample = col_bam_file_asr->GetNormfactor();
+			for (int i = 0 ; i < col_elements_int->size() ; i++) {
+				xmlpp::Element *element_rxi = samples->add_child("element_rxi");
+				int Z = col_elements_int->at(i);
+				element_rxi->set_attribute("element", AtomicNumberToSymbol(Z));
+				BAM::Data::ASR asr_data_sample = col_bam_file_asr->GetData(i);
+				//first check if is available among the pures
+				double rxi;
+				bool found = false;
+				Gtk::TreeModel::Children kids2 = second_page_model->children();
+				Gtk::TreeModel::Children::iterator iter2;
+				Gtk::TreeModel::Row row2;
+				for (iter2 = kids2.begin() ; iter2 != kids2.end() ; ++iter2) {
+					row2 = *iter2;
+					if (row2[second_page_columns.col_atomic_number] == Z) {
+						found = true;
+						break;	
+					}
+				}
+				if (found) {
+					//match found
+					BAM::File::ASR *asr_file_pure = row2[second_page_columns.col_bam_file_asr];
+					BAM::Data::ASR asr_data_pure = asr_file_pure->GetData(0);
+					double norm_factor_pure = asr_file_pure->GetNormfactor();
+					rxi = asr_data_sample.GetCounts() * norm_factor_sample / 
+					(asr_data_pure.GetCounts() * norm_factor_pure);
+					if (asr_data_sample.GetLine() == KA_LINE) {
+						element_rxi->set_attribute("linetype", "KA_LINE");
+					}
+					else if (asr_data_sample.GetLine() == LA_LINE) {
+						element_rxi->set_attribute("linetype", "LA_LINE");
+					}
+					else {
+						throw BAM::Exception("Invalid linetype detected");
+					}
+					element_rxi->set_attribute("datatype", "experimental");
+				}
+				else {
+					//no match means we need to look at the simulated data
+					found = false;
+					//look at page 5 for the xmso data
+					Gtk::TreeModel::Children kids3 = fifth_page_model->children();
+					Gtk::TreeModel::Children::iterator iter3;
+					Gtk::TreeModel::Row row3;
+					for (iter3 = kids3.begin() ; iter3 != kids3.end() ; ++iter3) {
+						row3 = *iter3;
+						if (row3[fifth_page_columns.col_atomic_number] == Z) {
+							found = true;
+							break;	
+						}
+					}
+					if (!found)
+						throw BAM::Exception("Could not find element in fifth page. This should never happen!");
+					if (row3[fifth_page_columns.col_xmso_counts_KA] > 0) {
+						rxi = asr_data_sample.GetCounts() * norm_factor_sample /
+						(row3[fifth_page_columns.col_xmso_counts_KA]*phi);
+						element_rxi->set_attribute("linetype", "KA_LINE");
+					}
+					else if (row3[fifth_page_columns.col_xmso_counts_LA] > 0) {
+						rxi = asr_data_sample.GetCounts() * norm_factor_sample /
+						(row3[fifth_page_columns.col_xmso_counts_LA]*phi);
+						element_rxi->set_attribute("linetype", "LA_LINE");
+					}
+					else
+						throw BAM::Exception("An element in a sample without corresponding pure measurement has no positive counts in the simulation results.");
+					element_rxi->set_attribute("datatype", "interpolated");
+				}
+				// rxi calculated at this point!
+				stringstream ss;
+				ss << rxi;
+				element_rxi->add_child_text(ss.str());
+			}
+			xmlpp::Element *asrfile = samples->add_child("asrfile");
+			asrfile->add_child_text(row[third_page_columns.col_filename]);
+		}
+		xmlpp::Element *xmimsim = rootnode->add_child("xmimsim");
+		xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(xmimsim);
+		xmlNodePtr node = nodepp->cobj();
+		writer = xmlNewTextWriterTree(doc, node, 0);
+		struct xmi_input *xmsi_raw = fourth_page_xmsi_file->GetInternalCopy();
+		if (xmi_write_input_xml_body(writer, xmsi_raw) == 0) {
+			throw BAM::Exception("Could not write XMI-MSIM input body");
+		}
+		//xmlTextWriterFlush(writer);
+
+		document.write_to_file_formatted(sixth_page_bpq2_entry.get_text());
+
+		xmi_free_input(xmsi_raw);
+		xmlFreeTextWriter(writer);
+	}
+	catch (BAM::Exception &e) {
+		//produce a message dialog telling the user to change the filename
+		Gtk::MessageDialog dialog(*this, string("BAM::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text()+string(".\nTry changing the filename"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+  		dialog.set_secondary_text(Glib::ustring("BAM error: ")+e.what());
+  		dialog.run();
+		previous_page();	
+		set_page_complete(sixth_page, false);
+		return;
+	}
+	catch (std::exception& e) {
+		//produce a message dialog telling the user to change the filename
+		Gtk::MessageDialog dialog(*this, string("std::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text()+string(".\nTry changing the filename"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+  		dialog.set_secondary_text(Glib::ustring("error: ")+e.what());
+  		dialog.run();
+		previous_page();
+		set_page_complete(sixth_page, false);
+		return;
+	}
+	catch (...) {
+		Gtk::MessageDialog dialog(*this, string("Some weird exception detected while writing to ")+sixth_page_bpq2_entry.get_text()+string(".\nTry changing the filename"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+  		dialog.run();
+		previous_page();
+		set_page_complete(sixth_page, false);
+		return;
+	}
+
+	get_application()->remove_window(*this);
+}
+
 void App2Assistant::on_assistant_prepare(Gtk::Widget *page) {
 	//when the 5th page has been reached, fill it up properly and commit
 	if (get_current_page() != 4) {
@@ -281,16 +490,23 @@ void App2Assistant::on_assistant_prepare(Gtk::Widget *page) {
     		std::cout << ' ' << *it;
   	std::cout << std::endl;*/
 
-	std::vector<int> diff_elements(pure_elements.size()+sample_elements.size());
-	std::vector<int>::iterator it = std::set_difference(sample_elements.begin(), sample_elements.end(), pure_elements.begin(), pure_elements.end(), diff_elements.begin());
-	diff_elements.resize(it-diff_elements.begin());
+	fifth_page_diff_elements.resize(pure_elements.size()+sample_elements.size());
+	std::vector<int>::iterator it = std::set_difference(sample_elements.begin(), sample_elements.end(), pure_elements.begin(), pure_elements.end(), fifth_page_diff_elements.begin());
+	fifth_page_diff_elements.resize(it-fifth_page_diff_elements.begin());
+
+	fifth_page_union_elements.resize(pure_elements.size()+sample_elements.size());
+	it = std::set_union(sample_elements.begin(), sample_elements.end(), pure_elements.begin(), pure_elements.end(), fifth_page_union_elements.begin());
+	fifth_page_union_elements.resize(it-fifth_page_union_elements.begin());
+	
+
+
 	/*std::cout << "diff_elements contains:";
   	for (std::vector<int>::iterator it=diff_elements.begin(); it!=diff_elements.end(); ++it)
     		std::cout << ' ' << *it;
   	std::cout << std::endl;*/
 
 
-	if (diff_elements.size() == 0) {
+	if (fifth_page_diff_elements.size() == 0) {
 		//no simulations needed
 		fifth_page_play_button.set_sensitive(false);
 		fifth_page_pause_button.set_sensitive(false);
@@ -299,19 +515,32 @@ void App2Assistant::on_assistant_prepare(Gtk::Widget *page) {
 		return;
 	}
 	//otherwise make the necessary preparations
-  	for (std::vector<int>::iterator it=diff_elements.begin(); it!=diff_elements.end(); ++it) {
+  	for (std::vector<int>::iterator it=fifth_page_union_elements.begin(); it!=fifth_page_union_elements.end(); ++it) {
 		//update model
 		char *element = AtomicNumberToSymbol(*it);
 		Gtk::TreeModel::Row row = *(fifth_page_model->append());
 		row[fifth_page_columns.col_element] = Glib::ustring(element);
+		row[fifth_page_columns.col_atomic_number] = *it;
 		row[fifth_page_columns.col_status] = Glib::ustring("Not started");
 		row[fifth_page_columns.col_progress] = 0;
+		row[fifth_page_columns.col_bam_file_asr] = 0;
 		xrlFree(element);
+		kids = second_page_model->children();
+		for (Gtk::TreeModel::Children::iterator iter = kids.begin() ; iter != kids.end() ; ++iter) {
+			Gtk::TreeModel::Row row2 = *iter;
+			if (row2[second_page_columns.col_atomic_number] == *it) {
+				BAM::File::ASR *temp_asr = row2[second_page_columns.col_bam_file_asr];
+				row[fifth_page_columns.col_bam_file_asr] = temp_asr;
+				break;
+			}
+		}
 		
 		//create xmsi files
 		row[fifth_page_columns.col_xmsi_filename] = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<ostringstream*>( &(ostringstream() << getpid()))->str() + row[fifth_page_columns.col_element] + ".xmsi");
 		row[fifth_page_columns.col_xmsi_file] = new BAM::File::XMSI(*fourth_page_xmsi_file);
 		row[fifth_page_columns.col_xmso_file] = 0;
+		row[fifth_page_columns.col_xmso_counts_KA] = 0.0;
+		row[fifth_page_columns.col_xmso_counts_LA] = 0.0;
 		BAM::File::XMSI *temp_xmsi_file = row[fifth_page_columns.col_xmsi_file];
 		std::string temp_xmsi_filename = Glib::locale_from_utf8(row[fifth_page_columns.col_xmsi_filename]);
 		
@@ -895,24 +1124,37 @@ void App2Assistant::xmimsim_child_watcher(GPid pid, int status) {
 			throw BAM::Exception("App2Assistant::xmimsim_start_recursive -> Could not read XMSO file");
 		}
 		row[fifth_page_columns.col_xmso_file] = xmso_file;
-		/*	
+		int Z = row[fifth_page_columns.col_atomic_number];
+		double col_xmso_counts_KA = 0;
+		double col_xmso_counts_LA = 0;
+
+		if (Z == 0)
+			throw BAM::Exception("App2Assistant::xmimsim_start_recursive -> Invalid col_element");
+			
 		try {
-			buttonVector[buttonIndex-1]->xmso_counts_KA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "KL2");
+			col_xmso_counts_KA += xmso_file->GetCountsForElementForLine(Z, "KL2");
 		}
 		catch (BAM::Exception &e) {}
 		try {
-			buttonVector[buttonIndex-1]->xmso_counts_KA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "KL3");
+			col_xmso_counts_KA += xmso_file->GetCountsForElementForLine(Z, "KL3");
 		}
 		catch (BAM::Exception &e) {}
 		try {
-			buttonVector[buttonIndex-1]->xmso_counts_LA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "L3M4");
+			col_xmso_counts_LA += xmso_file->GetCountsForElementForLine(Z, "L3M4");
 		}
 		catch (BAM::Exception &e) {}
 		try {
-			buttonVector[buttonIndex-1]->xmso_counts_LA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "L3M5");
+			col_xmso_counts_LA += xmso_file->GetCountsForElementForLine(Z, "L3M5");
 		}
 		catch (BAM::Exception &e) {}
-		*/
+
+		//both values should not be zero
+		if (col_xmso_counts_KA == 0.0 && col_xmso_counts_LA == 0.0)
+			throw BAM::Exception("App2Assistant::xmimsim_start_recursive -> Ka and La counts cannot both be 0");
+
+		row[fifth_page_columns.col_xmso_counts_KA] = col_xmso_counts_KA;
+		row[fifth_page_columns.col_xmso_counts_LA] = col_xmso_counts_LA;
+	
 		row[fifth_page_columns.col_status] = Glib::ustring("Completed");
 		fifth_page_play_button.set_sensitive(false);
 		fifth_page_stop_button.set_sensitive(false);
@@ -935,30 +1177,45 @@ void App2Assistant::xmimsim_child_watcher(GPid pid, int status) {
 			throw BAM::Exception("App2Assistant::xmimsim_start_recursive -> Could not read XMSO file");
 		}
 		row[fifth_page_columns.col_xmso_file] = xmso_file;
-		/*
+		Glib::ustring col_element = row[fifth_page_columns.col_element];
+		int Z = SymbolToAtomicNumber((char*) col_element.c_str());
+		double col_xmso_counts_KA = 0;
+		double col_xmso_counts_LA = 0;
+
+		if (Z == 0)
+			throw BAM::Exception("App2Assistant::xmimsim_start_recursive -> Invalid col_element");
+			
 		try {
-			buttonVector[buttonIndex-1]->xmso_counts_KA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "KL2");
+			col_xmso_counts_KA += xmso_file->GetCountsForElementForLine(Z, "KL2");
 		}
 		catch (BAM::Exception &e) {}
 		try {
-			buttonVector[buttonIndex-1]->xmso_counts_KA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "KL3");
+			col_xmso_counts_KA += xmso_file->GetCountsForElementForLine(Z, "KL3");
 		}
 		catch (BAM::Exception &e) {}
 		try {
-			buttonVector[buttonIndex-1]->xmso_counts_LA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "L3M4");
+			col_xmso_counts_LA += xmso_file->GetCountsForElementForLine(Z, "L3M4");
 		}
 		catch (BAM::Exception &e) {}
 		try {
-			buttonVector[buttonIndex-1]->xmso_counts_LA += xmso_file->GetCountsForElementForLine(buttonVector[buttonIndex-1]->GetZ(), "L3M5");
+			col_xmso_counts_LA += xmso_file->GetCountsForElementForLine(Z, "L3M5");
 		}
 		catch (BAM::Exception &e) {}
-		*/
+
+		//both values should not be zero
+		if (col_xmso_counts_KA == 0.0 && col_xmso_counts_LA == 0.0)
+			throw BAM::Exception("App2Assistant::xmimsim_start_recursive -> Ka and La counts cannot both be 0");
+
+		row[fifth_page_columns.col_xmso_counts_KA] = col_xmso_counts_KA;
+		row[fifth_page_columns.col_xmso_counts_LA] = col_xmso_counts_LA;
 
 		row[fifth_page_columns.col_status] = Glib::ustring("Completed");
 		//g_unlink(buttonVector[buttonIndex-1]->xmsi_file->GetOutputFile().c_str());
 		//g_unlink(buttonVector[buttonIndex-1]->xmsi_file->GetFilename().c_str());
 		//
 		fifth_page_iter++;
+
+		//and the beat goes on...
 		xmimsim_start_recursive();	
 	}
 }
@@ -1033,4 +1290,33 @@ void App2Assistant::update_console(string line, string tag) {
 	}
 	console_buffer->move_mark(cur_mark, console_buffer->end());
 	console_view.scroll_to(cur_mark, 0.0);*/
+}
+
+void App2Assistant::on_sixth_page_open_clicked() {
+	//fire up a filechooserdialog
+	Gtk::FileChooserDialog dialog(*this, "Please select a BAM-QUANT project 2 file", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	Glib::RefPtr<Gtk::FileFilter> filter_bqp1 = Gtk::FileFilter::create();
+	filter_bqp1->set_name("BAM-QUANT project 2 files");
+	filter_bqp1->add_pattern("*.bqp2");
+	filter_bqp1->add_pattern("*.BQP2");
+	dialog.add_filter(filter_bqp1);
+	dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+	dialog.add_button("Select", Gtk::RESPONSE_OK);
+	
+	int result = dialog.run();
+	string filename;
+	switch(result) {
+		case(Gtk::RESPONSE_OK):
+			filename = dialog.get_filename();
+			if (filename.compare(filename.length()-5, string::npos, ".bqp2") != 0)
+				filename += ".bqp2";
+			std::cout << "Open clicked: " << filename << std::endl;
+      			break;
+		case(Gtk::RESPONSE_CANCEL):
+		default:
+			return;
+	}
+	set_page_complete(sixth_page, true);	
+	sixth_page_bpq2_entry.set_text(filename);
+	return;
 }

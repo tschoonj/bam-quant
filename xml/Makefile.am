@@ -1,6 +1,7 @@
 bamdir = $(datadir)/bam-quant
 
-dist_bam_DATA = bam-quant-app1.dtd
+dist_bam_DATA = bam-quant-app1.dtd \
+		bam-quant-app2.dtd
 bam_DATA = bam-quant-cat.xml
 
 bam-quant-cat.xml:

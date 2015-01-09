@@ -1,0 +1,15 @@
+
+<!-- import from xmimsim-1.0.dtd -->
+<!-- let's hope this works with libxml!!! -->
+<!ENTITY % xmsi SYSTEM "http://www.xmi.UGent.be/xml/xmimsim-1.0.dtd">
+%xmsi;
+
+
+<!ELEMENT bam-quant-app2 (samples+, xmimsim)>
+<!ELEMENT samples (element_rxi+, asrfile)>
+<!ELEMENT element_rxi (#PCDATA)>
+<!ATTLIST element_rxi element CDATA #REQUIRED>
+<!ATTLIST element_rxi linetype (KA_LINE|LA_LINE) #REQUIRED>
+<!ATTLIST element_rxi datatype (experimental|interpolated) #REQUIRED>
+<!ELEMENT asrfile (#PCDATA)>
+

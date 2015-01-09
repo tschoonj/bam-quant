@@ -28,7 +28,6 @@ public:
 	
 
 private:
-	void on_assistant_apply();
 	void on_assistant_cancel();
 	void on_assistant_close();
 	void on_assistant_prepare(Gtk::Widget *page);
@@ -98,37 +97,48 @@ private:
 		public:
 			FifthPageColumns() {
 				add(col_element);
+				add(col_atomic_number);
 				add(col_status);
 				add(col_progress);
 				add(col_xmsi_file);
 				add(col_xmso_file);
 				add(col_xmsi_filename);
 				add(col_xmso_filename);
+				add(col_xmso_counts_KA);
+				add(col_xmso_counts_LA);
+				add(col_bam_file_asr);
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_element;
+			Gtk::TreeModelColumn<int> col_atomic_number;
 			Gtk::TreeModelColumn<Glib::ustring> col_status;
 			Gtk::TreeModelColumn<int> col_progress;
 			Gtk::TreeModelColumn<BAM::File::XMSI *> col_xmsi_file;
                 	Gtk::TreeModelColumn<BAM::File::XMSO *> col_xmso_file;
 			Gtk::TreeModelColumn<Glib::ustring> col_xmsi_filename;
 			Gtk::TreeModelColumn<Glib::ustring> col_xmso_filename;
+			Gtk::TreeModelColumn<double> col_xmso_counts_KA;
+			Gtk::TreeModelColumn<double> col_xmso_counts_LA;
+			Gtk::TreeModelColumn<BAM::File::ASR *> col_bam_file_asr;
 	};
 	FifthPageColumns fifth_page_columns;	
 	Gtk::Grid fifth_page;
 	Gtk::ScrolledWindow fifth_page_sw;
 	Gtk::TreeView fifth_page_tv;
 	Glib::RefPtr<Gtk::ListStore> fifth_page_model;
+	Gtk::TreeModel::Children::iterator fifth_page_iter;
+	std::vector<int> fifth_page_diff_elements;
+	std::vector<int> fifth_page_union_elements;
+	void on_fifth_page_play_clicked();
+	void on_fifth_page_pause_clicked();
+	void on_fifth_page_stop_clicked();
 
+	//XMI-MSIM related stuff
 	Glib::RefPtr<Glib::IOChannel> xmimsim_stderr;
 	Glib::RefPtr<Glib::IOChannel> xmimsim_stdout;
 	bool xmimsim_paused;
 	GPid xmimsim_pid;
 	Glib::Timer *timer;
 	vector<std::string> argv;
-	Gtk::TreeModel::Children::iterator fifth_page_iter;
-	void on_fifth_page_play_clicked();
-	void on_fifth_page_pause_clicked();
-	void on_fifth_page_stop_clicked();
 	void xmimsim_child_watcher(GPid pid, int child_status);
 	bool xmimsim_stdout_watcher(Glib::IOCondition cond);
 	bool xmimsim_stderr_watcher(Glib::IOCondition cond);
@@ -150,6 +160,16 @@ private:
 		return rv; 
 	}
 	void update_console(string line, string tag="");
+
+	//sixth page -> save the results
+	Gtk::Grid sixth_page;
+	Gtk::Entry sixth_page_bpq2_entry;
+	Gtk::Button sixth_page_save;
+	void on_sixth_page_open_clicked();
+
+	//seventh page -> last page!
+	Gtk::Label seventh_page;
+	
 
 };
 

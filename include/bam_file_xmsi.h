@@ -29,6 +29,11 @@ namespace BAM {
 				void Parse();
 				void Write();
 				void Write(string filename);
+				struct xmi_input *GetInternalCopy() {
+					struct xmi_input *rv;
+					xmi_copy_input(input, &rv);
+					return rv;
+				}
 				friend std::ostream& operator<< (std::ostream &out, const XMSI &xmsi);
 				void ReplaceComposition(const BAM::Data::XMSI::Composition &composition_new);
 				void SetOutputFile(string file) {
