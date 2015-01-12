@@ -5,7 +5,7 @@
 %xmsi;
 
 
-<!ELEMENT bam-quant-app2 (samples+, xmimsim)>
+<!ELEMENT bam-quant-app2 (samples+, xmimsim-input)>
 <!ELEMENT samples (element_rxi+, asrfile)>
 <!ELEMENT element_rxi (#PCDATA)>
 <!ATTLIST element_rxi element CDATA #REQUIRED>

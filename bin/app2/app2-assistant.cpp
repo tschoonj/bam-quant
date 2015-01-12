@@ -13,7 +13,6 @@
 #include <glibmm/convert.h>
 #include <algorithm>
 #include <libxml++/libxml++.h>
-#include <libxml/xmlwriter.h>
 #include <libxml/catalog.h>
 
 #ifdef G_OS_UNIX
@@ -317,14 +316,12 @@ void App2Assistant::on_assistant_close() {
 		document.set_internal_subset("bam-quant-app2", "", "http://www.bam.de/xml/bam-quant-app2.dtd");
 		//document.add_comment("this is a comment");
 		xmlDocPtr doc = document.cobj();
-		xmlTextWriterPtr writer = xmlNewTextWriterTree(doc, 0, 0);
-		if (xmi_write_default_comments(writer) == 0) {
+
+		xmlpp::Element *rootnode = document.create_root_node("bam-quant-app2");
+
+		if (xmi_write_default_comments(doc, rootnode->cobj()) == 0) {
 			throw BAM::Exception("Could not write XMI-MSIM default comments");
 		}
-
-		xmlTextWriterFlush(writer);
-		xmlFreeTextWriter(writer);
-		xmlpp::Element *rootnode = document.create_root_node("bam-quant-app2");
 
 		//loop over all samples from page three
 		Gtk::TreeModel::Children kids = third_page_model->children();
@@ -410,20 +407,17 @@ void App2Assistant::on_assistant_close() {
 			xmlpp::Element *asrfile = samples->add_child("asrfile");
 			asrfile->add_child_text(row[third_page_columns.col_filename]);
 		}
-		xmlpp::Element *xmimsim = rootnode->add_child("xmimsim");
-		xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(xmimsim);
-		xmlNodePtr node = nodepp->cobj();
-		writer = xmlNewTextWriterTree(doc, node, 0);
+		xmlpp::Element *xmimsim = rootnode->add_child("xmimsim-input");
+		//xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(xmimsim);
+		xmlNodePtr node = xmimsim->cobj();
 		struct xmi_input *xmsi_raw = fourth_page_xmsi_file->GetInternalCopy();
-		if (xmi_write_input_xml_body(writer, xmsi_raw) == 0) {
+		if (xmi_write_input_xml_body(doc, node, xmsi_raw) == 0) {
 			throw BAM::Exception("Could not write XMI-MSIM input body");
 		}
-		//xmlTextWriterFlush(writer);
 
 		document.write_to_file_formatted(sixth_page_bpq2_entry.get_text());
 
 		xmi_free_input(xmsi_raw);
-		xmlFreeTextWriter(writer);
 	}
 	catch (BAM::Exception &e) {
 		//produce a message dialog telling the user to change the filename

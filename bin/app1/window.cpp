@@ -445,9 +445,10 @@ void Window::save_project() {
 				ss << it->second->asr_file->GetNormfactor();
 				xmlpp::Element *normfactor = asrfile->add_child("normfactor");
 				normfactor->add_child_text(ss.str());
+				xmlpp::Element *xmimsim = element_data->add_child("xmimsim-results");
 				
-				xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(element_data);
-				xmlNodePtr node = nodepp->cobj();
+				//xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(element_data);
+				xmlNodePtr node = xmimsim->cobj();
 				struct xmi_output *xmso_raw = it->second->xmso_file->GetInternalCopy();
 				if (xmi_write_output_xml_body(doc, node, xmso_raw, -1, -1, 0) == 0) {
 					throw BAM::Exception("Could not write XMI-MSIM output body");
@@ -459,14 +460,13 @@ void Window::save_project() {
 				element_data->set_attribute("datatype", "interpolated");
 				element_data->set_attribute("element", it->second->GetElement());
 				element_data->set_attribute("linetype", it->second->xmso_counts_KA > 0.0 ? "KA_LINE": "LA_LINE");
-				xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(element_data);
-				xmlNodePtr node = nodepp->cobj();
+				xmlpp::Element *xmimsim = element_data->add_child("xmimsim-results");
+				//xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(element_data);
+				xmlNodePtr node = xmimsim->cobj();
 				struct xmi_output *xmso_raw = it->second->xmso_file->GetInternalCopy();
 				if (xmi_write_output_xml_body(doc, node, xmso_raw, -1, -1, 0) == 0) {
 					throw BAM::Exception("Could not write XMI-MSIM output body");
 				}
-				xmlTextWriterFlush(writer);
-				xmlFreeTextWriter(writer);
 				xmi_free_output(xmso_raw);
 			}
 		}
