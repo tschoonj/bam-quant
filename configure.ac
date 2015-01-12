@@ -57,9 +57,9 @@ esac
 AC_SUBST(LDFLAGS_EXTRA)
 
 #look for openmp support in C++
-AC_LANG_PUSH(C++)
-AC_OPENMP
-AC_LANG_POP(C++)
+#AC_LANG_PUSH(C++)
+#AC_OPENMP
+#AC_LANG_POP(C++)
 
 #AC_CHECK_LIB([m], [exp], [], [AC_MSG_ERROR([math library does not contain exp])])
 #AC_CHECK_FUNC(expm1,,[AC_MSG_ERROR([Required libc function not found])])

@@ -9,7 +9,6 @@
 #include <glibmm/miscutils.h>
 #include "xmi-msim-dialog.h"
 #include <libxml++/libxml++.h>
-#include <libxml/xmlwriter.h>
 #include <libxml/catalog.h>
 
 
@@ -421,15 +420,12 @@ void Window::save_project() {
 		document.set_internal_subset("bam-quant-app1", "", "http://www.bam.de/xml/bam-quant-app1.dtd");
 		//document.add_comment("this is a comment");
 		xmlDocPtr doc = document.cobj();
-		xmlTextWriterPtr writer = xmlNewTextWriterTree(doc, 0, 0);
-		if (xmi_write_default_comments(writer) == 0) {
+		xmlpp::Element *rootnode = document.create_root_node("bam-quant-app1");
+
+		if (xmi_write_default_comments(doc, rootnode->cobj()) == 0) {
 			throw BAM::Exception("Could not write XMI-MSIM default comments");
 		}
 
-		//
-		xmlTextWriterFlush(writer);
-		xmlFreeTextWriter(writer);
-		xmlpp::Element *rootnode = document.create_root_node("bam-quant-app1");
 		for (std::map<int, MendeleevButton*>::iterator it = buttonMap.begin(); it != buttonMap.end(); ++it) {
 			if (it->second->asr_file) {
 				xmlpp::Element *element_data = rootnode->add_child("element_data");
@@ -452,13 +448,10 @@ void Window::save_project() {
 				
 				xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(element_data);
 				xmlNodePtr node = nodepp->cobj();
-				writer = xmlNewTextWriterTree(doc, node, 0);
 				struct xmi_output *xmso_raw = it->second->xmso_file->GetInternalCopy();
-				if (xmi_write_output_xml_body(writer, xmso_raw, -1, -1, 0) == 0) {
+				if (xmi_write_output_xml_body(doc, node, xmso_raw, -1, -1, 0) == 0) {
 					throw BAM::Exception("Could not write XMI-MSIM output body");
 				}
-				xmlTextWriterFlush(writer);
-				xmlFreeTextWriter(writer);
 				xmi_free_output(xmso_raw);
 			}
 			else if (it->second->xmso_file) {
@@ -468,9 +461,8 @@ void Window::save_project() {
 				element_data->set_attribute("linetype", it->second->xmso_counts_KA > 0.0 ? "KA_LINE": "LA_LINE");
 				xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(element_data);
 				xmlNodePtr node = nodepp->cobj();
-				writer = xmlNewTextWriterTree(doc, node, 0);
 				struct xmi_output *xmso_raw = it->second->xmso_file->GetInternalCopy();
-				if (xmi_write_output_xml_body(writer, xmso_raw, -1, -1, 0) == 0) {
+				if (xmi_write_output_xml_body(doc, node, xmso_raw, -1, -1, 0) == 0) {
 					throw BAM::Exception("Could not write XMI-MSIM output body");
 				}
 				xmlTextWriterFlush(writer);
