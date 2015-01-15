@@ -1,7 +1,10 @@
+#include "config.h"
 #include "bam_exception.h"
 #include <fstream>
 #include <iostream>
+#ifdef HAVE_EXT_STDIO_FILEBUF_H
 #include <ext/stdio_filebuf.h>
+#endif
 #include "bam_file_xmsi.h"
 
 using namespace BAM;
@@ -72,6 +75,7 @@ void XMSI::Write(string filename) {
 	}
 }
 
+#ifdef HAVE_EXT_STDIO_FILEBUF_H
 //look here for more info regarding this very dirty trick : http://stackoverflow.com/questions/109449/getting-a-file-from-a-stdfstream
 typedef std::basic_ofstream<char>::__filebuf_type buffer_t;
 typedef __gnu_cxx::stdio_filebuf<char>            io_buffer_t; 
@@ -86,6 +90,7 @@ FILE* cfile(std::ostream const& os){
     if(&os == &std::clog) return stderr;
     return 0; // stream not recognized
 }
+#endif
 
 //for some reason friend functions are really sensitive to the namespace thing
 namespace BAM {
@@ -94,13 +99,17 @@ namespace BAM {
 			if (xmi_validate_input(xmsi.input) != 0) {
 				throw BAM::Exception("BAM::File::XMSI::operator<< -> Could not validate input");
 			}
+#ifdef HAVE_EXT_STDIO_FILEBUF_H
 			FILE *filePtr = cfile(out);
+#else
+			FILE *filePtr = 0;
+#endif
 
 			if (filePtr) {
 				xmi_print_input(filePtr,xmsi.input);
 			}
 			else
-				throw BAM::Exception("BAM::File::XMSI::operator<< -> Coult not get C filehandle for stream");
+				throw BAM::Exception("BAM::File::XMSI::operator<< -> Could not get C filehandle for stream");
 			return out;
 		}
 	}

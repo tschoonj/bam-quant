@@ -1,3 +1,4 @@
+#include "config.h"
 #include "bam_file_xmsi.h"
 #include "bam_data_xmsi.h"
 
@@ -16,8 +17,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	//pointer deref is really important here, otherwise you will just get an address
+#ifdef HAVE_EXT_STDIO_FILEBUF_H
+	//you need gcc for this to work
 	std::cout << *xmsi_file << endl;
-
+#endif
 	//now let's change the composition
 	BAM::Data::XMSI::Layer *layer;
 	BAM::Data::XMSI::Composition *composition;
@@ -47,7 +50,9 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
+#ifdef HAVE_EXT_STDIO_FILEBUF_H
 	std::cout << *xmsi_file << endl;
+#endif
 
 	xmsi_file->SetFilename("In_copy.xmsi");
 	try {

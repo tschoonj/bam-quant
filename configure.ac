@@ -66,6 +66,12 @@ AC_SUBST(LDFLAGS_EXTRA)
 #AC_CHECK_FUNC(log1p,,[AC_MSG_ERROR([Required libc function not found])])
 
 
+
+AC_LANG_PUSH(C++)
+AC_CHECK_HEADERS([ext/stdio_filebuf.h])
+AC_LANG_POP(C++)
+
+
 #look for xraylib
 #initialize pkg-config
 PKG_PROG_PKG_CONFIG
