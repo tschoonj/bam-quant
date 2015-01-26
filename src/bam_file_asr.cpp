@@ -57,6 +57,15 @@ void ASR::Parse() {
 				normfactor_found = true;
 				cout << "Normfactor: " << normfactor << endl;
 			}
+			else if (identifier.compare(0, string("Normfactor:").length(), "Normfactor:") == 0) {
+				normfactor_found = true;
+				string normfactor_str = identifier.substr(string("Normfactor:").length(), string::npos);
+				ss.clear();
+				ss.str("");
+				ss << normfactor_str;
+				ss >> normfactor;
+				cout << "Normfactor: " << normfactor << endl;
+			}
 		}
 		else {
 			int Z;
