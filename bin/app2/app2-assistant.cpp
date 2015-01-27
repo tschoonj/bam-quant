@@ -478,20 +478,24 @@ void App2Assistant::on_assistant_prepare(Gtk::Widget *page) {
 		sample_elements.insert(sample_elements.end(), col_elements_int->begin(), col_elements_int->end());
 	}
 	std::sort(sample_elements.begin(), sample_elements.end());
-	std::unique(sample_elements.begin(), sample_elements.end());
-	/*std::cout << "sample_elements contains:";
+	{
+		std::vector<int>::iterator it = std::unique(sample_elements.begin(), sample_elements.end());
+		sample_elements.resize(it-sample_elements.begin());
+	}
+	std::cout << "sample_elements contains:";
   	for (std::vector<int>::iterator it=sample_elements.begin(); it!=sample_elements.end(); ++it)
     		std::cout << ' ' << *it;
-  	std::cout << std::endl;*/
+  	std::cout << std::endl;
 
 	fifth_page_diff_elements.resize(pure_elements.size()+sample_elements.size());
-	std::vector<int>::iterator it = std::set_difference(sample_elements.begin(), sample_elements.end(), pure_elements.begin(), pure_elements.end(), fifth_page_diff_elements.begin());
-	fifth_page_diff_elements.resize(it-fifth_page_diff_elements.begin());
+	{
+		std::vector<int>::iterator it = std::set_difference(sample_elements.begin(), sample_elements.end(), pure_elements.begin(), pure_elements.end(), fifth_page_diff_elements.begin());
+		fifth_page_diff_elements.resize(it-fifth_page_diff_elements.begin());
 
-	fifth_page_union_elements.resize(pure_elements.size()+sample_elements.size());
-	it = std::set_union(sample_elements.begin(), sample_elements.end(), pure_elements.begin(), pure_elements.end(), fifth_page_union_elements.begin());
-	fifth_page_union_elements.resize(it-fifth_page_union_elements.begin());
-	
+		fifth_page_union_elements.resize(pure_elements.size()+sample_elements.size());
+		it = std::set_union(sample_elements.begin(), sample_elements.end(), pure_elements.begin(), pure_elements.end(), fifth_page_union_elements.begin());
+		fifth_page_union_elements.resize(it-fifth_page_union_elements.begin());
+	}
 
 
 	/*std::cout << "diff_elements contains:";
