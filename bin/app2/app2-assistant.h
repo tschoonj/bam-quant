@@ -46,13 +46,17 @@ private:
 			SecondPageColumns() {
 				add(col_element);
 				add(col_filename);
+				add(col_filename_full);
 				add(col_atomic_number);
 				add(col_bam_file_asr);
+				add(col_linetype);
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_element;
 			Gtk::TreeModelColumn<Glib::ustring> col_filename;
+			Gtk::TreeModelColumn<Glib::ustring> col_filename_full;
 			Gtk::TreeModelColumn<int> col_atomic_number;
 			Gtk::TreeModelColumn<BAM::File::ASR*> col_bam_file_asr;
+			Gtk::TreeModelColumn<Glib::ustring> col_linetype;
 	};
 	SecondPageColumns second_page_columns;	
 	Gtk::Button second_page_open;
@@ -71,11 +75,13 @@ private:
 				add(col_filename);
 				add(col_bam_file_asr);
 				add(col_elements_int);
+				add(col_filename_full);
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_elements;
 			Gtk::TreeModelColumn<Glib::ustring> col_filename;
 			Gtk::TreeModelColumn<BAM::File::ASR*> col_bam_file_asr;
 			Gtk::TreeModelColumn<std::vector<int>* > col_elements_int;
+			Gtk::TreeModelColumn<Glib::ustring> col_filename_full;
 	};
 	ThirdPageColumns third_page_columns;	
 	Gtk::Button third_page_open;

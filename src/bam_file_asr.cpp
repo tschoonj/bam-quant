@@ -8,8 +8,9 @@ using namespace BAM;
 using namespace BAM::File;
 using namespace std;
 
-ASR::ASR(string filename) : File::File(filename) {
+ASR::ASR(string filename, bool my_keep_negative_counts) : File::File(filename) {
 	//cout << "Entering BAM::File::ASR constructor" << endl;
+	keep_negative_counts = my_keep_negative_counts;
 	if (fs) {
 		this->Parse();
 	}
@@ -80,6 +81,8 @@ void ASR::Parse() {
 			ss << line;
 			ss >> Z >> elem_line >> energy >> counts >> stddev >> chi/* >> bg*/;
 			//switch to xraylib's lines
+			if (!keep_negative_counts && counts <= 0)
+				continue;
 			
 			if (elem_line == 1) {
 				elem_line = KA_LINE;

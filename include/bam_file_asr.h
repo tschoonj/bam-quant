@@ -14,9 +14,10 @@ namespace BAM {
 			private:
 				vector<Data::ASR> data_asr;
 				double normfactor;
+				bool keep_negative_counts;
 				void Parse();
 			public:
-				ASR(string);
+				ASR(string, bool keep_negative_counts = false);
 				ASR(double normfactor);
 				~ASR();
 				int GetNPeaks() {

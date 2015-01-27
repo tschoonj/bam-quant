@@ -72,6 +72,8 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 	second_page_tv.set_model(second_page_model);
 	second_page_tv.append_column("Element", second_page_columns.col_element);
 	second_page_tv.append_column("Filename", second_page_columns.col_filename);
+	second_page_tv.append_column("Linetype", second_page_columns.col_linetype);
+	second_page_tv.get_column(1)->set_expand();
 	second_page_sw.add(second_page_tv);
 	second_page_sw.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 	second_page.attach(second_page_sw, 1, 1, 1, 1);
@@ -159,9 +161,11 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 	//fifth_page_tv.append_column("Status", fifth_page_columns.col_status);
 	Gtk::CellRendererProgress* cell = Gtk::manage(new Gtk::CellRendererProgress);
 	int cols_count = fifth_page_tv.append_column("Status", *cell);
-	Gtk::TreeViewColumn* temp_column = fifth_page_tv.get_column(cols_count-1);
-	temp_column->add_attribute(cell->property_value(), fifth_page_columns.col_progress);
-	temp_column->add_attribute(cell->property_text(), fifth_page_columns.col_status);
+	{
+		Gtk::TreeViewColumn* temp_column = fifth_page_tv.get_column(cols_count-1);
+		temp_column->add_attribute(cell->property_value(), fifth_page_columns.col_progress);
+		temp_column->add_attribute(cell->property_text(), fifth_page_columns.col_status);
+	}
 	fifth_page_sw.add(fifth_page_tv);
 	fifth_page_sw.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 	fifth_page_sw.set_vexpand();
@@ -405,7 +409,7 @@ void App2Assistant::on_assistant_close() {
 				element_rxi->add_child_text(ss.str());
 			}
 			xmlpp::Element *asrfile = samples->add_child("asrfile");
-			asrfile->add_child_text(row[third_page_columns.col_filename]);
+			asrfile->add_child_text(row[third_page_columns.col_filename_full]);
 		}
 		xmlpp::Element *xmimsim = rootnode->add_child("xmimsim-input");
 		//xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(xmimsim);
@@ -657,9 +661,27 @@ void App2Assistant::on_second_page_open_clicked() {
 		row[second_page_columns.col_element] = Glib::ustring(element);
 		xrlFree(element);
 		row[second_page_columns.col_filename] = Glib::path_get_basename(*it);
+		row[second_page_columns.col_filename_full] = *it;
 		row[second_page_columns.col_atomic_number] = Z;
 		//this is causing a memory leak when the assistant is killed!!!
 		row[second_page_columns.col_bam_file_asr] = asr_file;
+		int linetype = asr_data.GetLine();
+		if (linetype == KA_LINE) {
+			row[second_page_columns.col_linetype] = Glib::ustring("Kα");
+		}
+		else if (linetype == LA_LINE) {
+			row[second_page_columns.col_linetype] = Glib::ustring("Lα");
+		}
+		else {
+			//unknown linetype
+			second_page_model->erase(row);
+			Gtk::MessageDialog dialog(*this, "Error reading in "+*it, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+  			dialog.set_secondary_text(Glib::ustring("Unknown linetype detected"));
+  			dialog.run();
+			delete asr_file;
+			continue;
+
+		}
 	}
 	if (second_page_model->children().size() >= 2) {
 		set_page_complete(second_page, true);	
@@ -757,6 +779,7 @@ void App2Assistant::on_third_page_open_clicked() {
 		Gtk::TreeModel::Row row = *(third_page_model->append());
 		row[third_page_columns.col_elements] = elements;
 		row[third_page_columns.col_filename] = Glib::path_get_basename(*it);
+		row[third_page_columns.col_filename_full] = *it;
 		row[third_page_columns.col_bam_file_asr] = asr_file;
 		row[third_page_columns.col_elements_int] = elements_int;
 	}
