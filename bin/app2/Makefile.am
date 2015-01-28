@@ -13,5 +13,10 @@ app2_CPPFLAGS = @gtkmm_CFLAGS@ \
 		@xraylib_CFLAGS@ \
 		@xmimsim_CFLAGS@ \
 		@libxmlmm_CFLAGS@ \
+		@gsl_CFLAGS@ \
 		-DBAM_CATALOG=\"$(datadir)/bam-quant/bam-quant-cat.xml\"
-app2_LDADD = @gtkmm_LIBS@ ${top_builddir}/src/libbam-quant.la @xmimsim_LIBS@ @libxmlmm_LIBS@
+app2_LDADD = @gtkmm_LIBS@ \
+	     ${top_builddir}/src/libbam-quant.la \
+	     @xmimsim_LIBS@ \
+	     @libxmlmm_LIBS@ \
+	     @gsl_LIBS@

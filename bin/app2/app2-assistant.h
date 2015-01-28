@@ -19,6 +19,7 @@
 #include "bam_data_asr.h"
 #include <iomanip>
 #include <iostream>
+#include <gsl/gsl_multifit_nlin.h>
 
 class App2Assistant : public Gtk::Assistant {
 public:
@@ -113,6 +114,8 @@ private:
 				add(col_xmso_counts_KA);
 				add(col_xmso_counts_LA);
 				add(col_bam_file_asr);
+				add(col_simulate_active);
+				add(col_simulate_sensitive);
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_element;
 			Gtk::TreeModelColumn<int> col_atomic_number;
@@ -125,6 +128,8 @@ private:
 			Gtk::TreeModelColumn<double> col_xmso_counts_KA;
 			Gtk::TreeModelColumn<double> col_xmso_counts_LA;
 			Gtk::TreeModelColumn<BAM::File::ASR *> col_bam_file_asr;
+			Gtk::TreeModelColumn<bool> col_simulate_active;
+			Gtk::TreeModelColumn<bool> col_simulate_sensitive;
 	};
 	FifthPageColumns fifth_page_columns;	
 	Gtk::Grid fifth_page;
@@ -137,6 +142,7 @@ private:
 	void on_fifth_page_play_clicked();
 	void on_fifth_page_pause_clicked();
 	void on_fifth_page_stop_clicked();
+	void on_fifth_page_simulate_active_toggled(const Glib::ustring &path);
 
 	//XMI-MSIM related stuff
 	Glib::RefPtr<Glib::IOChannel> xmimsim_stderr;
@@ -175,9 +181,24 @@ private:
 
 	//seventh page -> last page!
 	Gtk::Label seventh_page;
+
+	static int phi_lqfit_f(const gsl_vector *x, void *data, gsl_vector *f);
+	static int phi_lqfit_df(const gsl_vector *x, void *data, gsl_matrix *J);
+	static int phi_lqfit_fdf(const gsl_vector *x, void *data, gsl_vector *f, gsl_matrix *J) {
+		phi_lqfit_f(x, data, f);
+		phi_lqfit_df(x, data, J);
+		return GSL_SUCCESS;
+	}
 	
 
 };
+
+struct phi_lqfit_data {
+	std::vector<double> x;
+	std::vector<double> y;
+	std::vector<double> sigma;
+};
+
 
 
 #endif

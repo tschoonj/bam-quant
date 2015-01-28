@@ -159,9 +159,17 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 	fifth_page_tv.set_model(fifth_page_model);
 	fifth_page_tv.append_column("Element", fifth_page_columns.col_element);
 	//fifth_page_tv.append_column("Status", fifth_page_columns.col_status);
-	Gtk::CellRendererProgress* cell = Gtk::manage(new Gtk::CellRendererProgress);
-	int cols_count = fifth_page_tv.append_column("Status", *cell);
 	{
+		Gtk::CellRendererToggle* cell = Gtk::manage(new Gtk::CellRendererToggle);
+		int cols_count = fifth_page_tv.append_column("Simulate", *cell);
+		Gtk::TreeViewColumn* temp_column = fifth_page_tv.get_column(cols_count-1);
+		temp_column->add_attribute(cell->property_active(), fifth_page_columns.col_simulate_active);
+		temp_column->add_attribute(cell->property_sensitive(), fifth_page_columns.col_simulate_sensitive);
+		cell->signal_toggled().connect(sigc::mem_fun(*this, &App2Assistant::on_fifth_page_simulate_active_toggled));
+	}
+	{
+		Gtk::CellRendererProgress* cell = Gtk::manage(new Gtk::CellRendererProgress);
+		int cols_count = fifth_page_tv.append_column("Status", *cell);
 		Gtk::TreeViewColumn* temp_column = fifth_page_tv.get_column(cols_count-1);
 		temp_column->add_attribute(cell->property_value(), fifth_page_columns.col_progress);
 		temp_column->add_attribute(cell->property_text(), fifth_page_columns.col_status);
@@ -284,6 +292,7 @@ void App2Assistant::on_assistant_close() {
 	std::cout << "Close button clicked" << std::endl;
 
 	double phi = 0.0;
+	gsl_multifit_fdfsolver *s = 0;
 
 
 	//let's try saving our data
@@ -293,13 +302,17 @@ void App2Assistant::on_assistant_close() {
 		if (fifth_page_diff_elements.size() > 0) {
 			//estimate the phi factor
 			Gtk::TreeModel::Children pure_kids = fifth_page_model->children();
+			struct phi_lqfit_data pld;
 			for (Gtk::TreeModel::Children::iterator iter = pure_kids.begin() ; iter != pure_kids.end() ; ++iter) {
 				Gtk::TreeModel::Row row = *iter;
-				if (row[fifth_page_columns.col_bam_file_asr] == 0)
+				if (row[fifth_page_columns.col_bam_file_asr] == 0 ||
+				    row[fifth_page_columns.col_simulate_active] == false)
 					continue;
 				double local_phi = 0.0;
 				BAM::File::ASR *col_bam_file_asr = row[fifth_page_columns.col_bam_file_asr];
 				std::cout << "Element for phi: " << col_bam_file_asr->GetData(0).GetZ() << std::endl;
+
+
 				if (col_bam_file_asr->GetData(0).GetLine() == KA_LINE && row[fifth_page_columns.col_xmso_counts_KA] > 0.0) {
 					local_phi = col_bam_file_asr->GetData(0).GetCounts() * col_bam_file_asr->GetNormfactor() / row[fifth_page_columns.col_xmso_counts_KA]; 
 				}
@@ -310,10 +323,38 @@ void App2Assistant::on_assistant_close() {
 					throw BAM::Exception(std::string("Mismatch found: counts in ASR file and corresponding simulation result must both be positive values! Problem detected for element:")+row[fifth_page_columns.col_element]);
 				}
 				std::cout << "local_phi: " << local_phi << std::endl;
-				phi += local_phi;
+				pld.x.push_back(LineEnergy(col_bam_file_asr->GetData(0).GetZ(), col_bam_file_asr->GetData(0).GetLine()));
+				pld.y.push_back(local_phi);
 			}
-			phi /= second_page_model->children().size();
-			std::cout << "average phi: " << phi << std::endl;
+			//simple phi -> calculate mean
+			phi = std::accumulate(pld.y.begin(), pld.y.end(), 0)/pld.y.size();
+			std::cout << "average phi simple: " << phi << std::endl;
+
+			//complicated phi using non-linear least-squares fit
+			const gsl_multifit_fdfsolver_type *T = gsl_multifit_fdfsolver_lmsder;
+			gsl_multifit_function_fdf f;
+			pld.sigma.assign(pld.x.size(), 0.1);
+			double x_init[3] = {0.0, 1.0, 0.0};
+			gsl_vector_view x = gsl_vector_view_array(x_init, 3);
+			f.f = &App2Assistant::phi_lqfit_f;
+			f.df = &App2Assistant::phi_lqfit_df;
+			f.fdf = &App2Assistant::phi_lqfit_fdf;
+			f.n = pld.x.size();
+			f.p = 3;
+			f.params = &pld;
+		
+			s = gsl_multifit_fdfsolver_alloc(T, pld.x.size(), 3);
+			gsl_multifit_fdfsolver_set(s, &f, &x.vector);
+			int status = gsl_multifit_fdfsolver_driver(s, 500, 1E-4, 1E-4);
+			
+			if (status != GSL_SUCCESS) {
+				gsl_multifit_fdfsolver_free(s);	
+				throw BAM::Exception("No convergence while calculating scaling factor phi using GSL non-linear least squares fitting.");
+			}	
+			std::cout << "fit results: " << std::endl;
+			std::cout << "a: " << gsl_vector_get(s->x, 0) << std::endl;
+			std::cout << "b: " << gsl_vector_get(s->x, 1) << std::endl;
+			std::cout << "c: " << gsl_vector_get(s->x, 2) << std::endl;
 		}	
 		xmlpp::Document document;
 
@@ -390,11 +431,21 @@ void App2Assistant::on_assistant_close() {
 					if (!found)
 						throw BAM::Exception("Could not find element in fifth page. This should never happen!");
 					if (row3[fifth_page_columns.col_xmso_counts_KA] > 0) {
+						double lE = LineEnergy(Z, KA_LINE);
+						phi = gsl_vector_get(s->x, 0)*lE*lE + 
+						      gsl_vector_get(s->x, 1)*lE+
+						      gsl_vector_get(s->x, 2);
+						std::cout << "average phi fit: " << phi << " for " << Z <<std::endl;
 						rxi = asr_data_sample.GetCounts() * norm_factor_sample /
 						(row3[fifth_page_columns.col_xmso_counts_KA]*phi);
 						element_rxi->set_attribute("linetype", "KA_LINE");
 					}
 					else if (row3[fifth_page_columns.col_xmso_counts_LA] > 0) {
+						double lE = LineEnergy(Z, LA_LINE);
+						phi = gsl_vector_get(s->x, 0)*lE*lE + 
+						      gsl_vector_get(s->x, 1)*lE+
+						      gsl_vector_get(s->x, 2);
+						std::cout << "average phi fit: " << phi << " for " << Z <<std::endl;
 						rxi = asr_data_sample.GetCounts() * norm_factor_sample /
 						(row3[fifth_page_columns.col_xmso_counts_LA]*phi);
 						element_rxi->set_attribute("linetype", "LA_LINE");
@@ -424,6 +475,8 @@ void App2Assistant::on_assistant_close() {
 		xmi_free_input(xmsi_raw);
 	}
 	catch (BAM::Exception &e) {
+		if (s)
+			gsl_multifit_fdfsolver_free(s);	
 		//produce a message dialog telling the user to change the filename
 		Gtk::MessageDialog dialog(*this, string("BAM::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text()+string(".\nTry changing the filename"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   		dialog.set_secondary_text(Glib::ustring("BAM error: ")+e.what());
@@ -433,6 +486,8 @@ void App2Assistant::on_assistant_close() {
 		return;
 	}
 	catch (std::exception& e) {
+		if (s)
+			gsl_multifit_fdfsolver_free(s);	
 		//produce a message dialog telling the user to change the filename
 		Gtk::MessageDialog dialog(*this, string("std::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text()+string(".\nTry changing the filename"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   		dialog.set_secondary_text(Glib::ustring("error: ")+e.what());
@@ -442,6 +497,8 @@ void App2Assistant::on_assistant_close() {
 		return;
 	}
 	catch (...) {
+		if (s)
+			gsl_multifit_fdfsolver_free(s);	
 		Gtk::MessageDialog dialog(*this, string("Some weird exception detected while writing to ")+sixth_page_bpq2_entry.get_text()+string(".\nTry changing the filename"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   		dialog.run();
 		previous_page();
@@ -526,6 +583,8 @@ void App2Assistant::on_assistant_prepare(Gtk::Widget *page) {
 		row[fifth_page_columns.col_status] = Glib::ustring("Not started");
 		row[fifth_page_columns.col_progress] = 0;
 		row[fifth_page_columns.col_bam_file_asr] = 0;
+		row[fifth_page_columns.col_simulate_active] = true;
+		row[fifth_page_columns.col_simulate_sensitive] = false;
 		xrlFree(element);
 		kids = second_page_model->children();
 		for (Gtk::TreeModel::Children::iterator iter = kids.begin() ; iter != kids.end() ; ++iter) {
@@ -533,6 +592,7 @@ void App2Assistant::on_assistant_prepare(Gtk::Widget *page) {
 			if (row2[second_page_columns.col_atomic_number] == *it) {
 				BAM::File::ASR *temp_asr = row2[second_page_columns.col_bam_file_asr];
 				row[fifth_page_columns.col_bam_file_asr] = temp_asr;
+				row[fifth_page_columns.col_simulate_sensitive] = true;
 				break;
 			}
 		}
@@ -901,6 +961,12 @@ void App2Assistant::on_fifth_page_play_clicked() {
 
 	xmimsim_paused = false;
 	fifth_page_play_button.set_sensitive(false);
+	//make all checkbuttons unsensitive
+	Gtk::TreeModel::Children kids = fifth_page_model->children();
+	for (Gtk::TreeModel::Children::iterator iter = kids.begin() ; iter != kids.end() ; ++iter) {
+		Gtk::TreeModel::Row row = *iter;
+		row[fifth_page_columns.col_simulate_sensitive] = false;
+	}
 
 	//let's start the clock!
 	timer = new Glib::Timer();
@@ -1018,8 +1084,28 @@ void App2Assistant::xmimsim_start_recursive() {
 	g_usleep(G_USEC_PER_SEC/2);
 
 
-	//write inputfile
 	Gtk::TreeModel::Row row = *fifth_page_iter;
+
+	if (row[fifth_page_columns.col_simulate_active] == false) {
+		//skip this one
+		row[fifth_page_columns.col_status] = Glib::ustring("skipped");
+		if (++fifth_page_iter == fifth_page_model->children().end()) {
+			//this was the last one
+			fifth_page_play_button.set_sensitive(false);
+			fifth_page_stop_button.set_sensitive(false);
+			fifth_page_pause_button.set_sensitive(false);
+			set_page_complete(fifth_page, true);
+			xmimsim_pid = 0;
+			return;
+		}
+		else {
+			//and the beat goes on...
+			xmimsim_start_recursive();	
+			return;
+		}
+	}
+
+	//write inputfile
 	BAM::File::XMSI *temp_xmsi_file = row[fifth_page_columns.col_xmsi_file];
 	temp_xmsi_file->Write();
 	
@@ -1340,4 +1426,45 @@ void App2Assistant::on_sixth_page_open_clicked() {
 	set_page_complete(sixth_page, true);	
 	sixth_page_bpq2_entry.set_text(filename);
 	return;
+}
+
+void App2Assistant::on_fifth_page_simulate_active_toggled(const Glib::ustring &path) {
+	//get current status and invert it
+	Gtk::TreeModel::Row row = *(fifth_page_model->get_iter(path));
+	row[fifth_page_columns.col_simulate_active] = !row[fifth_page_columns.col_simulate_active];
+}
+
+/*
+ *
+ * Remember: y(x) = a * x^2 + b *x + c
+ *
+ */
+
+int App2Assistant::phi_lqfit_f(const gsl_vector *x, void *data, gsl_vector *f) {
+	struct phi_lqfit_data *pld = (struct phi_lqfit_data *) data;
+	double a = gsl_vector_get(x, 0);
+	double b = gsl_vector_get(x, 1);
+	double c = gsl_vector_get(x, 2);
+
+	for (int i = 0 ; i < pld->x.size() ; i++) {
+		double t = pld->x[i];
+		double Yi = a*t*t + b*t + c;
+		gsl_vector_set(f, i, (Yi - pld->y[i])/pld->sigma[i]);
+	}
+	return GSL_SUCCESS;
+}
+
+int App2Assistant::phi_lqfit_df(const gsl_vector *x, void *data, gsl_matrix *J) {
+	struct phi_lqfit_data *pld = (struct phi_lqfit_data *) data;
+	double a = gsl_vector_get(x, 0);
+	double b = gsl_vector_get(x, 1);
+	double c = gsl_vector_get(x, 2);
+
+	for (int i = 0 ; i < pld->x.size() ; i++) {
+		double t = pld->x[i];
+		gsl_matrix_set(J, i, 0, t*t/pld->sigma[i]);	
+		gsl_matrix_set(J, i, 1, t/pld->sigma[i]);	
+		gsl_matrix_set(J, i, 2, 1/pld->sigma[i]);	
+	}
+	return GSL_SUCCESS;
 }
