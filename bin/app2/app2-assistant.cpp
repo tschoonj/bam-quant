@@ -293,16 +293,17 @@ void App2Assistant::on_assistant_close() {
 
 	double phi = 0.0;
 	gsl_multifit_fdfsolver *s = 0;
+	std::string message;
 
 
 	//let's try saving our data
 	//if it works we close the program
 	//otherwise we ask the user to change the filename
 	try {
+		struct phi_lqfit_data pld;
 		if (fifth_page_diff_elements.size() > 0) {
 			//estimate the phi factor
 			Gtk::TreeModel::Children pure_kids = fifth_page_model->children();
-			struct phi_lqfit_data pld;
 			for (Gtk::TreeModel::Children::iterator iter = pure_kids.begin() ; iter != pure_kids.end() ; ++iter) {
 				Gtk::TreeModel::Row row = *iter;
 				if (row[fifth_page_columns.col_bam_file_asr] == 0 ||
@@ -330,31 +331,35 @@ void App2Assistant::on_assistant_close() {
 			phi = std::accumulate(pld.y.begin(), pld.y.end(), 0)/pld.y.size();
 			std::cout << "average phi simple: " << phi << std::endl;
 
-			//complicated phi using non-linear least-squares fit
-			const gsl_multifit_fdfsolver_type *T = gsl_multifit_fdfsolver_lmsder;
-			gsl_multifit_function_fdf f;
-			pld.sigma.assign(pld.x.size(), 0.1);
-			double x_init[3] = {0.0, 1.0, 0.0};
-			gsl_vector_view x = gsl_vector_view_array(x_init, 3);
-			f.f = &App2Assistant::phi_lqfit_f;
-			f.df = &App2Assistant::phi_lqfit_df;
-			f.fdf = &App2Assistant::phi_lqfit_fdf;
-			f.n = pld.x.size();
-			f.p = 3;
-			f.params = &pld;
-		
-			s = gsl_multifit_fdfsolver_alloc(T, pld.x.size(), 3);
-			gsl_multifit_fdfsolver_set(s, &f, &x.vector);
-			int status = gsl_multifit_fdfsolver_driver(s, 500, 1E-4, 1E-4);
-			
-			if (status != GSL_SUCCESS) {
-				gsl_multifit_fdfsolver_free(s);	
-				throw BAM::Exception("No convergence while calculating scaling factor phi using GSL non-linear least squares fitting.");
-			}	
-			std::cout << "fit results: " << std::endl;
-			std::cout << "a: " << gsl_vector_get(s->x, 0) << std::endl;
-			std::cout << "b: " << gsl_vector_get(s->x, 1) << std::endl;
-			std::cout << "c: " << gsl_vector_get(s->x, 2) << std::endl;
+			if (pld.x.size() > 3) {
+				//complicated phi using non-linear least-squares fit
+				const gsl_multifit_fdfsolver_type *T = gsl_multifit_fdfsolver_lmsder;
+				gsl_multifit_function_fdf f;
+				pld.sigma.assign(pld.x.size(), 0.1);
+				double x_init[3] = {0.1, 1.0, phi};
+				gsl_vector_view x = gsl_vector_view_array(x_init, 3);
+				f.f = &App2Assistant::phi_lqfit_f;
+				f.df = &App2Assistant::phi_lqfit_df;
+				f.fdf = &App2Assistant::phi_lqfit_fdf;
+				f.n = pld.x.size();
+				f.p = 3;
+				f.params = &pld;
+
+				s = gsl_multifit_fdfsolver_alloc(T, pld.x.size(), 3);
+				gsl_multifit_fdfsolver_set(s, &f, &x.vector);
+				int status = gsl_multifit_fdfsolver_driver(s, 500, 1E-3, 1E-3);
+
+				if (status != GSL_SUCCESS) {
+					message += "No convergence while calculating scaling factor phi using GSL non-linear least squares fitting. ";
+					message += gsl_strerror(status);
+					std::cout << "Exception message: " << message << std::endl;
+					throw BAM::Exception(message.c_str());
+				}	
+				std::cout << "fit results: " << std::endl;
+				std::cout << "a: " << gsl_vector_get(s->x, 0) << std::endl;
+				std::cout << "b: " << gsl_vector_get(s->x, 1) << std::endl;
+				std::cout << "c: " << gsl_vector_get(s->x, 2) << std::endl;
+			}
 		}	
 		xmlpp::Document document;
 
@@ -431,21 +436,25 @@ void App2Assistant::on_assistant_close() {
 					if (!found)
 						throw BAM::Exception("Could not find element in fifth page. This should never happen!");
 					if (row3[fifth_page_columns.col_xmso_counts_KA] > 0) {
-						double lE = LineEnergy(Z, KA_LINE);
-						phi = gsl_vector_get(s->x, 0)*lE*lE + 
-						      gsl_vector_get(s->x, 1)*lE+
-						      gsl_vector_get(s->x, 2);
-						std::cout << "average phi fit: " << phi << " for " << Z <<std::endl;
+						if (pld.x.size() > 3) {
+							double lE = LineEnergy(Z, KA_LINE);
+							phi = gsl_vector_get(s->x, 0)*lE*lE + 
+							      gsl_vector_get(s->x, 1)*lE+
+							      gsl_vector_get(s->x, 2);
+							std::cout << "average phi fit: " << phi << " for " << Z <<std::endl;
+						}
 						rxi = asr_data_sample.GetCounts() * norm_factor_sample /
 						(row3[fifth_page_columns.col_xmso_counts_KA]*phi);
 						element_rxi->set_attribute("linetype", "KA_LINE");
 					}
 					else if (row3[fifth_page_columns.col_xmso_counts_LA] > 0) {
-						double lE = LineEnergy(Z, LA_LINE);
-						phi = gsl_vector_get(s->x, 0)*lE*lE + 
-						      gsl_vector_get(s->x, 1)*lE+
-						      gsl_vector_get(s->x, 2);
-						std::cout << "average phi fit: " << phi << " for " << Z <<std::endl;
+						if (pld.x.size() > 3) {
+							double lE = LineEnergy(Z, LA_LINE);
+							phi = gsl_vector_get(s->x, 0)*lE*lE + 
+							      gsl_vector_get(s->x, 1)*lE+
+							      gsl_vector_get(s->x, 2);
+							std::cout << "average phi fit: " << phi << " for " << Z <<std::endl;
+						}
 						rxi = asr_data_sample.GetCounts() * norm_factor_sample /
 						(row3[fifth_page_columns.col_xmso_counts_LA]*phi);
 						element_rxi->set_attribute("linetype", "LA_LINE");
@@ -478,7 +487,7 @@ void App2Assistant::on_assistant_close() {
 		if (s)
 			gsl_multifit_fdfsolver_free(s);	
 		//produce a message dialog telling the user to change the filename
-		Gtk::MessageDialog dialog(*this, string("BAM::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text()+string(".\nTry changing the filename"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+		Gtk::MessageDialog dialog(*this, string("BAM::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   		dialog.set_secondary_text(Glib::ustring("BAM error: ")+e.what());
   		dialog.run();
 		previous_page();	
@@ -489,7 +498,7 @@ void App2Assistant::on_assistant_close() {
 		if (s)
 			gsl_multifit_fdfsolver_free(s);	
 		//produce a message dialog telling the user to change the filename
-		Gtk::MessageDialog dialog(*this, string("std::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text()+string(".\nTry changing the filename"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+		Gtk::MessageDialog dialog(*this, string("std::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   		dialog.set_secondary_text(Glib::ustring("error: ")+e.what());
   		dialog.run();
 		previous_page();
@@ -499,7 +508,7 @@ void App2Assistant::on_assistant_close() {
 	catch (...) {
 		if (s)
 			gsl_multifit_fdfsolver_free(s);	
-		Gtk::MessageDialog dialog(*this, string("Some weird exception detected while writing to ")+sixth_page_bpq2_entry.get_text()+string(".\nTry changing the filename"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+		Gtk::MessageDialog dialog(*this, string("Some weird exception detected while writing to ")+sixth_page_bpq2_entry.get_text(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   		dialog.run();
 		previous_page();
 		set_page_complete(sixth_page, false);
@@ -1436,7 +1445,7 @@ void App2Assistant::on_fifth_page_simulate_active_toggled(const Glib::ustring &p
 
 /*
  *
- * Remember: y(x) = a * x^2 + b *x + c
+ * Remember: y(x) = a * x^2 + b * x + c
  *
  */
 
@@ -1448,8 +1457,8 @@ int App2Assistant::phi_lqfit_f(const gsl_vector *x, void *data, gsl_vector *f) {
 
 	for (int i = 0 ; i < pld->x.size() ; i++) {
 		double t = pld->x[i];
-		double Yi = a*t*t + b*t + c;
-		gsl_vector_set(f, i, (Yi - pld->y[i])/pld->sigma[i]);
+		double Yi = a * t * t + b * t + c;
+		gsl_vector_set(f, i, (Yi - pld->y[i]) / pld->sigma[i]);
 	}
 	return GSL_SUCCESS;
 }
@@ -1462,9 +1471,9 @@ int App2Assistant::phi_lqfit_df(const gsl_vector *x, void *data, gsl_matrix *J) 
 
 	for (int i = 0 ; i < pld->x.size() ; i++) {
 		double t = pld->x[i];
-		gsl_matrix_set(J, i, 0, t*t/pld->sigma[i]);	
-		gsl_matrix_set(J, i, 1, t/pld->sigma[i]);	
-		gsl_matrix_set(J, i, 2, 1/pld->sigma[i]);	
+		gsl_matrix_set(J, i, 0, t * t / pld->sigma[i]);	
+		gsl_matrix_set(J, i, 1, t / pld->sigma[i]);	
+		gsl_matrix_set(J, i, 2, 1 / pld->sigma[i]);	
 	}
 	return GSL_SUCCESS;
 }
