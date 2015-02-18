@@ -34,6 +34,9 @@
 App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will produce a file containing\n"
 							"relative X-ray intensities based on the net-line intensities\n"
 							"obtained from pure elemental standards and samples."),
+		third_page_density_button("Set density"),
+		third_page_thickness_button("Set thickness"),
+		third_page_buttons(Gtk::ORIENTATION_HORIZONTAL),
 		xmimsim_paused(false),
 		xmimsim_pid(0),
 		timer(0),
@@ -42,7 +45,7 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 	{
 
 	set_border_width(12);
-	set_default_size(400, 300);
+	set_default_size(650, 450);
 
 	//first page
 	append_page(first_page);
@@ -88,7 +91,7 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 
 	//third page
 	label = Gtk::manage(new Gtk::Label("Select at least one ASR file\ncorresponding to measurements performed\non samples with unknown composition..."));
-	third_page.attach(*label, 0, 0, 2, 1);
+	third_page.attach(*label, 0, 0, 1, 1);
 	third_page.set_column_spacing(5);
 	third_page.set_row_spacing(5);
 	third_page.set_row_homogeneous(false);
@@ -98,29 +101,56 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 	label->set_margin_bottom(10);
 	label->set_margin_top(10);
 	
-	third_page_open.set_image_from_icon_name("document-open");
-	third_page_open.set_vexpand(false);
-	third_page_open.set_hexpand(false);
-	third_page_open.set_valign(Gtk::ALIGN_CENTER);
-	third_page.attach(third_page_open, 0, 1, 1, 1);
+	third_page_open_button.set_image_from_icon_name("document-open");
+	third_page_open_button.set_vexpand(false);
+	third_page_open_button.set_hexpand(false);
+	third_page_open_button.set_valign(Gtk::ALIGN_CENTER);
+	third_page.attach(third_page_buttons, 0, 2, 1, 1);
+	third_page_density_button.set_sensitive(false);
+	third_page_thickness_button.set_sensitive(false);
+	third_page_buttons.pack_start(third_page_open_button);
+	third_page_buttons.pack_start(third_page_density_button);
+	third_page_buttons.pack_start(third_page_thickness_button);
+	third_page_buttons.set_layout(Gtk::BUTTONBOX_CENTER);
+	third_page_buttons.set_spacing(10);
+	third_page_buttons.set_vexpand(false);
+	third_page_buttons.set_hexpand(false);
+
 	
 	third_page_model = Gtk::ListStore::create(third_page_columns);
 	third_page_tv.set_model(third_page_model);
 	third_page_tv.append_column("Elements", third_page_columns.col_elements);
+	third_page_tv.append_column_numeric_editable("Density (g/cm<sup>3</sup>)", third_page_columns.col_density, "%g");
+	third_page_tv.append_column_numeric_editable("Thickness (cm)", third_page_columns.col_thickness, "%g");
 	third_page_tv.append_column("Filename", third_page_columns.col_filename);
+
+	//dynamic_cast<Gtk::Label*>(third_page_tv.get_column(1)->get_widget())->set_use_markup();
+	label = Gtk::manage(new Gtk::Label("Density (g/cm<sup>3</sup>)")); 
+	label->set_use_markup();
+	label->show();
+	third_page_tv.get_column(1)->set_widget(*label);
+	Gtk::CellRendererText *density_renderer = static_cast<Gtk::CellRendererText*> (third_page_tv.get_column_cell_renderer(1)); 
+	density_renderer->signal_edited().connect(sigc::bind(sigc::mem_fun(*this, &App2Assistant::on_third_page_edited), true));
+
+	Gtk::CellRendererText *thickness_renderer = static_cast<Gtk::CellRendererText*> (third_page_tv.get_column_cell_renderer(2));
+	thickness_renderer->signal_edited().connect(sigc::bind(sigc::mem_fun(*this, &App2Assistant::on_third_page_edited), false));
+	
+
 	third_page_sw.add(third_page_tv);
 	third_page_sw.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-	third_page.attach(third_page_sw, 1, 1, 1, 1);
+	third_page.attach(third_page_sw, 0, 1, 1, 1);
 	third_page_sw.set_vexpand();
 	third_page_sw.set_hexpand();
 	append_page(third_page);
 	set_page_type(third_page, Gtk::ASSISTANT_PAGE_CONTENT);
 	set_page_title(third_page, "Select sample ASR files");
-	third_page_open.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_third_page_open_clicked));
+	third_page_open_button.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_third_page_open_clicked));
 	third_page_tv.signal_key_press_event().connect(sigc::mem_fun(*this, &App2Assistant::on_third_page_backspace_clicked));
 	third_page_tv.get_selection()->set_mode(Gtk::SELECTION_MULTIPLE);
+	third_page_tv.get_selection()->signal_changed().connect(sigc::mem_fun(*this, &App2Assistant::on_third_page_selection_changed));
 
-	
+	third_page_density_button.signal_clicked().connect(sigc::bind(sigc::mem_fun(*this, &App2Assistant::on_third_page_open_rho_or_T_clicked), true));
+	third_page_thickness_button.signal_clicked().connect(sigc::bind(sigc::mem_fun(*this, &App2Assistant::on_third_page_open_rho_or_T_clicked), false));
 	//fourth page
 	fourth_page_xmsi_file = 0; //set to zero when initializing
 	label = Gtk::manage(new Gtk::Label("Select an XMI-MSIM input-file\nthat properly describes the\nexcitation conditions as well as the\nexperimental geometry"));
@@ -470,6 +500,8 @@ void App2Assistant::on_assistant_close() {
 			}
 			xmlpp::Element *asrfile = samples->add_child("asrfile");
 			asrfile->add_child_text(row[third_page_columns.col_filename_full]);
+			samples->add_child("density")->add_child_text(static_cast<ostringstream*>(&(ostringstream() << row[third_page_columns.col_density]))->str());
+			samples->add_child("thickness")->add_child_text(static_cast<ostringstream*>(&(ostringstream() << row[third_page_columns.col_thickness]))->str());
 		}
 		xmlpp::Element *xmimsim = rootnode->add_child("xmimsim-input");
 		//xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(xmimsim);
@@ -760,6 +792,17 @@ void App2Assistant::on_second_page_open_clicked() {
 	}
 }
 
+void App2Assistant::on_third_page_selection_changed() {
+	if (third_page_model->children().size() >= 1) {
+		third_page_density_button.set_sensitive();
+		third_page_thickness_button.set_sensitive();
+	}
+	else {
+		third_page_density_button.set_sensitive(false);
+		third_page_thickness_button.set_sensitive(false);
+	}
+}
+
 bool App2Assistant::on_second_page_backspace_clicked(GdkEventKey *event) {
 	if (event->keyval == gdk_keyval_from_name("BackSpace") ||
 	    event->keyval == gdk_keyval_from_name("Delete")) {
@@ -777,10 +820,10 @@ bool App2Assistant::on_second_page_backspace_clicked(GdkEventKey *event) {
 			set_page_complete(second_page, false);	
 		}
 		
-               	return TRUE;
+               	return true;
         }
 
-        return FALSE;
+        return false;
 
 }
 
@@ -851,9 +894,25 @@ void App2Assistant::on_third_page_open_clicked() {
 		row[third_page_columns.col_filename_full] = *it;
 		row[third_page_columns.col_bam_file_asr] = asr_file;
 		row[third_page_columns.col_elements_int] = elements_int;
+		row[third_page_columns.col_density] = 0.0;
+		row[third_page_columns.col_thickness] = 0.0;
 	}
 	if (third_page_model->children().size() >= 1) {
-		set_page_complete(third_page, true);	
+		//check density and thickness
+		bool zero_found = false;
+		Gtk::TreeModel::Children kids = third_page_model->children();
+		for (Gtk::TreeModel::Children::iterator iter = kids.begin() ; iter != kids.end() ; ++iter) {
+			Gtk::TreeModel::Row row = *iter;
+			if (row[third_page_columns.col_density] <= 0.0 || 
+			    row[third_page_columns.col_thickness] <= 0.0) {
+				zero_found = true;
+				break;
+			}
+		}
+		if (zero_found)
+			set_page_complete(third_page, false);	
+		else
+			set_page_complete(third_page, true);	
 	}
 	else {
 		set_page_complete(third_page, false);	
@@ -861,26 +920,38 @@ void App2Assistant::on_third_page_open_clicked() {
 }
 
 bool App2Assistant::on_third_page_backspace_clicked(GdkEventKey *event) {
-	if (event->keyval == gdk_keyval_from_name("BackSpace") ||
-	    event->keyval == gdk_keyval_from_name("Delete")) {
-		Glib::RefPtr<Gtk::TreeSelection> selection = third_page_tv.get_selection();
-		std::vector<Gtk::TreeModel::Path> paths = selection->get_selected_rows();
-		for (std::vector<Gtk::TreeModel::Path>::reverse_iterator rit = paths.rbegin() ; rit != paths.rend() ; ++rit) {
-			Gtk::TreeModel::Row row = *(third_page_model->get_iter(*rit));
-			delete row[third_page_columns.col_bam_file_asr];
-			third_page_model->erase(row);
+	if (event->keyval != gdk_keyval_from_name("BackSpace") && 
+	    event->keyval != gdk_keyval_from_name("Delete")) {
+        	return false;
+	}
+	Glib::RefPtr<Gtk::TreeSelection> selection = third_page_tv.get_selection();
+	std::vector<Gtk::TreeModel::Path> paths = selection->get_selected_rows();
+	for (std::vector<Gtk::TreeModel::Path>::reverse_iterator rit = paths.rbegin() ; rit != paths.rend() ; ++rit) {
+		Gtk::TreeModel::Row row = *(third_page_model->get_iter(*rit));
+		delete row[third_page_columns.col_bam_file_asr];
+		third_page_model->erase(row);
+	}
+	if (third_page_model->children().size() >= 1) {
+		//check density and thickness
+		bool zero_found = false;
+		Gtk::TreeModel::Children kids = third_page_model->children();
+		for (Gtk::TreeModel::Children::iterator iter = kids.begin() ; iter != kids.end() ; ++iter) {
+			Gtk::TreeModel::Row row = *iter;
+			if (row[third_page_columns.col_density] <= 0.0 || 
+			    row[third_page_columns.col_thickness] <= 0.0) {
+				zero_found = true;
+				break;
+			}
 		}
-		if (third_page_model->children().size() >= 1) {
-			set_page_complete(third_page, true);	
-		}
-		else {
+		if (zero_found)
 			set_page_complete(third_page, false);	
-		}
-               	return TRUE;
-        }
-
-        return FALSE;
-
+		else
+			set_page_complete(third_page, true);	
+	}
+	else {
+		set_page_complete(third_page, false);	
+	}
+        return true;
 }
 void App2Assistant::on_fourth_page_open_clicked(Gtk::EntryIconPosition icon_position, const GdkEventButton* event) {
 	//launch dialog
@@ -1160,6 +1231,96 @@ void App2Assistant::xmimsim_start_recursive() {
 	//remove xmsi file from argv
 	argv.pop_back();
 	
+}
+
+void App2Assistant::on_third_page_edited(const Glib::ustring & path, const Glib::ustring &new_text, bool is_it_density) {
+	//std::cout << "Entering App2Assistant::on_third_page_edited" << std::endl; 
+	//the is_it_density is not used, since append_column_numeric_editable already appears to update the model anyway, but it's a nice reminder on how sigc::bind works
+	if (third_page_model->children().size() >= 1) {
+		//check density and thickness
+		bool zero_found = false;
+		Gtk::TreeModel::Children kids = third_page_model->children();
+		for (Gtk::TreeModel::Children::iterator iter = kids.begin() ; iter != kids.end() ; ++iter) {
+			Gtk::TreeModel::Row row = *iter;
+			if (row[third_page_columns.col_density] <= 0.0 || 
+			    row[third_page_columns.col_thickness] <= 0.0) {
+				zero_found = true;
+				break;
+			}
+		}
+		if (zero_found)
+			set_page_complete(third_page, false);	
+		else
+			set_page_complete(third_page, true);	
+	}
+	else {
+		set_page_complete(third_page, false);	
+	}
+	
+}
+
+void App2Assistant::on_third_page_open_rho_or_T_clicked(bool is_it_density) {
+	//prepare a dialog with a label and an entry
+	Gtk::Dialog dialog(is_it_density ? "Set the density" : "Set the thickness", *this, true);
+	dialog.add_button("Ok", Gtk::RESPONSE_OK);
+	dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
+	Gtk::Grid grid;
+	Gtk::Label label;
+	if (is_it_density)
+		label.set_markup("Density (g/cm<sup>3</sup>)");
+	else
+		label.set_text("Thickness (cm)");
+	grid.attach(label, 0, 0, 1, 1);
+
+	Gtk::Entry entry;
+	grid.attach(entry, 1, 0, 1, 1);
+	grid.set_column_spacing(5);
+	grid.set_border_width(5);
+	entry.set_hexpand();
+	grid.show_all();
+	dialog.get_content_area()->pack_start(grid, true, false, 0);
+
+	if (dialog.run() != Gtk::RESPONSE_OK) {
+		return;
+	}
+
+	//now check if the value was acceptable
+	std::istringstream ss(entry.get_text());
+	double value;
+	ss >> value;
+	if (ss.fail() || value <= 0.0) {
+		Gtk::MessageDialog mdialog(dialog, "Only positive numbers are accepted!");
+		mdialog.run();
+		return;
+	}
+
+	//assign value	
+	Glib::RefPtr<Gtk::TreeSelection> selection = third_page_tv.get_selection();
+	std::vector<Gtk::TreeModel::Path> paths = selection->get_selected_rows();
+	for (std::vector<Gtk::TreeModel::Path>::iterator rit = paths.begin() ; rit != paths.end() ; ++rit) {
+		Gtk::TreeModel::Row row = *(third_page_model->get_iter(*rit));
+		if (is_it_density)
+			row[third_page_columns.col_density] = value;
+		else
+			row[third_page_columns.col_thickness] = value;
+	}
+
+	//check density and thickness
+	bool zero_found = false;
+	Gtk::TreeModel::Children kids = third_page_model->children();
+	for (Gtk::TreeModel::Children::iterator iter = kids.begin() ; iter != kids.end() ; ++iter) {
+		Gtk::TreeModel::Row row = *iter;
+		if (row[third_page_columns.col_density] <= 0.0 || 
+		    row[third_page_columns.col_thickness] <= 0.0) {
+			zero_found = true;
+			break;
+		}
+	}
+	if (zero_found)
+		set_page_complete(third_page, false);	
+	else
+		set_page_complete(third_page, true);	
+
 }
 
 void App2Assistant::xmimsim_child_watcher(GPid pid, int status) {

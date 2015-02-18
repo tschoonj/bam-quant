@@ -77,17 +77,27 @@ private:
 				add(col_bam_file_asr);
 				add(col_elements_int);
 				add(col_filename_full);
+				add(col_density);
+				add(col_thickness);
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_elements;
 			Gtk::TreeModelColumn<Glib::ustring> col_filename;
 			Gtk::TreeModelColumn<BAM::File::ASR*> col_bam_file_asr;
 			Gtk::TreeModelColumn<std::vector<int>* > col_elements_int;
 			Gtk::TreeModelColumn<Glib::ustring> col_filename_full;
+			Gtk::TreeModelColumn<double> col_density;
+			Gtk::TreeModelColumn<double> col_thickness;
 	};
+	Gtk::ButtonBox third_page_buttons;
 	ThirdPageColumns third_page_columns;	
-	Gtk::Button third_page_open;
+	Gtk::Button third_page_open_button;
 	void on_third_page_open_clicked();
 	bool on_third_page_backspace_clicked(GdkEventKey *key);
+	void on_third_page_edited(const Glib::ustring & path, const Glib::ustring &new_text, bool is_it_density);
+	Gtk::Button third_page_density_button;
+	Gtk::Button third_page_thickness_button;
+	void on_third_page_open_rho_or_T_clicked(bool is_it_density);
+	void on_third_page_selection_changed();
 
 	//fourth page: XMSI file 
 	BAM::File::XMSI *fourth_page_xmsi_file;
