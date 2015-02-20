@@ -1,2 +1,3 @@
 SUBDIRS = app1 \
-	  app2
+	  app2 \
+	  app3

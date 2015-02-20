@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 	App2Assistant window;
 
 	if (xmi_xmlLoadCatalog() == 0) {
-		std::cerr << "Could not load XMI-MSIM XML catalog" << std::endl;
+		return 1;
 	}
 
 	return app->run(window);

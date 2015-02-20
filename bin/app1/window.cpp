@@ -9,10 +9,7 @@
 #include <glibmm/miscutils.h>
 #include "xmi-msim-dialog.h"
 #include <libxml++/libxml++.h>
-#include <libxml/catalog.h>
-
-
-bool Window::bam_catalog_loaded = false;
+#include <bam_catalog.h>
 
 
 Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
@@ -513,16 +510,11 @@ void Window::open_project() {
 	reset_project();
 
 	//load our catalog file
-	if (!bam_catalog_loaded) {
-		if (xmlLoadCatalog(BAM_CATALOG) != 0) {
-			std::cerr << "Could not load catalog: " << BAM_CATALOG << std::endl;
-			return;
-		}
-		else
-			bam_catalog_loaded = true;
+	if (bam_xmlLoadCatalog() == 0) {
+		return;
 	}
 	if (xmi_xmlLoadCatalog() == 0) {
-		std::cerr << "Could not load XMI-MSIM XML catalog" << std::endl;
+		return;
 	}
 	try {
 		xmlpp::DomParser *parser = new xmlpp::DomParser;

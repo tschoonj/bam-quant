@@ -32,7 +32,6 @@ class Window: public Gtk::ApplicationWindow {
 
 	private:
 		//MendeleevButton test_button;
-		static bool bam_catalog_loaded;
 		Gtk::Box big_box;
 		Gtk::Grid buttonGrid;
 		std::map<int, MendeleevButton*> buttonMap; //all buttons!

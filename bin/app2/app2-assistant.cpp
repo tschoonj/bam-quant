@@ -13,7 +13,6 @@
 #include <glibmm/convert.h>
 #include <algorithm>
 #include <libxml++/libxml++.h>
-#include <libxml/catalog.h>
 
 #ifdef G_OS_UNIX
 	#include <sys/types.h>
@@ -397,7 +396,7 @@ void App2Assistant::on_assistant_close() {
 		//document.add_comment("this is a comment");
 		xmlDocPtr doc = document.cobj();
 
-		xmlpp::Element *rootnode = document.create_root_node("bam-quant-app2");
+		xmlpp::Element *rootnode = document.create_root_node("bam-quant-rxi-multi");
 
 		if (xmi_write_default_comments(doc, rootnode->cobj()) == 0) {
 			throw BAM::Exception("Could not write XMI-MSIM default comments");
@@ -1574,8 +1573,8 @@ void App2Assistant::on_sixth_page_open_clicked() {
 	Gtk::FileChooserDialog dialog(*this, "Please select a BAM-QUANT project 2 file", Gtk::FILE_CHOOSER_ACTION_SAVE);
 	Glib::RefPtr<Gtk::FileFilter> filter_bqp1 = Gtk::FileFilter::create();
 	filter_bqp1->set_name("BAM-QUANT project 2 files");
-	filter_bqp1->add_pattern("*.bqp2");
-	filter_bqp1->add_pattern("*.BQP2");
+	filter_bqp1->add_pattern("*.rxi");
+	filter_bqp1->add_pattern("*.RXI");
 	dialog.add_filter(filter_bqp1);
 	dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
 	dialog.add_button("Select", Gtk::RESPONSE_OK);
@@ -1585,8 +1584,8 @@ void App2Assistant::on_sixth_page_open_clicked() {
 	switch(result) {
 		case(Gtk::RESPONSE_OK):
 			filename = dialog.get_filename();
-			if (filename.compare(filename.length()-5, string::npos, ".bqp2") != 0)
-				filename += ".bqp2";
+			if (filename.compare(filename.length()-4, string::npos, ".rxi") != 0)
+				filename += "rxi";
 			std::cout << "Open clicked: " << filename << std::endl;
       			break;
 		case(Gtk::RESPONSE_CANCEL):
