@@ -4,16 +4,14 @@
 #include <string>
 #include <exception>
 
-using namespace std;
-
 namespace BAM {
-	class Exception: public exception {
+	class Exception: public std::exception {
 	private:
 		const char *Message;  
 	public:
 		// constructors
 		Exception(const char *ch)  {Message=ch;}
-		Exception(string s)  {Message=s.c_str();}
+		Exception(std::string s)  {Message=s.c_str();}
 		// throw method
 		virtual const char* what() const throw() {
 			return Message;

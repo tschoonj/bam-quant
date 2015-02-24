@@ -11,6 +11,7 @@
 #include <libxml++/libxml++.h>
 #include <bam_catalog.h>
 
+using namespace std;
 
 Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
 	xmi_msim_dialog = 0;
@@ -509,14 +510,14 @@ void Window::open_project() {
 
 	reset_project();
 
-	//load our catalog file
-	if (bam_xmlLoadCatalog() == 0) {
-		return;
-	}
-	if (xmi_xmlLoadCatalog() == 0) {
-		return;
-	}
 	try {
+		//load our catalog file
+		if (bam_xmlLoadCatalog() == 0) {
+			throw BAM::Exception("Could not load BAM XML catalog");
+		}
+		if (xmi_xmlLoadCatalog() == 0) {
+			throw BAM::Exception("Could not load XMI-MSIM XML catalog");
+		}
 		xmlpp::DomParser *parser = new xmlpp::DomParser;
 		parser->set_validate();
 		parser->parse_file(filename);
@@ -534,9 +535,8 @@ void Window::open_project() {
 				//read asrfile
 				xmlpp::Node *asrfile = (*it)->get_first_child("asrfile");
 				if (asrfile == 0) {
-					cerr << "experimental datatype requires asrfile child!!!" << endl;
 					reset_project();
-					return;
+					throw BAM::Exception("experimental datatype requires asrfile child!!!");
 				}
 				Glib::ustring axil_counts_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("axil_counts"))->get_child_text()->get_content();
 				Glib::ustring normfactor_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("normfactor"))->get_child_text()->get_content();
@@ -553,9 +553,8 @@ void Window::open_project() {
 					buttonMap[Z]->asr_counts_KA = 0.0;
 				}
 				else {
-					cerr << "Unknown linetype detected!!" << endl;
 					reset_project();
-					return;
+					throw BAM::Exception("Unknown linetype detected!!");
 				}
 				ss.str("");
 				ss.clear();
@@ -574,9 +573,8 @@ void Window::open_project() {
 			xmlpp::Node *xmimsim_results = (*it)->get_first_child("xmimsim-results");
 			struct xmi_output *output = (struct xmi_output*) malloc(sizeof(struct xmi_output));
 			if (xmi_read_output_xml_body(document->cobj(), xmimsim_results->cobj(), output, 0, 0) == 0) {
-				cerr << "Error in xmi_read_output_xml_body" << endl;
 				reset_project();
-				return;
+				throw BAM::Exception("Error in xmi_read_output_xml_body");
 			}
 			if (it == list.begin()) {
 				//first file only

@@ -7,4 +7,4 @@ SUBDIRS = src include tests bin xml
 
 #EXTRA_DIST = test libxrmc.pc.in xrmc.spec.in
 #DISTCHECK_CONFIGURE_FLAGS = --disable-openmp --disable-xmi-msim
-DISTCHECK_CONFIGURE_FLAGS = CXX=g++-mp-4.9 CC=gcc-mp-4.9
+DISTCHECK_CONFIGURE_FLAGS = CXX=g++49 CC=gcc49

@@ -25,8 +25,8 @@ namespace BAM {
 				double thickness;
 			public:
 				Layer(double density_new, double thickness_new);
-				Layer(string compound, double density_new, double thickness_new);
-				Layer(string nistcompound, double thickness_new);
+				Layer(std::string compound, double density_new, double thickness_new);
+				Layer(std::string nistcompound, double thickness_new);
 				void AddElement(int Z_new, double weight_new);
 				void Normalize();
 				friend class Composition;

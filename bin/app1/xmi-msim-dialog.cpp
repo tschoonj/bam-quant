@@ -4,6 +4,8 @@
 #include <glibmm/main.h>
 #include <glibmm/convert.h>
 
+using namespace std;
+
 #ifdef G_OS_UNIX
 	#include <sys/types.h>
 	#include <sys/wait.h>

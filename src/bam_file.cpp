@@ -3,7 +3,7 @@
 
 using namespace BAM::File;
 
-File::File(string filename) : filename(filename) {
+File::File(std::string filename) : filename(filename) {
 	this->Open();	
 }
 
@@ -13,7 +13,7 @@ File::~File() {
 
 void File::Open(){
 	if (filename != "") {
-		fs.exceptions(ifstream::failbit | ifstream::badbit);
+		fs.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		fs.open(filename.c_str());
 	}
 }

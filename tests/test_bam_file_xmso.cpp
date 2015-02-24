@@ -7,6 +7,9 @@ int main(int argc, char *argv[]) {
 	BAM::File::XMSO *xmso_file;
 
 	try {
+		if (xmi_xmlLoadCatalog() == 0)
+			throw BAM::Exception("Could not load XMI-MSIM XML catalog");
+
 		xmso_file= new BAM::File::XMSO(TEST_FILE_XMSO);
 	}
 	catch (BAM::Exception &e) {

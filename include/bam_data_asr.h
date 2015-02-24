@@ -2,8 +2,6 @@
 #define BAM_DATA_ASR_H
 
 
-using namespace std;
-
 namespace BAM {
 	namespace Data {
 		class ASR {

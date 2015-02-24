@@ -4,25 +4,23 @@
 #include <fstream>
 #include "bam_exception.h"
 
-using namespace std;
-
 namespace BAM {
 	namespace File {
 		class File {
 		private:
 		protected:
-			ifstream fs;
-			string filename;
+			std::ifstream fs;
+			std::string filename;
 		public:
 			//constructor
-			File(string);
+			File(std::string);
 			//destructor
 			virtual ~File();
 			virtual void Open();
 			virtual void Close();
 			virtual void Parse() = 0;
-			string GetFilename() {return filename;}
-			void SetFilename(string new_filename) {
+			std::string GetFilename() {return filename;}
+			void SetFilename(std::string new_filename) {
 				if (new_filename != "")
 					filename = new_filename;
 				else

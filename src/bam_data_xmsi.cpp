@@ -18,7 +18,7 @@ Layer::Layer(double density_new, double thickness_new) : density(density_new), t
 	}
 }
 
-Layer::Layer(string compound, double density_new, double thickness_new) : density(density_new), thickness(thickness_new) {
+Layer::Layer(std::string compound, double density_new, double thickness_new) : density(density_new), thickness(thickness_new) {
 	if (thickness <= 0.0) {
 		throw BAM::Exception("BAM::Data::XMSI::Layer::Layer -> Cannot construct layer with negative thickness");
 	}
@@ -38,7 +38,7 @@ Layer::Layer(string compound, double density_new, double thickness_new) : densit
 
 }
 
-Layer::Layer(string nistcompound, double thickness_new) : thickness(thickness_new) {
+Layer::Layer(std::string nistcompound, double thickness_new) : thickness(thickness_new) {
 	if (thickness <= 0.0) {
 		throw BAM::Exception("BAM::Data::XMSI::Layer::Layer -> Cannot construct layer with negative thickness");
 	}

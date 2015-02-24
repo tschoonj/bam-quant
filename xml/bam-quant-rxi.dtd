@@ -6,7 +6,7 @@
 
 
 <!ELEMENT bam-quant-rxi-multi (samples+, xmimsim-input)>
-<!ELEMENT bam-quant-rxi-single(samples, xmimsim-input)>
+<!ELEMENT bam-quant-rxi-single (samples, xmimsim-input)>
 <!ELEMENT samples (element_rxi+, asrfile, density, thickness)>
 <!ELEMENT element_rxi (#PCDATA)>
 <!ATTLIST element_rxi element CDATA #REQUIRED>

@@ -9,12 +9,12 @@ int main(int argc, char **argv) {
 	try {
 		asr = new BAM::File::ASR(TEST_FILE_ASR);
 	}
-	catch (ifstream::failure &e) {
-		cerr << "Exception reading in file: " << e.what() << endl;	
+	catch (std::ifstream::failure &e) {
+		std::cerr << "Exception reading in file: " << e.what() << std::endl;	
 		return 1;
 	}
 	catch (BAM::Exception &e) {
-		cerr << "Some other exception detected: " << e.what() << endl;
+		std::cerr << "Some other exception detected: " << e.what() << std::endl;
 		return 1;
 	}
 

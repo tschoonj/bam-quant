@@ -6,9 +6,8 @@
 
 using namespace BAM;
 using namespace BAM::File;
-using namespace std;
 
-ASR::ASR(string filename, bool my_keep_negative_counts) : File::File(filename) {
+ASR::ASR(std::string filename, bool my_keep_negative_counts) : File::File(filename) {
 	//cout << "Entering BAM::File::ASR constructor" << endl;
 	keep_negative_counts = my_keep_negative_counts;
 	if (fs) {
@@ -27,7 +26,7 @@ ASR::ASR(double normfactor) : File::File(""), normfactor(normfactor) {}
 void ASR::Parse() {
 	//cout << "Entering BAM::FileASR Parse" << endl;
 
-	string line;
+	std::string line;
 	bool peaks_found = false;
 	bool normfactor_found = false;
 
@@ -41,8 +40,8 @@ void ASR::Parse() {
 		//cout << line << endl;
 		if (!peaks_found) {
 			//process metadata
-			stringstream ss;
-			string identifier;
+			std::stringstream ss;
+			std::string identifier;
 
 			ss << line;
 			ss >> identifier;
@@ -56,16 +55,16 @@ void ASR::Parse() {
 			else if (identifier == "Normfactor:") {
 				ss >> normfactor;
 				normfactor_found = true;
-				cout << "Normfactor: " << normfactor << endl;
+				//std::cout << "Normfactor: " << normfactor << endl;
 			}
-			else if (identifier.compare(0, string("Normfactor:").length(), "Normfactor:") == 0) {
+			else if (identifier.compare(0, std::string("Normfactor:").length(), "Normfactor:") == 0) {
 				normfactor_found = true;
-				string normfactor_str = identifier.substr(string("Normfactor:").length(), string::npos);
+				std::string normfactor_str = identifier.substr(std::string("Normfactor:").length(), std::string::npos);
 				ss.clear();
 				ss.str("");
 				ss << normfactor_str;
 				ss >> normfactor;
-				cout << "Normfactor: " << normfactor << endl;
+				//std::cout << "Normfactor: " << normfactor << endl;
 			}
 		}
 		else {
@@ -77,7 +76,7 @@ void ASR::Parse() {
 			//double bg;
 			double energy;
 		
-			stringstream ss;
+			std::stringstream ss;
 			ss << line;
 			ss >> Z >> elem_line >> energy >> counts >> stddev >> chi/* >> bg*/;
 			//switch to xraylib's lines

@@ -4,37 +4,99 @@
 
 #include "bam_file_xmsi.h"
 #include "bam_data_rxi.h"
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 
 
 namespace BAM {
 	namespace File {
 		namespace RXI {
-			class Single: public File {
+			class Single: public File::File {
 			private:
-				BAM::File::XMSI xmimsim_input;
+				BAM::File::XMSI *xmimsim_input;
 				BAM::Data::RXI::Sample sample;
 				
 			public:
-				Single(string);
-				void Open() {}
-				void Close() {}
+				Single(std::string);
+				Single() : File::File(""), xmimsim_input(0), sample() {}
+				~Single() {
+					if (xmimsim_input)
+						delete xmimsim_input;
+				}
+				void Open();
+				void Close();
 				void Parse();
-				//void Write();
-				//void Write(string filename);
+				void Write();
+				void Write(std::string filename);
+				Single(const Single &single) : File(single.filename), sample(single.sample) {
+					if (single.xmimsim_input)
+						xmimsim_input = new BAM::File::XMSI(*single.xmimsim_input);
+					else 
+						xmimsim_input = 0;
+				}
+				Single& operator= (const Single &single) {
+					if (this == &single)
+						return *this;
+					if (xmimsim_input)
+						delete xmimsim_input;
+					if (single.xmimsim_input)
+						xmimsim_input = new BAM::File::XMSI(*single.xmimsim_input);
+					else 
+						xmimsim_input = 0;
+					sample = single.sample;
+					return *this;
+				}
+				BAM::Data::RXI::Sample GetSample() {
+					return sample;
+				}
 			};
 			class Multi: public File {
 			private:
-				BAM::File::XMSI xmimsim_input;
-				vector<BAM::Data::RXI::Sample> sample;
+				BAM::File::XMSI *xmimsim_input;
+				std::vector<BAM::Data::RXI::Sample> samples;
 				
 			public:
-				Multi(string);
-				void Open() {}
-				void Close() {}
+				Multi(std::string);
+				Multi() : File::File(""), xmimsim_input(0) {}
+				~Multi() {
+					if (xmimsim_input)
+						delete xmimsim_input;
+				}
+				void Open();
+				void Close();
 				void Parse();
-				//void Write();
-				//void Write(string filename);
+				void Write();
+				void Write(std::string filename);
+				Multi(const Multi &multi) : File(multi.filename), samples(multi.samples) {
+					if (multi.xmimsim_input)
+						xmimsim_input = new BAM::File::XMSI(*multi.xmimsim_input);
+					else 
+						xmimsim_input = 0;
+				}
+				Multi& operator= (const Multi &multi) {
+					if (this == &multi)
+						return *this;
+					if (xmimsim_input)
+						delete xmimsim_input;
+					if (multi.xmimsim_input)
+						xmimsim_input = new BAM::File::XMSI(*multi.xmimsim_input);
+					else 
+						xmimsim_input = 0;
+					samples = multi.samples;
+					return *this;
+				}
+				BAM::Data::RXI::Sample GetSample(int index) {
+					BAM::Data::RXI::Sample sample;
+					try {
+						sample = samples.at(index);
+					}
+					catch (std::out_of_range &e) {
+						throw BAM::Exception(std::string("BAM::File::RXI::Multi::GetSample: ")+e.what());
+					} 
+					return sample;
+				}
 			};
 		}
 	}

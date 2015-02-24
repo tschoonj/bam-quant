@@ -160,28 +160,28 @@ private:
 	bool xmimsim_paused;
 	GPid xmimsim_pid;
 	Glib::Timer *timer;
-	vector<std::string> argv;
+	std::vector<std::string> argv;
 	void xmimsim_child_watcher(GPid pid, int child_status);
 	bool xmimsim_stdout_watcher(Glib::IOCondition cond);
 	bool xmimsim_stderr_watcher(Glib::IOCondition cond);
 	bool xmimsim_iochannel_watcher(Glib::IOCondition cond, Glib::RefPtr<Glib::IOChannel> iochannel);
 	void xmimsim_start_recursive();
-	string get_elapsed_time() {
+	std::string get_elapsed_time() {
 		if (!timer)
-			return string("timer error");
+			return std::string("timer error");
 
 		long time_elapsed = (long) timer->elapsed();
 		long hours = time_elapsed / 3600;
 		time_elapsed = time_elapsed % 3600;
 		long minutes = time_elapsed / 60;
 		long seconds = time_elapsed % 60;
-		stringstream ss;
+		std::stringstream ss;
 		ss.fill('0');
-		ss << setw(2) << hours << ":" << setw(2) << minutes << ":" << setw(2) << seconds << " ";
-		string rv = ss.str();
+		ss << std::setw(2) << hours << ":" << std::setw(2) << minutes << ":" << std::setw(2) << seconds << " ";
+		std::string rv = ss.str();
 		return rv; 
 	}
-	void update_console(string line, string tag="");
+	void update_console(std::string line, std::string tag="");
 
 	//sixth page -> save the results
 	Gtk::Grid sixth_page;

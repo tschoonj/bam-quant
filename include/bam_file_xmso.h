@@ -12,8 +12,9 @@ namespace BAM {
 		private:
 			struct xmi_output *output;
 		public:
-			XMSO(string);
-			XMSO(struct xmi_output *, string filename="");
+			XMSO() : File::File(""), output(0) {} 
+			XMSO(std::string);
+			XMSO(struct xmi_output *, std::string filename="");
 			~XMSO();
 			void Open();
 			void Close();
@@ -23,8 +24,8 @@ namespace BAM {
 				xmi_copy_output(output, &rv);
 				return rv;
 			}
-			vector<int> GetElements() {
-				vector<int> elements;
+			std::vector<int> GetElements() {
+				std::vector<int> elements;
 				for (int i = 0 ; i < output->nvar_red_history ; i++) {
 					elements.push_back(output->var_red_history[i].atomic_number);
 				}	
@@ -35,10 +36,10 @@ namespace BAM {
 					if (Z == output->var_red_history[i].atomic_number)
 						return output->var_red_history[i].total_counts;
 				}
-				throw BAM::Exception(string("BAM::File::XMSI::GetCountsForElement -> Requested element not found"));
+				throw BAM::Exception(std::string("BAM::File::XMSI::GetCountsForElement -> Requested element not found"));
 				return 0;
 			}
-			double GetCountsForElementForLine(int Z, string line) {
+			double GetCountsForElementForLine(int Z, std::string line) {
 				for (int i = 0 ; i < output->nvar_red_history ; i++) {
 					if (Z == output->var_red_history[i].atomic_number) {
 						for (int j = 0 ; j < output->var_red_history[i].n_lines ; j++) {
@@ -47,10 +48,10 @@ namespace BAM {
 						}
 					}
 				}
-				throw BAM::Exception(string("BAM::File::XMSI::GetCountsForElementForLine -> Requested element or line not found"));
+				throw BAM::Exception(std::string("BAM::File::XMSI::GetCountsForElementForLine -> Requested element or line not found"));
 				return 0;
 			}
-			double GetCountsForElementForLineForInteraction(int Z, string line, int interaction) {
+			double GetCountsForElementForLineForInteraction(int Z, std::string line, int interaction) {
 				for (int i = 0 ; i < output->nvar_red_history ; i++) {
 					if (Z == output->var_red_history[i].atomic_number) {
 						for (int j = 0 ; j < output->var_red_history[i].n_lines ; j++) {
@@ -64,7 +65,7 @@ namespace BAM {
 						}
 					}
 				}
-				throw BAM::Exception(string("BAM::File::XMSI::GetCountsForElementForLineForInteraction -> Requested element, line or interaction not found"));
+				throw BAM::Exception(std::string("BAM::File::XMSI::GetCountsForElementForLineForInteraction -> Requested element, line or interaction not found"));
 				return 0;
 			}
 			//void Write();

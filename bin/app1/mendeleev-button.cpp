@@ -5,6 +5,8 @@
 #include <xraylib.h>
 #include <window.h>
 
+using namespace std;
+
 void MendeleevButton::on_button_clicked() {
 	std::cout << "Button with element: " << element << " clicked" << std::endl;
 	//trial code to reset color

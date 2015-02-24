@@ -10,13 +10,14 @@
 using namespace BAM;
 using namespace BAM::File;
 
-XMSI::XMSI(string filename) : File::File(filename) {
+
+XMSI::XMSI(std::string filename) : File::File(filename) {
 	input = 0;
 	Parse();
 	Close();
 }
 
-XMSI::XMSI(struct xmi_input *new_input, string filename) : File::File(filename) {
+XMSI::XMSI(struct xmi_input *new_input, std::string filename) : File::File(filename) {
 	if (xmi_validate_input(new_input) != 0) {
 		throw BAM::Exception("BAM::File::XMSI::XMSI -> Could not validate input");
 	}
@@ -36,9 +37,6 @@ void XMSI::Close() {
 }
 
 void XMSI::Parse() {
-	if (xmi_xmlLoadCatalog() == 0) {
-		throw BAM::Exception("BAM::File::XMSI::Parse -> Could not load XMI-MSIM XML catalog");
-	}
 	if (xmi_read_input_xml((char*)(filename.c_str()), &input) == 0) {
 		//std::cout << "BAM::File::XMSI::Parse -> Could not read file "+filename << std::endl;
 		throw BAM::Exception("BAM::File::XMSI::Parse -> Could not read file ");
@@ -57,17 +55,17 @@ void XMSI::Write() {
 	}	
 }
 
-void XMSI::Write(string filename) {
+void XMSI::Write(std::string new_filename) {
 	try {
-		SetFilename(filename);
+		SetFilename(new_filename);
 		Write();
 	}
 	catch (BAM::Exception &e) {
-		string message(e.what());
+		std::string message(e.what());
 		size_t pos = message.find("->");
-		if (pos == string::npos) {
+		if (pos == std::string::npos) {
 			//this should not happen
-			throw BAM::Exception(string("BAM::File::XMSI::Write -> ")+ e.what());
+			throw BAM::Exception(std::string("BAM::File::XMSI::Write -> ")+ e.what());
 		}
 		else {
 			throw BAM::Exception(("BAM::File::XMSI::Write -> ")+ message.substr(pos+3));

@@ -31,7 +31,7 @@ class MendeleevButton : public Gtk::Button {
 		double xmso_counts_LA; //raw
 		double phi;
 		Gtk::Popover popover;
-		string temp_xmsi_filename;
+		std::string temp_xmsi_filename;
 		void reset_button();
 		int GetZ() {
 			return Z;

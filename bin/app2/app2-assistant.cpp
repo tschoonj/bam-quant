@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <libxml++/libxml++.h>
 
+using namespace std;
+
 #ifdef G_OS_UNIX
 	#include <sys/types.h>
 	#include <sys/wait.h>
@@ -392,7 +394,7 @@ void App2Assistant::on_assistant_close() {
 		}	
 		xmlpp::Document document;
 
-		document.set_internal_subset("bam-quant-app2", "", "http://www.bam.de/xml/bam-quant-app2.dtd");
+		document.set_internal_subset("bam-quant-rxi-multi", "", "http://www.bam.de/xml/bam-quant-rxi.dtd");
 		//document.add_comment("this is a comment");
 		xmlDocPtr doc = document.cobj();
 

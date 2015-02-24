@@ -6,18 +6,16 @@
 #include "bam_exception.h"
 #include <vector>
 
-using namespace std;
-
 namespace BAM {
 	namespace File {
 		class ASR : public File {
 		private:
-			vector<Data::ASR> data_asr;
+			std::vector<Data::ASR> data_asr;
 			double normfactor;
 			bool keep_negative_counts;
 			void Parse();
 		public:
-			ASR(string, bool keep_negative_counts = false);
+			ASR(std::string, bool keep_negative_counts = false);
 			ASR(double normfactor);
 			~ASR();
 			int GetNPeaks() {
