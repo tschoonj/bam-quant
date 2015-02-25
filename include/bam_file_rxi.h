@@ -21,7 +21,7 @@ namespace BAM {
 			public:
 				Single(std::string);
 				//Single() : File::File(""), xmimsim_input(0), sample() {}
-				Single(BAM::File::XMSI input, BAM::Data::RXI::Sample sample, std::string filename = "") : File::File(filename), sample(sample) {
+				Single(BAM::File::XMSI input, BAM::Data::RXI::Sample sample) : File::File(""), sample(sample) {
 					xmimsim_input = new BAM::File::XMSI(input);
 				}
 				~Single() {
@@ -102,6 +102,9 @@ namespace BAM {
 				}
 				void AddSample(BAM::Data::RXI::Sample sample) {
 					samples.push_back(sample);
+				}
+				Single GetSingle(int index) {
+					return Single(*xmimsim_input, GetSample(index));
 				}
 			};
 		}
