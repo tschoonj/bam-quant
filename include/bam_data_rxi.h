@@ -16,7 +16,7 @@ namespace BAM {
 				std::string datatype;
 				double rxi;
 				public:
-				SingleElement(std::string element = "", std::string linetype = "", std::string datatype = "", double rxi = 0.0) : element(element), linetype(linetype), datatype(datatype), rxi(rxi) {}
+				SingleElement(std::string element, std::string linetype, std::string datatype, double rxi) : element(element), linetype(linetype), datatype(datatype), rxi(rxi) {}
 				std::string GetElement() {
 					return element;
 				}
@@ -42,16 +42,7 @@ namespace BAM {
 				double density;
 				double thickness;
 				public:
-				Sample() : asrfile(""), density(0.0), thickness(0.0) {}
-				void SetASRfile(std::string file) {
-					asrfile = file;	
-				}
-				void SetDensity(double value) {
-					density = value;	
-				}
-				void SetThickness(double value) {
-					thickness = value;	
-				}
+				Sample(std::string asrfile, double density, double thickness) : asrfile(asrfile), density(density), thickness(thickness) {}
 				std::string GetASRfile() {
 					return asrfile;
 				}
@@ -75,14 +66,12 @@ namespace BAM {
 					elements.push_back(single_element);
 				}
 				SingleElement GetSingleElement(int index) {
-					SingleElement element;
 					try {
-						element = elements.at(index);
+						return elements.at(index);
 					}
 					catch (std::out_of_range &e) {
 						throw BAM::Exception(std::string("BAM::Data::RXI::Sample::GetSingleElement: ")+e.what());
 					}
-					return element;
 				}
 				size_t GetNumberOfSingleElements() {
 					return elements.size();

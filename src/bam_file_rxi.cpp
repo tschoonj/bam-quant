@@ -14,8 +14,23 @@ using namespace BAM::File::RXI;
 using namespace BAM::Data::RXI;
 
 static Sample ConvertXMLToSample(xmlpp::Element *element) {
-	Sample rv;
-
+	Glib::ustring asrfile = dynamic_cast<xmlpp::Element*>(element->get_first_child("asrfile"))->get_child_text()->get_content();
+	Glib::ustring density_str = dynamic_cast<xmlpp::Element*>(element->get_first_child("density"))->get_child_text()->get_content();
+	Glib::ustring thickness_str = dynamic_cast<xmlpp::Element*>(element->get_first_child("thickness"))->get_child_text()->get_content();
+	double density;
+	double thickness;
+	{
+		std::stringstream ss;
+		ss << density_str;
+		ss >> density;
+	}
+	{
+		std::stringstream ss;
+		ss << thickness_str;
+		ss >> thickness;
+	}
+	Sample rv(asrfile, density, thickness);
+	
 	xmlpp::Node::NodeList list = element->get_children("element_rxi");
 	for (xmlpp::Node::NodeList::iterator it = list.begin() ; it != list.end() ; ++it) {
  		Glib::ustring element = dynamic_cast<xmlpp::Element*>(*it)->get_attribute_value("element");
@@ -29,25 +44,6 @@ static Sample ConvertXMLToSample(xmlpp::Element *element) {
 		rv.AddSingleElement(SingleElement(element, linetype, datatype, rxi));
 	}
 
-	Glib::ustring asrfile = dynamic_cast<xmlpp::Element*>(element->get_first_child("asrfile"))->get_child_text()->get_content();
-	Glib::ustring density_str = dynamic_cast<xmlpp::Element*>(element->get_first_child("density"))->get_child_text()->get_content();
-	Glib::ustring thickness_str = dynamic_cast<xmlpp::Element*>(element->get_first_child("thickness"))->get_child_text()->get_content();
-	rv.SetASRfile(asrfile);
-	{
-		std::stringstream ss;
-		double density;
-		ss << density_str;
-		ss >> density;
-		rv.SetDensity(density);
-	}
-	{
-		std::stringstream ss;
-		double thickness;
-		ss << thickness_str;
-		ss >> thickness;
-		rv.SetThickness(thickness);
-	}
-	
 	return rv;
 }
 
@@ -75,7 +71,7 @@ static void ConvertSampleToXML(xmlpp::Element *sampleXML, Sample &sampleBAM) {
 	return;
 }
 
-Single::Single(std::string filename) : File::File(filename), xmimsim_input(0) {
+Single::Single(std::string filename) : File::File(filename), xmimsim_input(0), sample("", 0.0, 0.0) {
 	try {
 		Parse();
 	}

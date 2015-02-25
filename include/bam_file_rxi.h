@@ -20,7 +20,10 @@ namespace BAM {
 				
 			public:
 				Single(std::string);
-				Single() : File::File(""), xmimsim_input(0), sample() {}
+				//Single() : File::File(""), xmimsim_input(0), sample() {}
+				Single(BAM::File::XMSI input, BAM::Data::RXI::Sample sample, std::string filename = "") : File::File(filename), sample(sample) {
+					xmimsim_input = new BAM::File::XMSI(input);
+				}
 				~Single() {
 					if (xmimsim_input)
 						delete xmimsim_input;
@@ -59,7 +62,9 @@ namespace BAM {
 				
 			public:
 				Multi(std::string);
-				Multi() : File::File(""), xmimsim_input(0) {}
+				Multi(BAM::File::XMSI input, std::string filename = "") : File::File(filename) {
+					xmimsim_input = new BAM::File::XMSI(input);
+				}
 				~Multi() {
 					if (xmimsim_input)
 						delete xmimsim_input;
@@ -88,14 +93,15 @@ namespace BAM {
 					return *this;
 				}
 				BAM::Data::RXI::Sample GetSample(int index) {
-					BAM::Data::RXI::Sample sample;
 					try {
-						sample = samples.at(index);
+						return samples.at(index);
 					}
 					catch (std::out_of_range &e) {
 						throw BAM::Exception(std::string("BAM::File::RXI::Multi::GetSample: ")+e.what());
 					} 
-					return sample;
+				}
+				void AddSample(BAM::Data::RXI::Sample sample) {
+					samples.push_back(sample);
 				}
 			};
 		}

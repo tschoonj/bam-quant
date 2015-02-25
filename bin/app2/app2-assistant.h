@@ -53,8 +53,8 @@ private:
 				add(col_linetype);
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_element;
-			Gtk::TreeModelColumn<Glib::ustring> col_filename;
-			Gtk::TreeModelColumn<Glib::ustring> col_filename_full;
+			Gtk::TreeModelColumn<std::string> col_filename;
+			Gtk::TreeModelColumn<std::string> col_filename_full;
 			Gtk::TreeModelColumn<int> col_atomic_number;
 			Gtk::TreeModelColumn<BAM::File::ASR*> col_bam_file_asr;
 			Gtk::TreeModelColumn<Glib::ustring> col_linetype;
@@ -84,7 +84,7 @@ private:
 			Gtk::TreeModelColumn<Glib::ustring> col_filename;
 			Gtk::TreeModelColumn<BAM::File::ASR*> col_bam_file_asr;
 			Gtk::TreeModelColumn<std::vector<int>* > col_elements_int;
-			Gtk::TreeModelColumn<Glib::ustring> col_filename_full;
+			Gtk::TreeModelColumn<std::string> col_filename_full;
 			Gtk::TreeModelColumn<double> col_density;
 			Gtk::TreeModelColumn<double> col_thickness;
 	};

@@ -12,7 +12,7 @@
 #include <glibmm/main.h>
 #include <glibmm/convert.h>
 #include <algorithm>
-#include <libxml++/libxml++.h>
+#include <bam_file_rxi.h>
 
 using namespace std;
 
@@ -367,7 +367,7 @@ void App2Assistant::on_assistant_close() {
 				const gsl_multifit_fdfsolver_type *T = gsl_multifit_fdfsolver_lmsder;
 				gsl_multifit_function_fdf f;
 				pld.sigma.assign(pld.x.size(), 0.1);
-				double x_init[3] = {0.1, 1.0, phi};
+				double x_init[3] = {1E-6, 1E-4, phi};
 				gsl_vector_view x = gsl_vector_view_array(x_init, 3);
 				f.f = &App2Assistant::phi_lqfit_f;
 				f.df = &App2Assistant::phi_lqfit_df;
@@ -378,7 +378,7 @@ void App2Assistant::on_assistant_close() {
 
 				s = gsl_multifit_fdfsolver_alloc(T, pld.x.size(), 3);
 				gsl_multifit_fdfsolver_set(s, &f, &x.vector);
-				int status = gsl_multifit_fdfsolver_driver(s, 500, 1E-3, 1E-3);
+				int status = gsl_multifit_fdfsolver_driver(s, 500, 1E-2, 1E-2);
 
 				if (status != GSL_SUCCESS) {
 					message += "No convergence while calculating scaling factor phi using GSL non-linear least squares fitting. ";
@@ -392,35 +392,29 @@ void App2Assistant::on_assistant_close() {
 				std::cout << "c: " << gsl_vector_get(s->x, 2) << std::endl;
 			}
 		}	
-		xmlpp::Document document;
 
-		document.set_internal_subset("bam-quant-rxi-multi", "", "http://www.bam.de/xml/bam-quant-rxi.dtd");
-		//document.add_comment("this is a comment");
-		xmlDocPtr doc = document.cobj();
-
-		xmlpp::Element *rootnode = document.create_root_node("bam-quant-rxi-multi");
-
-		if (xmi_write_default_comments(doc, rootnode->cobj()) == 0) {
-			throw BAM::Exception("Could not write XMI-MSIM default comments");
-		}
+		BAM::File::RXI::Multi rxi_multi(*fourth_page_xmsi_file);
 
 		//loop over all samples from page three
 		Gtk::TreeModel::Children kids = third_page_model->children();
 		for (Gtk::TreeModel::Children::iterator iter = kids.begin() ; iter != kids.end() ; ++iter) {
 			Gtk::TreeModel::Row row = *iter;
-			xmlpp::Element *samples = rootnode->add_child("samples");
+			BAM::Data::RXI::Sample sample(row[third_page_columns.col_filename_full], row[third_page_columns.col_density], row[third_page_columns.col_thickness]);
 			
 			//loop over all elements in the sample
 			std::vector<int> *col_elements_int = row[third_page_columns.col_elements_int];
 			BAM::File::ASR *col_bam_file_asr = row[third_page_columns.col_bam_file_asr];
 			double norm_factor_sample = col_bam_file_asr->GetNormfactor();
 			for (int i = 0 ; i < col_elements_int->size() ; i++) {
-				xmlpp::Element *element_rxi = samples->add_child("element_rxi");
+				//BAM::Data::RXI::SingleElement;
 				int Z = col_elements_int->at(i);
-				element_rxi->set_attribute("element", AtomicNumberToSymbol(Z));
+				std::string element(AtomicNumberToSymbol(Z));
+				std::string linetype;
+				std::string datatype;
+				double rxi;
+
 				BAM::Data::ASR asr_data_sample = col_bam_file_asr->GetData(i);
 				//first check if is available among the pures
-				double rxi;
 				bool found = false;
 				Gtk::TreeModel::Children kids2 = second_page_model->children();
 				Gtk::TreeModel::Children::iterator iter2;
@@ -440,15 +434,15 @@ void App2Assistant::on_assistant_close() {
 					rxi = asr_data_sample.GetCounts() * norm_factor_sample / 
 					(asr_data_pure.GetCounts() * norm_factor_pure);
 					if (asr_data_sample.GetLine() == KA_LINE) {
-						element_rxi->set_attribute("linetype", "KA_LINE");
+						linetype = "KA_LINE";
 					}
 					else if (asr_data_sample.GetLine() == LA_LINE) {
-						element_rxi->set_attribute("linetype", "LA_LINE");
+						linetype = "LA_LINE";
 					}
 					else {
 						throw BAM::Exception("Invalid linetype detected");
 					}
-					element_rxi->set_attribute("datatype", "experimental");
+					datatype = "experimental";
 				}
 				else {
 					//no match means we need to look at the simulated data
@@ -476,7 +470,7 @@ void App2Assistant::on_assistant_close() {
 						}
 						rxi = asr_data_sample.GetCounts() * norm_factor_sample /
 						(row3[fifth_page_columns.col_xmso_counts_KA]*phi);
-						element_rxi->set_attribute("linetype", "KA_LINE");
+						linetype = "KA_LINE";
 					}
 					else if (row3[fifth_page_columns.col_xmso_counts_LA] > 0) {
 						if (pld.x.size() > 3) {
@@ -488,33 +482,17 @@ void App2Assistant::on_assistant_close() {
 						}
 						rxi = asr_data_sample.GetCounts() * norm_factor_sample /
 						(row3[fifth_page_columns.col_xmso_counts_LA]*phi);
-						element_rxi->set_attribute("linetype", "LA_LINE");
+						linetype = "LA_LINE";
 					}
 					else
 						throw BAM::Exception("An element in a sample without corresponding pure measurement has no positive counts in the simulation results.");
-					element_rxi->set_attribute("datatype", "interpolated");
+					datatype = "interpolated";
 				}
-				// rxi calculated at this point!
-				stringstream ss;
-				ss << rxi;
-				element_rxi->add_child_text(ss.str());
+				sample.AddSingleElement(BAM::Data::RXI::SingleElement(element, linetype, datatype, rxi));
 			}
-			xmlpp::Element *asrfile = samples->add_child("asrfile");
-			asrfile->add_child_text(row[third_page_columns.col_filename_full]);
-			samples->add_child("density")->add_child_text(static_cast<ostringstream*>(&(ostringstream() << row[third_page_columns.col_density]))->str());
-			samples->add_child("thickness")->add_child_text(static_cast<ostringstream*>(&(ostringstream() << row[third_page_columns.col_thickness]))->str());
+			rxi_multi.AddSample(sample);
 		}
-		xmlpp::Element *xmimsim = rootnode->add_child("xmimsim-input");
-		//xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(xmimsim);
-		xmlNodePtr node = xmimsim->cobj();
-		struct xmi_input *xmsi_raw = fourth_page_xmsi_file->GetInternalCopy();
-		if (xmi_write_input_xml_body(doc, node, xmsi_raw) == 0) {
-			throw BAM::Exception("Could not write XMI-MSIM input body");
-		}
-
-		document.write_to_file_formatted(sixth_page_bpq2_entry.get_text());
-
-		xmi_free_input(xmsi_raw);
+		rxi_multi.Write(std::string(sixth_page_bpq2_entry.get_text().c_str()));
 	}
 	catch (BAM::Exception &e) {
 		if (s)
@@ -1572,9 +1550,9 @@ void App2Assistant::update_console(string line, string tag) {
 
 void App2Assistant::on_sixth_page_open_clicked() {
 	//fire up a filechooserdialog
-	Gtk::FileChooserDialog dialog(*this, "Please select a BAM-QUANT project 2 file", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	Gtk::FileChooserDialog dialog(*this, "Please select a BAM-QUANT relative X-ray intensities file", Gtk::FILE_CHOOSER_ACTION_SAVE);
 	Glib::RefPtr<Gtk::FileFilter> filter_bqp1 = Gtk::FileFilter::create();
-	filter_bqp1->set_name("BAM-QUANT project 2 files");
+	filter_bqp1->set_name("BAM-QUANT RXI files");
 	filter_bqp1->add_pattern("*.rxi");
 	filter_bqp1->add_pattern("*.RXI");
 	dialog.add_filter(filter_bqp1);
@@ -1587,7 +1565,7 @@ void App2Assistant::on_sixth_page_open_clicked() {
 		case(Gtk::RESPONSE_OK):
 			filename = dialog.get_filename();
 			if (filename.compare(filename.length()-4, string::npos, ".rxi") != 0)
-				filename += "rxi";
+				filename += ".rxi";
 			std::cout << "Open clicked: " << filename << std::endl;
       			break;
 		case(Gtk::RESPONSE_CANCEL):

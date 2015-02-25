@@ -47,22 +47,7 @@ int main(int argc, char *argv[]) {
 			BAM::Data::RXI::Sample sample = rxi_single2.GetSample();
 			std::cout << "Sample density: " << sample.GetDensity() << std::endl;
 			std::cout << "Sample density as string: " << sample.GetDensityString() << std::endl;
-		}
-		catch (BAM::Exception &e) {
-			throw BAM::Exception(std::string(e.what()));
-		}
-		catch (...) {
-			throw BAM::Exception("Unknown exception caught");
-		}
-		try {
-			std::cout << "Case 3" << std::endl;
-			BAM::File::RXI::Single rxi_single3;
-
-			rxi_single3 = *rxi_single;
-			BAM::Data::RXI::Sample sample = rxi_single3.GetSample();
-			std::cout << "Sample density: " << sample.GetDensity() << std::endl;
-			std::cout << "Sample density as string: " << sample.GetDensityString() << std::endl;
-			rxi_single3.Write(std::string(Glib::path_get_basename(TEST_FILE_RXI_SINGLE))+".copy");
+			rxi_single2.Write(std::string(Glib::path_get_basename(TEST_FILE_RXI_SINGLE))+".copy");
 		}
 		catch (BAM::Exception &e) {
 			throw BAM::Exception(std::string(e.what()));
