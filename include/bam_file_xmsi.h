@@ -20,8 +20,8 @@ namespace BAM {
 		class XMSI : public File {
 		private:
 			struct xmi_input *input;
-		public:
 			XMSI() : File(""), input(0) {}
+		public:
 			XMSI(std::string);
 			XMSI(struct xmi_input *, std::string filename="");
 			~XMSI();
@@ -34,6 +34,10 @@ namespace BAM {
 				struct xmi_input *rv;
 				xmi_copy_input(input, &rv);
 				return rv;
+			}
+			struct xmi_input *GetInternalPointer() {
+				//this is dangerous!!!
+				return input;
 			}
 			friend std::ostream& operator<< (std::ostream &out, const XMSI &xmsi);
 			void ReplaceComposition(const BAM::Data::XMSI::Composition &composition_new);

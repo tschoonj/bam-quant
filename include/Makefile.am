@@ -9,4 +9,5 @@ bam_quantinclude_HEADERS = bam_file.h \
 			   bam_file_xmso.h \
 			   bam_catalog.h \
 			   bam_data_rxi.h \
-			   bam_file_rxi.h
+			   bam_file_rxi.h \
+			   bam_job_xmsi.h

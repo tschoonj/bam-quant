@@ -5,6 +5,8 @@
 #include <xmi_msim.h>
 #include <iostream>
 #include "bam_catalog.h"
+#include "bam_file_rxi.h" 
+#include "bam_job_xmsi.h" 
 
 
 
@@ -26,7 +28,6 @@ int main(int argc, char **argv) {
 	}
 
 	static struct xmi_main_options options;
-	static std::string hdf5_file;
         static std::string spe_file_noconv;
         static std::string spe_file_conv;
         static std::string csv_file_noconv;
@@ -36,17 +37,11 @@ int main(int argc, char **argv) {
         static std::string htm_file_noconv;
         static std::string htm_file_conv;
 	static std::string custom_detector_response;
-        double zero_sum;
-        struct xmi_solid_angle *solid_angle_def=NULL;
-        struct xmi_escape_ratios *escape_ratios_def=NULL;
-        char *xmi_input_string;
+	static std::string hdf5_file;
         static std::string xmimsim_hdf5_solid_angles;
         static std::string xmimsim_hdf5_escape_ratios;
-        gchar *xmimsim_hdf5_solid_angles_utf8 = NULL;
-        gchar *xmimsim_hdf5_escape_ratios_utf8 = NULL;
-        gchar *hdf5_file_utf8 = NULL;
         bool version = false;
-	std::vector<std::string> arg_files;
+	std::vector<std::string> argv_files;
 
 
         options.use_M_lines = 1;
@@ -102,28 +97,23 @@ int main(int argc, char **argv) {
 	option_group.add_entry(App3OptionEntry( "set-threads", 0, "Set the number of threads (default=max)", "N"), options.omp_num_threads);
 	option_group.add_entry(App3OptionEntry( "verbose", 'v', "Verbose mode"), (bool&) options.verbose);
 	option_group.add_entry(App3OptionEntry( "very-verbose", 'V', "Even more verbose mode"), (bool&) options.extra_verbose);
-	//option_group.add_entry(App3OptionEntry( "version", 0, "Display version information"), version);
-	option_group.add_entry_filename(App3OptionEntry( G_OPTION_REMAINING), arg_files);
+	option_group.add_entry(App3OptionEntry( "version", 0, "Display version information"), version);
+	option_group.add_entry_filename(App3OptionEntry( G_OPTION_REMAINING), argv_files);
 
 	option_context.set_main_group(option_group);
 	option_context.set_ignore_unknown_options();
 
 	option_context.parse(argc, argv);
 
-        /*if (version) {
+        if (version) {
                 std::cout << xmi_version_string() << std::endl;
                 return 0;
-        }*/
+        }
 
-        if (arg_files.size() != 2) {
+        if (argv_files.size() != 2) {
 		std::cerr << option_context.get_help(true) << std::endl;
                 return 1;
         }		
-
-	if (options.omp_num_threads > xmi_omp_get_max_threads() ||
-                        options.omp_num_threads < 1) {
-                options.omp_num_threads = xmi_omp_get_max_threads();
-        }
 
 	if (options.extra_verbose) {
                 options.verbose = 1;
@@ -138,6 +128,34 @@ int main(int argc, char **argv) {
                 std::cout << "Option number of threads: " << options.omp_num_threads << std::endl;
                 std::cout << "Option advanced Compton: " << options.use_advanced_compton << std::endl;
         }
+
+
+	try {
+		//start by reading in the inputfile
+		BAM::File::RXI::Single single(argv_files[0]);
+
+		//now next -> produce the initial XMSI
+
+
+
+	}
+	catch (BAM::Exception &e) {
+		std::cerr << "Fatal BAM exception: " << e.what() << std::endl;
+		return 1;
+	}
+	catch (std::exception &e) {
+		std::cerr << "Fatal non-BAM exception: " << e.what() << std::endl;
+		return 1;
+	}
+	catch (Glib::Exception &e) {
+		std::cerr << "Fatal Glib exception: " << e.what() << std::endl;
+		return 1;
+	}
+	catch (...) {
+		std::cerr << "Unknown exception occurred" << std::endl;
+		return 1;
+	}
+
 
 	return 0;
 }
