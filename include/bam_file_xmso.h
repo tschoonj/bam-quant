@@ -15,6 +15,21 @@ namespace BAM {
 			XMSO() : File::File(""), output(0) {} 
 			XMSO(std::string);
 			XMSO(struct xmi_output *, std::string filename="");
+			XMSO(const XMSO &xmso) : File(xmso.filename), output(0) {
+				if (xmso.output)
+					xmi_copy_output(xmso.output, &output);
+			}
+			XMSO& operator= (const XMSO &xmso) {
+				if (this == &xmso)
+					return *this;
+				if (output)
+					xmi_free_output(output);
+				if (xmso.output)
+					xmi_copy_output(xmso.output, &output);
+				else
+					output = 0;
+				return *this;
+			}
 			~XMSO();
 			void Open();
 			void Close();
@@ -68,9 +83,8 @@ namespace BAM {
 				throw BAM::Exception(std::string("BAM::File::XMSI::GetCountsForElementForLineForInteraction -> Requested element, line or interaction not found"));
 				return 0;
 			}
-			//void Write();
-			//void Write(string filename);
-			//friend std::ostream& operator<< (std::ostream &out, const XMSI &xmsi);
+			void Write();
+			void Write(std::string filename);
 		};
 	}
 }

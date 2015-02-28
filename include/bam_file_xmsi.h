@@ -50,11 +50,9 @@ namespace BAM {
 				return std::string(input->general->outputfile);
 			}
 			//copy constructor
-			XMSI(const XMSI &xmsi) : File(xmsi.filename) {
+			XMSI(const XMSI &xmsi) : File(xmsi.filename), input(0) {
 				if (xmsi.input)
 					xmi_copy_input(xmsi.input, &input);
-				else
-					input = 0;
 			}
 			XMSI& operator= (const XMSI &xmsi) {
 				if (this == &xmsi)

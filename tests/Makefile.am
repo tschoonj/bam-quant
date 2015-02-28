@@ -4,7 +4,8 @@ check_PROGRAMS = test_bam_file_asr \
 		 test_bam_file_xmsi \
 		 test_bam_file_xmso \
 		 test_bam_file_rxi_single \
-		 test_bam_file_rxi_multi
+		 test_bam_file_rxi_multi \
+		 test_bam_job_xmsi
 
 test_bam_file_asr_SOURCES = test_bam_file_asr.cpp
 test_bam_file_asr_LDADD = ../src/libbam-quant.la
@@ -26,11 +27,14 @@ test_bam_file_rxi_multi_SOURCES = test_bam_file_rxi_multi.cpp
 test_bam_file_rxi_multi_LDADD = ../src/libbam-quant.la @xmimsim_LIBS@
 test_bam_file_rxi_multi_CPPFLAGS = -DTEST_FILE_RXI_MULTI=\"$(srcdir)/rxi_test_data_multi.rxi\" $(AM_CPPFLAGS) @xmimsim_CFLAGS@ -DCATALOGPATH=\"$(abs_top_srcdir)/xml/\" @glibmm_CFLAGS@
 
+test_bam_job_xmsi_SOURCES = test_bam_job_xmsi.cpp
+test_bam_job_xmsi_LDADD = ../src/libbam-quant.la @xmimsim_LIBS@
+test_bam_job_xmsi_CPPFLAGS = -DTEST_JOB_XMSI=\"$(srcdir)/test_bam_job_xmsi.xmsi\" $(AM_CPPFLAGS) @xmimsim_CFLAGS@
 
 TESTS = $(check_PROGRAMS)
 
 
-EXTRA_DIST = In.xmsi std20kev In.xmso rxi_test_data_single.rxi rxi_test_data_multi.rxi
+EXTRA_DIST = In.xmsi std20kev In.xmso rxi_test_data_single.rxi rxi_test_data_multi.rxi test_bam_job_xmsi.xmsi
 
 clean-local:
-	rm -rf In_copy.xmsi rxi_test_data_single.rxi.copy rxi_test_data_multi.rxi.copy
+	rm -rf In_copy.xmsi rxi_test_data_single.rxi.copy rxi_test_data_multi.rxi.copy test_bam_job_xmsi.xmso

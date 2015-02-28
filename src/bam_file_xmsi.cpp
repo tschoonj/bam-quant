@@ -56,21 +56,8 @@ void XMSI::Write() {
 }
 
 void XMSI::Write(std::string new_filename) {
-	try {
-		SetFilename(new_filename);
-		Write();
-	}
-	catch (BAM::Exception &e) {
-		std::string message(e.what());
-		size_t pos = message.find("->");
-		if (pos == std::string::npos) {
-			//this should not happen
-			throw BAM::Exception(std::string("BAM::File::XMSI::Write -> ")+ e.what());
-		}
-		else {
-			throw BAM::Exception(("BAM::File::XMSI::Write -> ")+ message.substr(pos+3));
-		}
-	}
+	SetFilename(new_filename);
+	Write();
 }
 
 #ifdef HAVE_EXT_STDIO_FILEBUF_H
