@@ -13,5 +13,6 @@ app3_CPPFLAGS = @gtkmm_CFLAGS@ \
 		@xmimsim_CFLAGS@ \
 		@libxmlmm_CFLAGS@
 app3_LDADD = @gtkmm_LIBS@ \
+	     @gsl_LIBS@ \
 	     ${top_builddir}/src/libbam-quant.la \
-	     @gsl_LIBS@
+	     @xmimsim_LIBS@

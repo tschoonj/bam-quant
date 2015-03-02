@@ -20,11 +20,11 @@ test_bam_file_xmso_LDADD = ../src/libbam-quant.la @xmimsim_LIBS@
 test_bam_file_xmso_CPPFLAGS = -DTEST_FILE_XMSO=\"$(srcdir)/In.xmso\" $(AM_CPPFLAGS) @xmimsim_CFLAGS@
 
 test_bam_file_rxi_single_SOURCES = test_bam_file_rxi_single.cpp
-test_bam_file_rxi_single_LDADD = ../src/libbam-quant.la @xmimsim_LIBS@
+test_bam_file_rxi_single_LDADD = ../src/libbam-quant.la @xmimsim_LIBS@ @glibmm_LIBS@
 test_bam_file_rxi_single_CPPFLAGS = -DTEST_FILE_RXI_SINGLE=\"$(srcdir)/rxi_test_data_single.rxi\" $(AM_CPPFLAGS) @xmimsim_CFLAGS@ -DCATALOGPATH=\"$(abs_top_srcdir)/xml/\" @glibmm_CFLAGS@
 
 test_bam_file_rxi_multi_SOURCES = test_bam_file_rxi_multi.cpp
-test_bam_file_rxi_multi_LDADD = ../src/libbam-quant.la @xmimsim_LIBS@
+test_bam_file_rxi_multi_LDADD = ../src/libbam-quant.la @xmimsim_LIBS@ @glibmm_LIBS@
 test_bam_file_rxi_multi_CPPFLAGS = -DTEST_FILE_RXI_MULTI=\"$(srcdir)/rxi_test_data_multi.rxi\" $(AM_CPPFLAGS) @xmimsim_CFLAGS@ -DCATALOGPATH=\"$(abs_top_srcdir)/xml/\" @glibmm_CFLAGS@
 
 test_bam_job_xmsi_SOURCES = test_bam_job_xmsi.cpp
