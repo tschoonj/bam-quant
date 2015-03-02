@@ -54,6 +54,9 @@ namespace BAM {
 				BAM::Data::RXI::Sample GetSample() {
 					return sample;
 				}
+				BAM::File::XMSI GetInputXMSI() {
+					return *xmimsim_input;
+				}
 			};
 			class Multi: public File {
 			private:

@@ -131,13 +131,37 @@ int main(int argc, char **argv) {
 
 
 	try {
+		BAM::Job::XMSI::RandomNumberAcquisitionStart();
+
 		//start by reading in the inputfile
-		BAM::File::RXI::Single single(argv_files[0]);
+		BAM::File::RXI::Single single_rxi(argv_files[0]);
+		BAM::Data::RXI::Sample sample = single_rxi.GetSample();
 
 		//now next -> produce the initial XMSI
+		BAM::File::XMSI initial_input(single_rxi.GetInputXMSI());
+
+		//now change its composition
+		BAM::Data::XMSI::Composition composition;
+
+		BAM::Data::XMSI::Layer layer1("Air, Dry (near sea level)", 5.0);
+		composition.AddLayer(layer1);
+
+		BAM::Data::XMSI::Layer layer2(sample.GetDensity(), sample.GetThickness());
+		
+		//starting weights determined by normalizing the array of RXI's
+		for (int i = 0 ; i < sample.GetNumberOfSingleElements() ; i++) {
+			BAM::Data::RXI::SingleElement single_element = sample.GetSingleElement(i);
+			layer2.AddElement(single_element.GetElement(), single_element.GetRXI());
+		}
+		layer2.Normalize();
+		composition.AddLayer(layer2);
+		composition.SetReferenceLayer(2);
+		initial_input.ReplaceComposition(composition);
 
 
 
+
+		BAM::Job::XMSI::RandomNumberAcquisitionStop();
 	}
 	catch (BAM::Exception &e) {
 		std::cerr << "Fatal BAM exception: " << e.what() << std::endl;

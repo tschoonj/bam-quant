@@ -57,6 +57,8 @@ Layer::Layer(std::string nistcompound, double thickness_new) : thickness(thickne
 }
 
 void Layer::AddElement(int Z_new, double weight_new) {
+	if (Z_new < 1 || Z_new > 95) 
+		throw BAM::Exception("BAM::Data::XMSI::Layer::AddElement -> Z_new must be a number between 1 and 94");
 	//ensure Z isn't already present!
 	std::vector<int>::iterator it = std::find(Z.begin(), Z.end(), Z_new);
 	if (it == Z.end()) {
@@ -68,6 +70,14 @@ void Layer::AddElement(int Z_new, double weight_new) {
 		int index = std::distance(Z.begin(), it);	
 		weight[index] += weight_new;
 	}
+}
+
+void Layer::AddElement(std::string Z_new, double weight_new) {
+	int Z = SymbolToAtomicNumber((char *) Z_new.c_str());
+	if (Z == 0) {
+		throw BAM::Exception("BAM::Data::XMSI::Layer::AddElement -> Z_new must be a chemical symbol");
+	}
+	AddElement(Z, weight_new);
 }
 
 void Layer::Normalize() {
@@ -96,4 +106,18 @@ void Composition::SetReferenceLayer(int reference_layer_new) {
 		throw BAM::Exception("BAM::Data::XMSI::Composition::SetReferenceLayer -> Invalid reference layer detected");
 	}	
 	reference_layer = reference_layer_new;
+}
+
+void Composition::ReplaceLayer(const Layer &layer_new, int layer_index) {
+	//make sure layer_index is valid!
+	if (layer_index < 1 || layer_index > layers.size())
+		throw BAM::Exception("BAM::Data::Composition::ReplaceLayer -> Invalid layer_index detected");
+	xmi_free_layer(&layers[layer_index-1]);
+
+	layers[layer_index-1].Z = (int *) xmi_memdup(&layer_new.Z[0], sizeof(int)*layer_new.Z.size());
+	layers[layer_index-1].weight = (double *) xmi_memdup(&layer_new.weight[0], sizeof(double)*layer_new.Z.size());
+	xmi_scale_double(layers[layer_index-1].weight, layer_new.Z.size(), 1.0/xmi_sum_double(layers[layer_index-1].weight, layer_new.Z.size()));
+	layers[layer_index-1].density = layer_new.density;
+	layers[layer_index-1].thickness = layer_new.thickness;
+	layers[layer_index-1].n_elements = layer_new.Z.size();
 }

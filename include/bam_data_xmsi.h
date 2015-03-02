@@ -28,6 +28,7 @@ namespace BAM {
 				Layer(std::string compound, double density_new, double thickness_new);
 				Layer(std::string nistcompound, double thickness_new);
 				void AddElement(int Z_new, double weight_new);
+				void AddElement(std::string Z_new, double weight_new);
 				void Normalize();
 				friend class Composition;
 			};
@@ -43,6 +44,7 @@ namespace BAM {
 					}
 				}
 				void AddLayer(const Layer &layer_new);
+				void ReplaceLayer(const Layer &layer_new, int layer_index);
 				void SetReferenceLayer(int reference_layer_new);
 				friend class BAM::File::XMSI;
 			};

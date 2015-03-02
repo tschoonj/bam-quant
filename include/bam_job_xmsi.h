@@ -28,9 +28,26 @@ namespace BAM {
 			struct xmi_escape_ratios *escape_ratios;
 
 			static bool random_acquisition_started;
-			static int ObjectCounter;
 			void Initialize();
 		public:
+			static void RandomNumberAcquisitionStart() {
+				//start random number acquisition
+				if (!random_acquisition_started) {
+					if (xmi_start_random_acquisition() == 0) {
+						BAM::Exception("BAM::Job::XMSI::RandomNumberAcquisitionStart -> Could not start random number acquisition");
+					}
+					random_acquisition_started = true;
+				}
+			}
+			static void RandomNumberAcquisitionStop() {
+				if (random_acquisition_started) {
+					xmi_end_random_acquisition();
+					if (xmi_end_random_acquisition() == 0) {
+						BAM::Exception("BAM::Job::XMSI::RandomNumberAcquisitionStop -> Could not stop random number acquisition");
+					}
+					random_acquisition_started = false;
+				}
+			}
 			XMSI(	std::string xmsi_filename,
 				struct xmi_main_options options = xmi_get_default_main_options(),
 				std::string hdf5_file = "",
@@ -81,10 +98,6 @@ namespace BAM {
 				if (xmimsim_input)
 					delete xmimsim_input;
 
-				if (--ObjectCounter == 0) {
-					//last object was destroyed
-					xmi_end_random_acquisition();
-				}
 			}
 			void Start();
 			void Write() {

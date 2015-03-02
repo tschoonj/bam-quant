@@ -9,20 +9,10 @@ using namespace BAM;
 using namespace BAM::Job;
 
 bool XMSI::random_acquisition_started = false;
-int XMSI::ObjectCounter = 0;
 
 void XMSI::Initialize() {
-	
 
 	xmi_init_hdf5();
-
-	//start random number acquisition
-	if (!random_acquisition_started) {
-		if (xmi_start_random_acquisition() == 0) {
-			BAM::Exception("BAM::Job::XMSI::Initialize -> Could not start random number acquisition");
-		}
-		random_acquisition_started = true;
-	}
 
 	//check number of threads
 	if (options.omp_num_threads > xmi_omp_get_max_threads() || options.omp_num_threads < 1) {
@@ -34,7 +24,7 @@ void XMSI::Initialize() {
 		hdf5_file_c = strdup(hdf5_file.c_str());
 
 	if (xmi_get_hdf5_data_file(&hdf5_file_c) == 0) {
-		BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_get_hdf5_data_file");
+		throw BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_get_hdf5_data_file");
 	}
 
 
@@ -42,7 +32,7 @@ void XMSI::Initialize() {
 	xmi_input_C2F(xmimsim_input->GetInternalPointer(), &inputFPtr);
 
 	if (xmi_init_input(&inputFPtr) == 0) {
-		BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_init_input");
+		throw BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_init_input");
 	}
 	
 	if (options.verbose)
@@ -50,7 +40,7 @@ void XMSI::Initialize() {
 
         //read from HDF5 file what needs to be read in
         if (xmi_init_from_hdf5(hdf5_file_c, inputFPtr, &hdf5FPtr, options) == 0) {
-                BAM::Exception("Could not initialize from hdf5 data file");
+                throw BAM::Exception("Could not initialize from hdf5 data file");
         }
         else if (options.verbose)
                 std::cout << "HDF5 datafile "<< hdf5_file <<" successfully processed" << std::endl;
@@ -65,22 +55,27 @@ void XMSI::Start() {
 	 *
 	 * 1) solid angle grid
 	 * 2) run the actual simulation
-	 * 3)
+	 * 3) apply detector response function
 	 *
 	 */
+
+	if (!random_acquisition_started) {
+		throw BAM::Exception("BAM::Job::XMSI::Start -> Cannot start XMSI job before launching the random number acquisition");
+	}
+
 	if (options.use_variance_reduction) {
 		if (!xmimsim_hdf5_solid_angles.empty())
 			xmimsim_hdf5_solid_angles_c = strdup(xmimsim_hdf5_solid_angles.c_str());
 
 		if (xmi_get_solid_angle_file(&xmimsim_hdf5_solid_angles_c, 1) == 0)
-			BAM::Exception("BAM::Job::XMSI::Start-> Error in xmi_get_solid_angle_file");
+			throw BAM::Exception("BAM::Job::XMSI::Start-> Error in xmi_get_solid_angle_file");
 
 	        //check if solid angles are already precalculated
                 if (options.verbose)
                         std::cout << "Querying " << xmimsim_hdf5_solid_angles << " for solid angle grid" << std::endl;
 
                 if (xmi_find_solid_angle_match(xmimsim_hdf5_solid_angles_c , xmimsim_input->GetInternalPointer(), &solid_angles, options) == 0)
-			BAM::Exception("BAM::Job::XMSI::Start -> Error in xmi_find_solid_angle_match");
+			throw BAM::Exception("BAM::Job::XMSI::Start -> Error in xmi_find_solid_angle_match");
 
                 if (solid_angles == 0) {
                         if (options.verbose)
@@ -90,14 +85,14 @@ void XMSI::Start() {
 			char *xmi_input_string = 0;
 
                         if (xmi_write_input_xml_to_string(&xmi_input_string, xmimsim_input->GetInternalPointer()) == 0) {
-				BAM::Exception("BAM::Job::XMSI::Start -> Error in xmi_write_input_xml_to_string");
+				throw BAM::Exception("BAM::Job::XMSI::Start -> Error in xmi_write_input_xml_to_string");
                         }
 
                         xmi_solid_angle_calculation(inputFPtr, &solid_angles, xmi_input_string, options);
 
                         //update hdf5 file
                         if( xmi_update_solid_angle_hdf5_file(xmimsim_hdf5_solid_angles_c, solid_angles) == 0)
-				BAM::Exception("BAM::Job::XMSI::Start -> Error in xmi_update_solid_angle_hdf5_file");
+				throw BAM::Exception("BAM::Job::XMSI::Start -> Error in xmi_update_solid_angle_hdf5_file");
                         else if (options.verbose)
                                 std::cout << xmimsim_hdf5_solid_angles_c << " was successfully updated with new solid angle grid" << std::endl;
 
@@ -120,7 +115,7 @@ void XMSI::Start() {
 	double zero_sum;
 
 	if (xmi_main_msim(inputFPtr, hdf5FPtr, 1, &channels, options, &brute_history, &var_red_history, solid_angles) == 0) {
-		BAM::Exception("BAM::Job::XMSI::Start -> Error in xmi_main_msim");
+		throw BAM::Exception("BAM::Job::XMSI::Start -> Error in xmi_main_msim");
 	}
 	
 	if (options.verbose)
@@ -140,11 +135,11 @@ void XMSI::Start() {
 			xmimsim_hdf5_escape_ratios_c = strdup(xmimsim_hdf5_escape_ratios.c_str());
 
 		if (xmi_get_escape_ratios_file(&xmimsim_hdf5_escape_ratios_c, 1) == 0)
-			BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_get_escape_ratios_file");
+			throw BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_get_escape_ratios_file");
 
 		//check if escape ratios are already precalculated
                if (xmi_find_escape_ratios_match(xmimsim_hdf5_escape_ratios_c , xmimsim_input->GetInternalPointer(), &escape_ratios, options) == 0)
-			BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_find_escape_ratios_match");
+			throw BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_find_escape_ratios_match");
 
                if (escape_ratios == 0) {
 			if (options.verbose)
@@ -154,14 +149,14 @@ void XMSI::Start() {
 			char *xmi_input_string = 0;
 
                         if (xmi_write_input_xml_to_string(&xmi_input_string, xmimsim_input->GetInternalPointer()) == 0) {
-				BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_write_input_xml_to_string");
+				throw BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_write_input_xml_to_string");
                         }
 
 			xmi_escape_ratios_calculation(xmimsim_input->GetInternalPointer(), &escape_ratios, xmi_input_string, hdf5_file_c, options, xmi_get_default_escape_ratios_options());
 
 			//update hdf5 file
 			if(xmi_update_escape_ratios_hdf5_file(xmimsim_hdf5_escape_ratios_c , escape_ratios) == 0)
-				BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_update_escape_ratios_hdf5_file");
+				throw BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_update_escape_ratios_hdf5_file");
 			else if (options.verbose)
 				std::cout << xmimsim_hdf5_escape_ratios_c << " was successfully updated with new escape peak ratios" << std::endl;
 			xmlFree(xmi_input_string);
@@ -184,14 +179,14 @@ void XMSI::Start() {
 	else {
 		XmiDetectorConvoluteAll xmi_detector_convolute_all_custom;
 		if (!Glib::Module::get_supported()) {
-			BAM::Exception("BAM::Job::XMSI::Start -> No module support on this platform: cannot use custom detector convolution routine");
+			throw BAM::Exception("BAM::Job::XMSI::Start -> No module support on this platform: cannot use custom detector convolution routine");
 		}
 		Glib::Module module(std::string(options.custom_detector_response));
 		if (!module) {
-			BAM::Exception(std::string("BAM::Job::XMSI::Start -> Could not open ") + options.custom_detector_response + ": " + Glib::Module::get_last_error());
+			throw BAM::Exception(std::string("BAM::Job::XMSI::Start -> Could not open ") + options.custom_detector_response + ": " + Glib::Module::get_last_error());
 		}
 		if (!module.get_symbol("xmi_detector_convolute_all_custom", (void *&) xmi_detector_convolute_all_custom)) {
-			BAM::Exception(std::string("Error retrieving xmi_detector_convolute_all_custom in ") + options.custom_detector_response + ": " + Glib::Module::get_last_error());
+			throw BAM::Exception(std::string("Error retrieving xmi_detector_convolute_all_custom in ") + options.custom_detector_response + ": " + Glib::Module::get_last_error());
 		}
 		else if (options.verbose)
 			std::cout << "xmi_detector_convolute_all_custom loaded from " << options.custom_detector_response << std::endl;

@@ -13,11 +13,14 @@ int main(int argc, char *argv[]) {
 		//catalog stuff first
 		if (xmi_xmlLoadCatalog() == 0)
 			throw BAM::Exception("Could not load XMI-MSIM XML catalog");
-	
+
+		BAM::Job::XMSI::RandomNumberAcquisitionStart();
+
 		job = new BAM::Job::XMSI(TEST_JOB_XMSI, options);
 		job->Start();
 		job->Write();
 
+		BAM::Job::XMSI::RandomNumberAcquisitionStop();
 	}
 	catch (BAM::Exception &e) {
 		std::cerr << "BAM exception: " << e.what() << std::endl;
