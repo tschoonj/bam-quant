@@ -48,21 +48,15 @@ static Sample ConvertXMLToSample(xmlpp::Element *element) {
 }
 
 static void ConvertSampleToXML(xmlpp::Element *sampleXML, Sample &sampleBAM) {
-	bool exception_found = false;
+	std::vector<std::string> elements(sampleBAM.GetElements());
 
-	for (int i = 0 ; !exception_found ; i++) {
-		try {
-			SingleElement single_element = sampleBAM.GetSingleElement(i);
-			xmlpp::Element *element_rxi = sampleXML->add_child("element_rxi");
-			element_rxi->set_attribute("element", single_element.GetElement());
-			element_rxi->set_attribute("linetype", single_element.GetLineType());
-			element_rxi->set_attribute("datatype", single_element.GetDataType());
-			element_rxi->add_child_text(single_element.GetRXIString());
-		}
-		catch (BAM::Exception &e) {
-			//GetSingleElement throws exception when going out of range
-			exception_found = true;
-		}
+	for (std::vector<std::string>::iterator it = elements.begin() ; it != elements.end() ; ++it) {
+		SingleElement single_element = sampleBAM.GetSingleElement(*it);
+		xmlpp::Element *element_rxi = sampleXML->add_child("element_rxi");
+		element_rxi->set_attribute("element", single_element.GetElement());
+		element_rxi->set_attribute("linetype", single_element.GetLineType());
+		element_rxi->set_attribute("datatype", single_element.GetDataType());
+		element_rxi->add_child_text(single_element.GetRXIString());
 	}
 	sampleXML->add_child("asrfile")->add_child_text(sampleBAM.GetASRfile());
 	sampleXML->add_child("density")->add_child_text(sampleBAM.GetDensityString());

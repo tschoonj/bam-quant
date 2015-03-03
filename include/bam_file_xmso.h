@@ -46,6 +46,14 @@ namespace BAM {
 				}	
 				return elements;
 			}
+			double GetCountsForElement(std::string symbol) {
+				int Z = SymbolToAtomicNumber((char *) symbol.c_str());
+				if (Z == 0) {
+					throw BAM::Exception(std::string("BAM::File::XMSI::GetCountsForElement -> argument must be a valid chemical symbol"));
+						
+				}
+				return GetCountsForElement(Z);
+			}
 			double GetCountsForElement(int Z) {
 				for (int i = 0 ; i < output->nvar_red_history ; i++) {
 					if (Z == output->var_red_history[i].atomic_number)
@@ -53,6 +61,14 @@ namespace BAM {
 				}
 				throw BAM::Exception(std::string("BAM::File::XMSI::GetCountsForElement -> Requested element not found"));
 				return 0;
+			}
+			double GetCountsForElementForLine(std::string symbol, std::string line) {
+				int Z = SymbolToAtomicNumber((char *) symbol.c_str());
+				if (Z == 0) {
+					throw BAM::Exception(std::string("BAM::File::XMSI::GetCountsForElementForLine -> argument must be a valid chemical symbol"));
+						
+				}
+				return GetCountsForElementForLine(Z, line);
 			}
 			double GetCountsForElementForLine(int Z, std::string line) {
 				for (int i = 0 ; i < output->nvar_red_history ; i++) {
@@ -65,6 +81,14 @@ namespace BAM {
 				}
 				throw BAM::Exception(std::string("BAM::File::XMSI::GetCountsForElementForLine -> Requested element or line not found"));
 				return 0;
+			}
+			double GetCountsForElementForLineForInteraction(std::string symbol, std::string line, int interaction) {
+				int Z = SymbolToAtomicNumber((char *) symbol.c_str());
+				if (Z == 0) {
+					throw BAM::Exception(std::string("BAM::File::XMSI::GetCountsForElementForLineForInteraction -> argument must be a valid chemical symbol"));
+						
+				}
+				return GetCountsForElementForLineForInteraction(Z, line, interaction);
 			}
 			double GetCountsForElementForLineForInteraction(int Z, std::string line, int interaction) {
 				for (int i = 0 ; i < output->nvar_red_history ; i++) {

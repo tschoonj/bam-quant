@@ -81,7 +81,7 @@ private:
 				add(col_thickness);
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_elements;
-			Gtk::TreeModelColumn<Glib::ustring> col_filename;
+			Gtk::TreeModelColumn<std::string> col_filename;
 			Gtk::TreeModelColumn<BAM::File::ASR*> col_bam_file_asr;
 			Gtk::TreeModelColumn<std::vector<int>* > col_elements_int;
 			Gtk::TreeModelColumn<std::string> col_filename_full;
@@ -133,8 +133,8 @@ private:
 			Gtk::TreeModelColumn<int> col_progress;
 			Gtk::TreeModelColumn<BAM::File::XMSI *> col_xmsi_file;
                 	Gtk::TreeModelColumn<BAM::File::XMSO *> col_xmso_file;
-			Gtk::TreeModelColumn<Glib::ustring> col_xmsi_filename;
-			Gtk::TreeModelColumn<Glib::ustring> col_xmso_filename;
+			Gtk::TreeModelColumn<std::string> col_xmsi_filename;
+			Gtk::TreeModelColumn<std::string> col_xmso_filename;
 			Gtk::TreeModelColumn<double> col_xmso_counts_KA;
 			Gtk::TreeModelColumn<double> col_xmso_counts_LA;
 			Gtk::TreeModelColumn<BAM::File::ASR *> col_bam_file_asr;

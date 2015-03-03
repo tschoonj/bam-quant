@@ -9,6 +9,43 @@
 #include "bam_job_xmsi.h" 
 
 
+#define BAM_QUANT_MAX_ITERATIONS 100
+#define BAM_QUANT_CONV_THRESHOLD 0.001
+
+bool element_comp (std::string lhs, std::string rhs) {return SymbolToAtomicNumber((char *) lhs.c_str()) < SymbolToAtomicNumber((char *) rhs.c_str());}
+
+double calculate_rxi(std::string element, BAM::File::XMSO sample_output, std::map<std::string, BAM::File::XMSO, bool(*)(std::string,std::string)> pure_map, BAM::Data::RXI::SingleElement single_element) {
+	double rxi;
+	//everything depends on linetype!
+	if (single_element.GetLineType() == "KA_LINE") {
+		double numerator = sample_output.GetCountsForElementForLine(element, "KL2") +
+				   sample_output.GetCountsForElementForLine(element, "KL3");
+		double denominator = pure_map[element].GetCountsForElementForLine(element, "KL2") +
+				     pure_map[element].GetCountsForElementForLine(element, "KL3");
+		if (numerator == 0.0) 
+			throw BAM::Exception(std::string("Error in calculate_rxi: zero counts detected for ") + element + " in sample_output");
+		if (denominator == 0.0) 
+			throw BAM::Exception(std::string("Error in calculate_rxi: zero counts detected for ") + element + " in pure_map");
+		rxi = numerator / denominator;
+	}
+	else if (single_element.GetLineType() == "LA_LINE") {
+		double numerator = sample_output.GetCountsForElementForLine(element, "L3M4") +
+				   sample_output.GetCountsForElementForLine(element, "L3M5");
+		double denominator = pure_map[element].GetCountsForElementForLine(element, "L3M4") +
+				     pure_map[element].GetCountsForElementForLine(element, "L3M5");
+		if (numerator == 0.0) 
+			throw BAM::Exception(std::string("Error in calculate_rxi: zero counts detected for ") + element + " in sample_output");
+		if (denominator == 0.0) 
+			throw BAM::Exception(std::string("Error in calculate_rxi: zero counts detected for ") + element + " in pure_map");
+		rxi = numerator / denominator;
+	}
+	else {
+		throw BAM::Exception("Error in calculate_rxi: unknown linetype");
+	}
+	return rxi;
+}
+
+
 
 int main(int argc, char **argv) {
 	Glib::set_application_name("app3");
@@ -138,7 +175,40 @@ int main(int argc, char **argv) {
 		BAM::Data::RXI::Sample sample = single_rxi.GetSample();
 
 		//now next -> produce the initial XMSI
-		BAM::File::XMSI initial_input(single_rxi.GetInputXMSI());
+		BAM::File::XMSI initial_input(single_rxi.GetFileXMSI());
+
+		/*
+		 *
+		 * Calculate the intensities of the pure element samples
+		 *
+		 */
+		//bool(*element_comp_pt)(std::string,std::string) = element_comp;
+		std::map<std::string,BAM::File::XMSO,bool(*)(std::string,std::string)> pure_map(element_comp);
+
+		std::vector<std::string> sample_elements(sample.GetElements());
+
+		if (options.verbose) 
+			std::cout << "Start simulations of the pure elements" << std::endl <<
+				     "======================================" << std::endl << std::endl;
+		for (std::vector<std::string>::iterator it = sample_elements.begin() ; it != sample_elements.end() ; ++it) {
+			BAM::Data::RXI::SingleElement single_element = sample.GetSingleElement(*it);
+			BAM::Data::XMSI::Composition composition_pure;
+			BAM::File::XMSI input_pure(initial_input);
+
+			BAM::Data::XMSI::Layer layer_pure1("Air, Dry (near sea level)", 5.0);
+			composition_pure.AddLayer(layer_pure1);
+
+			BAM::Data::XMSI::Layer layer_pure2(ElementDensity(SymbolToAtomicNumber((char *) single_element.GetElement().c_str())), 5.0);
+			layer_pure2.AddElement(single_element.GetElement(), 1.0);
+			composition_pure.AddLayer(layer_pure2);
+			composition_pure.SetReferenceLayer(2);
+			input_pure.ReplaceComposition(composition_pure);
+			//input_pure.SetOutputFile(Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<ostringstream*>( &(ostringstream() << getpid()))->str() +  single_element.GetElement()+ ".xmso");
+
+			BAM::Job::XMSI job(input_pure, options);
+			job.Start();
+			pure_map[*it] = job.GetFileXMSO();
+		}
 
 		//now change its composition
 		BAM::Data::XMSI::Composition composition;
@@ -149,8 +219,8 @@ int main(int argc, char **argv) {
 		BAM::Data::XMSI::Layer layer2(sample.GetDensity(), sample.GetThickness());
 		
 		//starting weights determined by normalizing the array of RXI's
-		for (int i = 0 ; i < sample.GetNumberOfSingleElements() ; i++) {
-			BAM::Data::RXI::SingleElement single_element = sample.GetSingleElement(i);
+		for (std::vector<std::string>::iterator it = sample_elements.begin() ; it != sample_elements.end() ; ++it) {
+			BAM::Data::RXI::SingleElement single_element(sample.GetSingleElement(*it));
 			layer2.AddElement(single_element.GetElement(), single_element.GetRXI());
 		}
 		layer2.Normalize();
@@ -158,8 +228,38 @@ int main(int argc, char **argv) {
 		composition.SetReferenceLayer(2);
 		initial_input.ReplaceComposition(composition);
 
+		double sum_all;
+		int iteration = 0;
 
+		sum_all = BAM_QUANT_CONV_THRESHOLD*10.0;
 
+		if (options.verbose) 
+			std::cout << "Start simulations of the sample" << std::endl <<
+				     "===============================" << std::endl << std::endl;
+		
+		while ((sum_all > BAM_QUANT_CONV_THRESHOLD)) {
+			//the big while loop
+			if (iteration++ > BAM_QUANT_MAX_ITERATIONS) {
+				throw BAM::Exception("No convergence after 100 iterations");
+			}
+			if (options.verbose)
+				std::cout << "Iteration: " << iteration << std::endl << std::endl;
+			//create job
+			BAM::Job::XMSI job(initial_input, options);
+			job.Start();
+		
+			//get FileXMSO 
+			BAM::File::XMSO output(job.GetFileXMSO());
+
+			sum_all = 0;
+
+			//calculate RXIs
+			for (std::vector<std::string>::iterator it = sample_elements.begin() ; it != sample_elements.end() ; ++it) {
+				BAM::Data::RXI::SingleElement single_element = sample.GetSingleElement(*it);
+				double rxi = calculate_rxi(*it, output, pure_map, single_element);	
+				sum_all += (rxi-single_element.GetRXI())*(rxi-single_element.GetRXI());
+			}
+		}
 
 		BAM::Job::XMSI::RandomNumberAcquisitionStop();
 	}

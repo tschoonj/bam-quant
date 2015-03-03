@@ -624,7 +624,7 @@ void App2Assistant::on_assistant_prepare(Gtk::Widget *page) {
 		row[fifth_page_columns.col_xmso_counts_KA] = 0.0;
 		row[fifth_page_columns.col_xmso_counts_LA] = 0.0;
 		BAM::File::XMSI *temp_xmsi_file = row[fifth_page_columns.col_xmsi_file];
-		std::string temp_xmsi_filename = Glib::locale_from_utf8(row[fifth_page_columns.col_xmsi_filename]);
+		std::string temp_xmsi_filename(row[fifth_page_columns.col_xmsi_filename]);
 		
 		//now change its composition
 		BAM::Data::XMSI::Composition composition;
@@ -1372,9 +1372,9 @@ void App2Assistant::xmimsim_child_watcher(GPid pid, int status) {
 		//last simulation
 		Gtk::TreeModel::Row row = *fifth_page_iter;
 		BAM::File::XMSO *xmso_file;
-		Glib::ustring xmso_filename = row[fifth_page_columns.col_xmso_filename];
+		std::string xmso_filename = row[fifth_page_columns.col_xmso_filename];
 		try {
-			xmso_file = new BAM::File::XMSO(Glib::locale_from_utf8(xmso_filename));
+			xmso_file = new BAM::File::XMSO(xmso_filename);
 		}
 		catch (BAM::Exception &e) {
 			throw BAM::Exception("App2Assistant::xmimsim_start_recursive -> Could not read XMSO file");
@@ -1425,9 +1425,9 @@ void App2Assistant::xmimsim_child_watcher(GPid pid, int status) {
 		fifth_page_iter--;
 		Gtk::TreeModel::Row row = *fifth_page_iter;
 		BAM::File::XMSO *xmso_file;
-		Glib::ustring xmso_filename = row[fifth_page_columns.col_xmso_filename];
+		std::string xmso_filename = row[fifth_page_columns.col_xmso_filename];
 		try {
-			xmso_file = new BAM::File::XMSO(Glib::locale_from_utf8(xmso_filename));
+			xmso_file = new BAM::File::XMSO(xmso_filename);
 		}
 		catch (BAM::Exception &e) {
 			throw BAM::Exception("App2Assistant::xmimsim_start_recursive -> Could not read XMSO file");

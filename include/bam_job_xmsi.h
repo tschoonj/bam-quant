@@ -34,16 +34,15 @@ namespace BAM {
 				//start random number acquisition
 				if (!random_acquisition_started) {
 					if (xmi_start_random_acquisition() == 0) {
-						BAM::Exception("BAM::Job::XMSI::RandomNumberAcquisitionStart -> Could not start random number acquisition");
+						throw BAM::Exception("BAM::Job::XMSI::RandomNumberAcquisitionStart -> Could not start random number acquisition");
 					}
 					random_acquisition_started = true;
 				}
 			}
 			static void RandomNumberAcquisitionStop() {
 				if (random_acquisition_started) {
-					xmi_end_random_acquisition();
 					if (xmi_end_random_acquisition() == 0) {
-						BAM::Exception("BAM::Job::XMSI::RandomNumberAcquisitionStop -> Could not stop random number acquisition");
+						throw BAM::Exception("BAM::Job::XMSI::RandomNumberAcquisitionStop -> Could not stop random number acquisition");
 					}
 					random_acquisition_started = false;
 				}
@@ -78,6 +77,37 @@ namespace BAM {
 
 				Initialize();
 			}
+			XMSI(	BAM::File::XMSI xmimsim_input_new,
+				struct xmi_main_options options = xmi_get_default_main_options(),
+				std::string hdf5_file = "",
+				std::string xmimsim_hdf5_solid_angles = "",
+				std::string xmimsim_hdf5_escape_ratios = "") :
+				xmimsim_input(0),
+				xmimsim_output(0),
+				xmsi_filename(""),
+				options(options),
+				hdf5_file(hdf5_file),
+				xmimsim_hdf5_solid_angles(xmimsim_hdf5_solid_angles),
+				xmimsim_hdf5_escape_ratios(xmimsim_hdf5_escape_ratios),
+				hdf5_file_c(0),
+				xmimsim_hdf5_solid_angles_c(0),
+				xmimsim_hdf5_escape_ratios_c(0),
+				inputFPtr(0),
+				hdf5FPtr(0),
+				solid_angles(0),
+				escape_ratios(0) {
+
+
+				xmimsim_input = new BAM::File::XMSI(xmimsim_input_new);
+
+				if (options.verbose)
+					std::cout << "Inputfile " << xmsi_filename << "successfully parsed" << std::endl;
+
+				if (options.extra_verbose)
+					xmi_print_input(stdout, xmimsim_input->GetInternalPointer());
+
+				Initialize();
+			}
 			~XMSI() {
 				if (hdf5_file_c)
 					free(hdf5_file_c);
@@ -102,8 +132,13 @@ namespace BAM {
 			void Start();
 			void Write() {
 				if (!xmimsim_output)
-					BAM::Exception("BAM::Job::XMSI::Write -> No output found that can be written to file");
+					throw BAM::Exception("BAM::Job::XMSI::Write -> No output found that can be written to file");
 				xmimsim_output->Write();
+			}
+			BAM::File::XMSO GetFileXMSO() {
+				if (!xmimsim_output)
+					throw BAM::Exception("BAM::Job::XMSI::GetFileXMSO -> No output found that can be returned");
+				return *xmimsim_output;	
 			}
 		};
 	}

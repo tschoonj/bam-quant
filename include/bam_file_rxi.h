@@ -54,7 +54,7 @@ namespace BAM {
 				BAM::Data::RXI::Sample GetSample() {
 					return sample;
 				}
-				BAM::File::XMSI GetInputXMSI() {
+				BAM::File::XMSI GetFileXMSI() {
 					return *xmimsim_input;
 				}
 			};
