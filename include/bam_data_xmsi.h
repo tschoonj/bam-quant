@@ -7,6 +7,8 @@
 #include <iostream>
 #include <numeric>
 #include <algorithm>
+#include <map>
+#include <xraylib.h>
 #include "bam_file_xmsi.h"
 
 
@@ -23,6 +25,10 @@ namespace BAM {
 				std::vector <double> weight;
 				double density;
 				double thickness;
+				Layer(struct xmi_layer layer) : density(layer.density), thickness(layer.thickness) {
+					Z.assign(layer.Z, layer.Z+layer.n_elements);
+					weight.assign(layer.weight, layer.weight+layer.n_elements);
+				}
 			public:
 				Layer(double density_new, double thickness_new);
 				Layer(std::string compound, double density_new, double thickness_new);
@@ -30,12 +36,35 @@ namespace BAM {
 				void AddElement(int Z_new, double weight_new);
 				void AddElement(std::string Z_new, double weight_new);
 				void Normalize();
+				void RemoveElements() {
+					Z.clear();
+					weight.clear();
+				}
+				std::map<std::string,double> GetZandWeightMap() {
+					std::map<std::string,double> rv;
+					for (int i = 0 ; i < Z.size() ; i++) {
+						char *symbol = AtomicNumberToSymbol(Z[i]);
+						std::string element(symbol);
+						xrlFree(symbol);
+						rv[element] = weight[i];
+					}
+					return rv;
+				}
 				friend class Composition;
 			};
 			class Composition {
 			private:
 				int reference_layer;
 				std::vector <struct xmi_layer> layers;
+				Composition(struct xmi_composition *composition) {
+					reference_layer = composition->reference_layer;
+					struct xmi_composition *composition_copy;
+					xmi_copy_composition(composition, &composition_copy);
+					layers.assign(composition_copy->layers, composition_copy->layers+composition_copy->n_layers);
+					xmi_free(composition_copy->layers);
+					xmi_free(composition_copy);
+
+				}
 			public:
 				Composition() : reference_layer(0) {}
 				~Composition() {
@@ -46,6 +75,14 @@ namespace BAM {
 				void AddLayer(const Layer &layer_new);
 				void ReplaceLayer(const Layer &layer_new, int layer_index);
 				void SetReferenceLayer(int reference_layer_new);
+				Layer GetLayer(int layer_index) {
+					try {
+						return Layer(layers.at(layer_index));
+					}
+					catch (std::out_of_range &e) {
+						throw BAM::Exception(std::string("BAM::File::RXI::Multi::GetSample: ")+e.what());
+					} 
+				}
 				friend class BAM::File::XMSI;
 			};
 		}

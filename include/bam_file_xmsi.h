@@ -40,6 +40,7 @@ namespace BAM {
 				return input;
 			}
 			friend std::ostream& operator<< (std::ostream &out, const XMSI &xmsi);
+			BAM::Data::XMSI::Composition GetComposition();
 			void ReplaceComposition(const BAM::Data::XMSI::Composition &composition_new);
 			void SetOutputFile(std::string file) {
 				if (input->general->outputfile)

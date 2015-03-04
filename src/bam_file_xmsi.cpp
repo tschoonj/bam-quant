@@ -100,6 +100,10 @@ namespace BAM {
 	}
 }
 
+BAM::Data::XMSI::Composition XMSI::GetComposition() {
+	return BAM::Data::XMSI::Composition (input->composition);
+}
+
 void XMSI::ReplaceComposition(const BAM::Data::XMSI::Composition &composition_new) {
 	//make sure input is valid
 	if (composition_new.layers.size() == 0) {
@@ -117,5 +121,6 @@ void XMSI::ReplaceComposition(const BAM::Data::XMSI::Composition &composition_ne
 	composition.layers = (struct xmi_layer*) xmi_memdup(&composition_new.layers[0], sizeof(struct xmi_layer)*composition_new.layers.size());
 	composition.n_layers = composition_new.layers.size();
 	xmi_copy_composition(&composition, &input->composition);
+	xmi_free(composition.layers);
 }
 

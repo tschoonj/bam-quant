@@ -7,12 +7,16 @@
 #include "bam_catalog.h"
 #include "bam_file_rxi.h" 
 #include "bam_job_xmsi.h" 
-
+#include <algorithm>
+#include <cmath>
 
 #define BAM_QUANT_MAX_ITERATIONS 100
 #define BAM_QUANT_CONV_THRESHOLD 0.001
 
 bool element_comp (std::string lhs, std::string rhs) {return SymbolToAtomicNumber((char *) lhs.c_str()) < SymbolToAtomicNumber((char *) rhs.c_str());}
+
+bool rxi_match(std::pair<std::string,double> rxi_rel) {return rxi_rel.second < BAM_QUANT_CONV_THRESHOLD;}
+
 
 double calculate_rxi(std::string element, BAM::File::XMSO sample_output, std::map<std::string, BAM::File::XMSO, bool(*)(std::string,std::string)> pure_map, BAM::Data::RXI::SingleElement single_element) {
 	double rxi;
@@ -228,38 +232,82 @@ int main(int argc, char **argv) {
 		composition.SetReferenceLayer(2);
 		initial_input.ReplaceComposition(composition);
 
-		double sum_all;
 		int iteration = 0;
-
-		sum_all = BAM_QUANT_CONV_THRESHOLD*10.0;
 
 		if (options.verbose) 
 			std::cout << "Start simulations of the sample" << std::endl <<
 				     "===============================" << std::endl << std::endl;
 		
-		while ((sum_all > BAM_QUANT_CONV_THRESHOLD)) {
-			//the big while loop
+		std::map<std::string, double, bool(*)(std::string,std::string)> rxi_rel(element_comp);
+		for (std::vector<std::string>::iterator it = sample_elements.begin() ; it != sample_elements.end() ; ++it) {
+			rxi_rel[*it] = BAM_QUANT_CONV_THRESHOLD*10.0;
+		}
+
+		BAM::Job::XMSI *job(0);
+
+		do {
+			//the big do while loop
 			if (iteration++ > BAM_QUANT_MAX_ITERATIONS) {
 				throw BAM::Exception("No convergence after 100 iterations");
 			}
 			if (options.verbose)
 				std::cout << "Iteration: " << iteration << std::endl << std::endl;
 			//create job
-			BAM::Job::XMSI job(initial_input, options);
-			job.Start();
+			if (job)
+				delete job;
+
+			job = new BAM::Job::XMSI(initial_input, options);
+			job->Start();
 		
 			//get FileXMSO 
-			BAM::File::XMSO output(job.GetFileXMSO());
+			BAM::File::XMSO output(job->GetFileXMSO());
 
-			sum_all = 0;
+			//first get the composition back
+			BAM::Data::XMSI::Composition composition_old(initial_input.GetComposition());
+			BAM::Data::XMSI::Layer layer_old(composition_old.GetLayer(2));
+			std::map<std::string, double> layer_old_map(layer_old.GetZandWeightMap());
+
+			BAM::Data::XMSI::Layer layer_new(layer_old);
+			layer_new.RemoveElements();
 
 			//calculate RXIs
+			//and update the concentrations
 			for (std::vector<std::string>::iterator it = sample_elements.begin() ; it != sample_elements.end() ; ++it) {
 				BAM::Data::RXI::SingleElement single_element = sample.GetSingleElement(*it);
 				double rxi = calculate_rxi(*it, output, pure_map, single_element);	
-				sum_all += (rxi-single_element.GetRXI())*(rxi-single_element.GetRXI());
+				rxi_rel[*it] = fabs(rxi-single_element.GetRXI())/single_element.GetRXI();
+				double rxi_scale = single_element.GetRXI()/rxi;
+
+				//make sure that rxi_scale doesnt go wild!
+				double max_scale;
+				if (layer_old_map[*it] <= 0.0001)
+					max_scale = 100.0;
+				else if (layer_old_map[*it] <= 0.01)
+					max_scale = 10.0;
+				else if (layer_old_map[*it] <= 0.1)
+					max_scale = 2.5;
+				else if (layer_old_map[*it] <= 0.25)
+					max_scale = 1.5;
+				else if (layer_old_map[*it] <= 0.375)
+					max_scale = 1.2;
+				else if (layer_old_map[*it] <= 0.50)
+					max_scale = 1.1;
+				else if (layer_old_map[*it] <= 0.6)
+					max_scale = 1.05;
+				else if (layer_old_map[*it] <= 0.7)
+					max_scale = 1.025;
+				else 
+					max_scale = 1.01;
+				
+				double new_weight = layer_old_map[*it]*std::min(rxi_scale, max_scale);
+				layer_new.AddElement(*it, new_weight);
 			}
+			layer_new.Normalize();
+			composition_old.ReplaceLayer(layer_new, 2);
+			initial_input.ReplaceComposition(composition_old);
+
 		}
+		while (std::count_if(rxi_rel.begin(), rxi_rel.end(), rxi_match) != rxi_rel.size());
 
 		BAM::Job::XMSI::RandomNumberAcquisitionStop();
 	}
