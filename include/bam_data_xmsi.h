@@ -51,6 +51,7 @@ namespace BAM {
 					return rv;
 				}
 				friend class Composition;
+				friend std::ostream& operator<< (std::ostream &out, const Layer &layer);
 			};
 			class Composition {
 			private:

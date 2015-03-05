@@ -1,5 +1,7 @@
+#include "config.h"
 #include "bam_data_xmsi.h"
 #include <xraylib.h>
+#include <xmi_msim.h>
 
 using namespace BAM;
 using namespace BAM::Data;
@@ -84,6 +86,23 @@ void Layer::Normalize() {
 	double sum = std::accumulate(weight.begin(), weight.end(), 0.0);
 	std::transform(weight.begin(), weight.end(), weight.begin(), std::bind1st(std::multiplies<double>(),1.0/sum));
 }
+
+namespace BAM {
+	namespace Data {
+		namespace XMSI {
+			std::ostream& operator<< (std::ostream &out, const Layer &layer) {
+				out << "Layer " << std::endl;
+                		for (int j = 0 ; j < layer.Z.size() ; j++) {
+                        		out << "Z: " << layer.Z[j] << " -> weight: " << layer.weight[j] << std::endl;
+                		}
+                		out << "density: " << layer.density << std::endl;
+                		out << "thickness:" << layer.thickness << std::endl;
+				return out;
+			}
+		}
+	}
+}
+
 
 //Composition stuff
 void Composition::AddLayer(const Layer &layer_new) {

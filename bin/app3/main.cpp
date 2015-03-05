@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	static struct xmi_main_options options;
+	static struct xmi_main_options options = xmi_get_default_main_options();
         static std::string spe_file_noconv;
         static std::string spe_file_conv;
         static std::string csv_file_noconv;
@@ -83,22 +83,6 @@ int main(int argc, char **argv) {
         static std::string xmimsim_hdf5_escape_ratios;
         bool version = false;
 	std::vector<std::string> argv_files;
-
-
-        options.use_M_lines = 1;
-        options.use_cascade_auger = 1;
-        options.use_cascade_radiative = 1;
-        options.use_variance_reduction = 1;
-        options.use_sum_peaks = 0;
-        options.use_escape_peaks = 1;
-        options.use_poisson = 0;
-        options.verbose = 0;
-        options.use_opencl = 0;
-        options.extra_verbose = 0;
-        options.omp_num_threads = xmi_omp_get_max_threads();
-        options.custom_detector_response = NULL;
-        options.use_advanced_compton = 0;
-
 
 
 	Glib::OptionContext option_context("inputfile XMSO-file");
@@ -214,7 +198,7 @@ int main(int argc, char **argv) {
 			pure_map[*it] = job.GetFileXMSO();
 		}
 
-		//now change its composition
+		// start preparing for the simulations of the sample
 		BAM::Data::XMSI::Composition composition;
 
 		BAM::Data::XMSI::Layer layer1("Air, Dry (near sea level)", 5.0);
@@ -228,6 +212,9 @@ int main(int argc, char **argv) {
 			layer2.AddElement(single_element.GetElement(), single_element.GetRXI());
 		}
 		layer2.Normalize();
+		if (options.verbose) {
+			std::cout << "Initial composition" << layer2;
+		}
 		composition.AddLayer(layer2);
 		composition.SetReferenceLayer(2);
 		initial_input.ReplaceComposition(composition);
@@ -244,6 +231,7 @@ int main(int argc, char **argv) {
 		}
 
 		BAM::Job::XMSI *job(0);
+		int counted = 0;
 
 		do {
 			//the big do while loop
@@ -303,11 +291,23 @@ int main(int argc, char **argv) {
 				layer_new.AddElement(*it, new_weight);
 			}
 			layer_new.Normalize();
+			if (options.verbose) {
+				std::cout << "New composition" << layer_new;
+			}
 			composition_old.ReplaceLayer(layer_new, 2);
 			initial_input.ReplaceComposition(composition_old);
 
+			counted = std::count_if(rxi_rel.begin(), rxi_rel.end(), rxi_match);
+
+			if (options.verbose) {
+				std::cout << "Composition matched: " << counted << "/" << rxi_rel.size() << std::endl;
+			}
+
 		}
-		while (std::count_if(rxi_rel.begin(), rxi_rel.end(), rxi_match) != rxi_rel.size());
+		while (counted != rxi_rel.size());
+
+		//get FileXMSO 
+		job->GetFileXMSO().Write(argv_files[1]);
 
 		BAM::Job::XMSI::RandomNumberAcquisitionStop();
 	}

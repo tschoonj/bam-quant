@@ -20,7 +20,8 @@ XMSO::XMSO(struct xmi_output *new_output, std::string filename) : File::File("")
 }
 
 XMSO::~XMSO() {
-	xmi_free_output(output);
+	if (output)
+		xmi_free_output(output);
 }
 
 void XMSO::Open() {
