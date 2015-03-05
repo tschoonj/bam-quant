@@ -11,7 +11,7 @@
 #include <cmath>
 
 #define BAM_QUANT_MAX_ITERATIONS 100
-#define BAM_QUANT_CONV_THRESHOLD 0.001
+#define BAM_QUANT_CONV_THRESHOLD 0.01
 
 bool element_comp (std::string lhs, std::string rhs) {return SymbolToAtomicNumber((char *) lhs.c_str()) < SymbolToAtomicNumber((char *) rhs.c_str());}
 
@@ -193,6 +193,9 @@ int main(int argc, char **argv) {
 			input_pure.ReplaceComposition(composition_pure);
 			//input_pure.SetOutputFile(Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<ostringstream*>( &(ostringstream() << getpid()))->str() +  single_element.GetElement()+ ".xmso");
 
+			if (options.verbose)
+					std::cout << std::endl << "Simulating " << *it << std::endl;
+
 			BAM::Job::XMSI job(input_pure, options);
 			job.Start();
 			pure_map[*it] = job.GetFileXMSO();
@@ -286,7 +289,10 @@ int main(int argc, char **argv) {
 					max_scale = 1.025;
 				else 
 					max_scale = 1.01;
-				
+			
+				if (options.verbose)
+					std::cout << *it << ": RXI -> " << rxi << " [" << single_element.GetRXI() << "]" << std::endl;
+
 				double new_weight = layer_old_map[*it]*std::min(rxi_scale, max_scale);
 				layer_new.AddElement(*it, new_weight);
 			}

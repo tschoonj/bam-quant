@@ -15,9 +15,11 @@ namespace BAM {
 			XMSO() : File::File(""), output(0) {} 
 			XMSO(std::string);
 			XMSO(struct xmi_output *, std::string filename="");
-			XMSO(const XMSO &xmso) : File(xmso.filename), output(0) {
+			XMSO(const XMSO &xmso) : File(""), output(0) {
 				if (xmso.output)
 					xmi_copy_output(xmso.output, &output);
+				if (!xmso.filename.empty())
+					SetFilename(xmso.filename);
 			}
 			XMSO& operator= (const XMSO &xmso) {
 				if (this == &xmso)
@@ -28,6 +30,8 @@ namespace BAM {
 					xmi_copy_output(xmso.output, &output);
 				else
 					output = 0;
+				if (!xmso.filename.empty())
+					SetFilename(xmso.filename);
 				return *this;
 			}
 			~XMSO();

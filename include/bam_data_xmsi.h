@@ -5,6 +5,7 @@
 #include <vector>
 #include <iterator>
 #include <iostream>
+#include <stdexcept>
 #include <numeric>
 #include <algorithm>
 #include <map>
@@ -78,10 +79,10 @@ namespace BAM {
 				void SetReferenceLayer(int reference_layer_new);
 				Layer GetLayer(int layer_index) {
 					try {
-						return Layer(layers.at(layer_index));
+						return Layer(layers.at(layer_index-1));
 					}
 					catch (std::out_of_range &e) {
-						throw BAM::Exception(std::string("BAM::File::RXI::Multi::GetSample: ")+e.what());
+						throw BAM::Exception(std::string("BAM::Data:XMSI::GetLayer: ")+e.what());
 					} 
 				}
 				friend class BAM::File::XMSI;
