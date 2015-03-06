@@ -93,7 +93,9 @@ namespace BAM {
 			std::ostream& operator<< (std::ostream &out, const Layer &layer) {
 				out << "Layer " << std::endl;
                 		for (int j = 0 ; j < layer.Z.size() ; j++) {
-                        		out << "Z: " << layer.Z[j] << " -> weight: " << layer.weight[j] << std::endl;
+					char *element = AtomicNumberToSymbol(layer.Z[j]);
+                        		out << element << " -> weight: " << layer.weight[j] << std::endl;
+					xrlFree(element);
                 		}
                 		out << "density: " << layer.density << std::endl;
                 		out << "thickness:" << layer.thickness << std::endl;
