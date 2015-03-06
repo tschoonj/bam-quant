@@ -65,7 +65,7 @@ static void ConvertSampleToXML(xmlpp::Element *sampleXML, Sample &sampleBAM) {
 	return;
 }
 
-Single::Single(std::string filename) : File::File(filename), xmimsim_input(0), sample("", 0.0, 0.0) {
+Single::Single(std::string filename) : Common(filename) ,sample("", 0.0, 0.0) {
 	try {
 		Parse();
 	}
@@ -158,7 +158,7 @@ void Single::Write(std::string new_filename) {
 	Write();
 }
 
-Multi::Multi(std::string filename) : File::File(filename), xmimsim_input(0) {
+Multi::Multi(std::string filename) : Common(filename) {
 	try {
 		Parse();
 	}
@@ -250,4 +250,29 @@ void Multi::Write() {
 void Multi::Write(std::string new_filename) {
 	SetFilename(new_filename);
 	Write();
+}
+
+
+namespace BAM {
+	namespace File {
+		namespace RXI {
+			Common* Parse(std::string filename) {
+				Common *rv;
+				try {
+					//first try Single
+					rv = new Single(filename);	
+				}
+				catch (BAM::Exception &e){
+					try {
+						//then try multi
+						rv = new Multi(filename);	
+					}
+					catch (BAM::Exception &e){
+						throw BAM::Exception("BAM::File::RXI::Common::Parse -> file is neither Single nor Multi");
+					}
+				}
+				return rv;
+			}
+		}
+	}
 }

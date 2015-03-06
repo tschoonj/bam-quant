@@ -19,7 +19,7 @@ namespace BAM {
 			virtual void Open();
 			virtual void Close();
 			virtual void Parse() = 0;
-			std::string GetFilename() {return filename;}
+			std::string GetFilename() const {return filename;}
 			void SetFilename(std::string new_filename) {
 				if (new_filename != "")
 					filename = new_filename;
