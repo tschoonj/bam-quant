@@ -95,6 +95,9 @@ namespace BAM {
 						throw BAM::Exception(std::string("BAM::File::RXI::Multi::GetSample: ")+e.what());
 					} 
 				}
+				size_t GetNumberOfSamples() {
+					return samples.size();
+				}
 				void AddSample(BAM::Data::RXI::Sample sample) {
 					samples.push_back(sample);
 				}

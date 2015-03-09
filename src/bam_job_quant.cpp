@@ -40,7 +40,8 @@ Quant::Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_
 	//check if we are dealing with single or multi
 	if (dynamic_cast<BAM::File::RXI::Single*>(common)) {
 		if (options.verbose)
-			std::cout << "Single RXI mode active" << std::endl << std::endl;
+			std::cout << "Single RXI mode active" << std::endl 
+				  << "======================" << std::endl << std::endl;
 
 		BAM::File::RXI::Single *single_rxi = dynamic_cast<BAM::File::RXI::Single*>(common);
 
@@ -51,7 +52,15 @@ Quant::Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_
 	}
 	else if (dynamic_cast<BAM::File::RXI::Multi*>(common)) {
 		if (options.verbose)
-			std::cout << "Multi RXI mode active" << std::endl << std::endl;
+			std::cout << "Multi RXI mode active" << std::endl 
+				  << "======================" << std::endl << std::endl;
+
+		BAM::File::RXI::Multi *multi_rxi = dynamic_cast<BAM::File::RXI::Multi*>(common);
+
+		for (int i = 0 ; i < multi_rxi->GetNumberOfSamples() ; i++) {
+			BAM::Data::RXI::Sample sample = multi_rxi->GetSample(i);
+
+		}
 	}
 	else {
 		BAM::Exception("BA::Job::Quant::Quant -> Invalid classtype of common");
