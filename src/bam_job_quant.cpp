@@ -1,5 +1,7 @@
+#include "config.h"
 #include "bam_job_quant.h"
 #include "bam_exception.h"
+#include <libxml++/libxml++.h>
 #include <cmath>
 
 using namespace BAM::Job;
@@ -47,8 +49,7 @@ Quant::Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_
 
 		BAM::Data::RXI::Sample sample = single_rxi->GetSample();
 
-		SimulateSample(sample, outputfile);
-
+		SimulateSample(sample).Write(outputfile);
 	}
 	else if (dynamic_cast<BAM::File::RXI::Multi*>(common)) {
 		if (options.verbose)
@@ -57,9 +58,47 @@ Quant::Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_
 
 		BAM::File::RXI::Multi *multi_rxi = dynamic_cast<BAM::File::RXI::Multi*>(common);
 
-		for (int i = 0 ; i < multi_rxi->GetNumberOfSamples() ; i++) {
-			BAM::Data::RXI::Sample sample = multi_rxi->GetSample(i);
+		//open xml file
+		try {
+			xmlpp::Document document;
+			document.set_internal_subset("bam-quant-rxi-multi-output", "", "http://www.bam.de/xml/bam-quant-rxi.dtd");
+			//document.add_comment("this is a comment");
+			xmlDocPtr doc = document.cobj();
 
+			xmlpp::Element *rootnode = document.create_root_node("bam-quant-rxi-multi-output");
+
+			if (xmi_write_default_comments(doc, rootnode->cobj()) == 0) {
+				throw BAM::Exception("BAM::Job::Quant::Quant -> Could not write XMI-MSIM default comments");
+			}
+		
+			for (int i = 0 ; i < multi_rxi->GetNumberOfSamples() ; i++) {
+				BAM::Data::RXI::Sample sample = multi_rxi->GetSample(i);
+
+				if (options.verbose)
+					std::cout << "Now processing: " << sample.GetASRfile() << std::endl << std::endl;				
+
+				BAM::File::XMSO xmso_file = SimulateSample(sample);
+				xmso_file.SetInputfile(sample.GetASRfile());
+				xmlpp::Element *xmimsim_results = rootnode->add_child("xmimsim-results");
+				xmlNodePtr node = xmimsim_results->cobj();
+				struct xmi_output *xmso_raw = xmso_file.GetInternalPointer();
+				if (xmi_write_output_xml_body(doc, node, xmso_raw, -1, -1, 0) == 0) {
+					throw BAM::Exception("BAM::Job::Quant::Quant -> Could not write XMI-MSIM output body");
+				}
+			}
+			document.write_to_file_formatted(outputfile);
+		}
+		catch (BAM::Exception &e) {
+			throw BAM::Exception(e.what());
+		}
+		catch (xmlpp::exception &e) {
+			throw BAM::Exception(std::string("BAM::Job::Quant::Quant -> XML++ exception -> ") + e.what());
+		}
+		catch (std::exception &e) {
+			throw BAM::Exception(std::string("BAM::Job::Quant::Quant -> ") + e.what());
+		}
+		catch (...) {
+			throw BAM::Exception(std::string("BAM::Job::Quant::Quant -> Unknown exception occurred"));
 		}
 	}
 	else {
@@ -92,7 +131,7 @@ void Quant::SimulatePure(BAM::Data::RXI::SingleElement single_element) {
 	pure_map[single_element.GetElement()] = job.GetFileXMSO();
 }
 
-void Quant::SimulateSample(BAM::Data::RXI::Sample &sample, std::string outputfile) {
+BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 	/*
 	 *
 	 * Calculate the intensities of the pure element samples
@@ -220,7 +259,8 @@ void Quant::SimulateSample(BAM::Data::RXI::Sample &sample, std::string outputfil
 	}
 	while (counted != rxi_rel.size());
 
-	//get FileXMSO 
-	job->GetFileXMSO().Write(outputfile);
+	BAM::File::XMSO rv = job->GetFileXMSO();
 	delete job;
+
+	return rv;
 }

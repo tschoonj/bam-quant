@@ -23,7 +23,7 @@ namespace BAM {
 			double calculate_rxi(std::string element, BAM::File::XMSO &sample_output, BAM::Data::RXI::SingleElement single_element);
 
 			void SimulatePure(BAM::Data::RXI::SingleElement single_element);
-			void SimulateSample(BAM::Data::RXI::Sample &sample, std::string outputfile);
+			BAM::File::XMSO SimulateSample(BAM::Data::RXI::Sample &sample);
 			BAM::File::XMSI initial_input;
 		public:
 			Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_main_options options);

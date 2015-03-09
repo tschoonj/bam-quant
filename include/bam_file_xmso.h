@@ -5,6 +5,7 @@
 #include "bam_file.h"
 #include <iostream>
 #include <vector>
+#include <cstring>
 
 namespace BAM {
 	namespace File {
@@ -42,6 +43,10 @@ namespace BAM {
 				struct xmi_output *rv;
 				xmi_copy_output(output, &rv);
 				return rv;
+			}
+			struct xmi_output *GetInternalPointer() {
+				//this is dangerous!!!
+				return output;
 			}
 			std::vector<int> GetElements() {
 				std::vector<int> elements;
@@ -113,6 +118,16 @@ namespace BAM {
 			}
 			void Write();
 			void Write(std::string filename);
+			void SetInputfile(std::string filename) {
+				if (output) {
+					if (output->inputfile)
+						free(output->inputfile);
+					output->inputfile = strdup(filename.c_str());
+				}
+				else {
+					throw BAM::Exception("BAM::File::XMSO::SetInputfile -> no data available");
+				}
+			}
 		};
 	}
 }
