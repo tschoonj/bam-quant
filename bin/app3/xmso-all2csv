@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+
+use strict;
+use Text::CSV_XS qw(csv);
+use XML::LibXML;
+use xraylib;
+use List::MoreUtils qw(uniq);
+
+if (scalar(@ARGV) != 2) {
+	die "USAGE: xmso-all2csv xmso-all-file csv-file";
+}
+
+
+my $parser = XML::LibXML->new(load_ext_dtd => 1, complete_attributes => 1, no_blanks => 1);
+$parser->load_catalog("/usr/local/share/xmimsim/xmimsim_cat.xml");
+
+my $dom = XML::LibXML->load_xml(location => $ARGV[0]);
+my $rootnode = $dom->documentElement();
+
+my $xpc = XML::LibXML::XPathContext->new();
+my @results_nodes = $xpc->findnodes("/bam-quant-rxi-multi-output/xmimsim-results", $rootnode);
+
+my @results;
+
+foreach my $result_node (@results_nodes) {
+	my $inputfile = $xpc->findvalue("inputfile", $result_node);
+	my %node_results;
+	$node_results{'inputfile'} = $inputfile;
+	printf STDOUT "inputfile: %s\n", $inputfile;
+
+	my %elements;
+
+	my @element_nodes = $xpc->findnodes("xmimsim-input/composition/layer[2]/element", $result_node);
+	foreach my $element_node (@element_nodes) {
+		my $atomic_number= $xpc->findvalue("atomic_number", $element_node);
+		my $element = xraylib::AtomicNumberToSymbol($atomic_number);
+		my $weight_fraction = $xpc->findvalue("weight_fraction", $element_node);
+		printf STDOUT "element: %s -> weight_fraction: %g\n", $element, $weight_fraction;
+		$elements{$atomic_number} = $weight_fraction;
+	}
+	$node_results{'elements'} = \%elements;
+	push @results, \%node_results;
+}
+
+my @unique_atomic_numbers;
+
+foreach my $result (@results) {
+	push @unique_atomic_numbers, keys %{$result->{'elements'}};
+}
+@unique_atomic_numbers = uniq(@unique_atomic_numbers);
+@unique_atomic_numbers = sort {$a <=> $b} @unique_atomic_numbers;
+
+print "@unique_atomic_numbers\n";
+
+my @unique_elements;
+foreach my $unique_atomic_number (@unique_atomic_numbers) {
+	push @unique_elements, xraylib::AtomicNumberToSymbol($unique_atomic_number);
+}
+
+open (my $fh, '>', $ARGV[1]) or die "Could not write to file $ARGV[1]: $!\n";
+printf $fh ",%s\n", join(',', @unique_elements);
+
+foreach my $result (@results) {
+	my $str = $result->{'inputfile'};
+	foreach my $unique_atomic_number (@unique_atomic_numbers) {
+		$str .= ",";
+		if (exists($result->{'elements'}->{$unique_atomic_number})) {
+			$str .= $result->{'elements'}->{$unique_atomic_number};
+		}
+	}
+	$str .= "\n";
+	printf $fh "%s", $str;
+}
+close ($fh);

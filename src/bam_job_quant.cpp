@@ -6,6 +6,16 @@
 
 using namespace BAM::Job;
 
+namespace BAM {
+	class ExceptionLocal : public Exception {
+	public:
+		explicit ExceptionLocal(const std::string &s) : Exception(s) {}
+		virtual ~ExceptionLocal() throw() {};
+			
+	};
+}
+
+
 double Quant::calculate_rxi(std::string element, BAM::File::XMSO &sample_output, BAM::Data::RXI::SingleElement single_element) {
 	double rxi;
 	//everything depends on linetype!
@@ -71,22 +81,42 @@ Quant::Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_
 				throw BAM::Exception("BAM::Job::Quant::Quant -> Could not write XMI-MSIM default comments");
 			}
 		
+			std::stringstream exit_message;
+			exit_message << "Summary" << std::endl;
+			
+
 			for (int i = 0 ; i < multi_rxi->GetNumberOfSamples() ; i++) {
 				BAM::Data::RXI::Sample sample = multi_rxi->GetSample(i);
 
 				if (options.verbose)
 					std::cout << "Now processing: " << sample.GetASRfile() << std::endl << std::endl;				
 
-				BAM::File::XMSO xmso_file = SimulateSample(sample);
-				xmso_file.SetInputfile(sample.GetASRfile());
+				BAM::File::XMSO *xmso_file;
+				try {
+					xmso_file = new BAM::File::XMSO(SimulateSample(sample));
+				}
+				catch (BAM::ExceptionLocal &e) {
+					//no convergence for our threshold
+					delete xmso_file;
+					exit_message << sample.GetASRfile() << ": no convergence" << std::endl;
+					continue;
+				}
+				catch (BAM::Exception &e) {
+					throw BAM::Exception(e.what());
+				}
+				exit_message << sample.GetASRfile() << ": converged successfully" << std::endl;
+				xmso_file->SetInputfile(sample.GetASRfile());
 				xmlpp::Element *xmimsim_results = rootnode->add_child("xmimsim-results");
 				xmlNodePtr node = xmimsim_results->cobj();
-				struct xmi_output *xmso_raw = xmso_file.GetInternalPointer();
+				struct xmi_output *xmso_raw = xmso_file->GetInternalPointer();
+
 				if (xmi_write_output_xml_body(doc, node, xmso_raw, -1, -1, 0) == 0) {
 					throw BAM::Exception("BAM::Job::Quant::Quant -> Could not write XMI-MSIM output body");
 				}
+				delete xmso_file;
 			}
 			document.write_to_file_formatted(outputfile);
+			std::cout << exit_message.str();
 		}
 		catch (BAM::Exception &e) {
 			throw BAM::Exception(e.what());
@@ -186,7 +216,9 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 	do {
 		//the big do while loop
 		if (iteration++ > BAM_QUANT_MAX_ITERATIONS) {
-			throw BAM::Exception("No convergence after 100 iterations");
+			if (job)
+				delete job;
+			throw BAM::ExceptionLocal("BAM::File::XMSO Quant::SimulateSample -> No convergence after 100 iterations");
 		}
 		if (options.verbose)
 			std::cout << "Iteration: " << iteration << std::endl << std::endl;

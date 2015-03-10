@@ -7,14 +7,15 @@
 namespace BAM {
 	class Exception: public std::exception {
 	private:
-		const char *Message;  
+		std::string Message;  
 	public:
 		// constructors
-		Exception(const char *ch)  {Message=ch;}
-		Exception(std::string s)  {Message=s.c_str();}
+		//explicit Exception(const char *ch) : Message(ch) {}
+		explicit Exception(const std::string &s) : Message(s) {}
+		virtual ~Exception() throw() {};
 		// throw method
 		virtual const char* what() const throw() {
-			return Message;
+			return Message.c_str();
 		}
 	};
 }
