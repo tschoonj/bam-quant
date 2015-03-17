@@ -79,6 +79,7 @@ private:
 				add(col_filename_full);
 				add(col_density);
 				add(col_thickness);
+				add(col_fix_thickness_density);
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_elements;
 			Gtk::TreeModelColumn<std::string> col_filename;
@@ -87,6 +88,7 @@ private:
 			Gtk::TreeModelColumn<std::string> col_filename_full;
 			Gtk::TreeModelColumn<double> col_density;
 			Gtk::TreeModelColumn<double> col_thickness;
+			Gtk::TreeModelColumn<bool> col_fix_thickness_density;
 	};
 	Gtk::ButtonBox third_page_buttons;
 	ThirdPageColumns third_page_columns;	
@@ -96,8 +98,11 @@ private:
 	void on_third_page_edited(const Glib::ustring & path, const Glib::ustring &new_text, bool is_it_density);
 	Gtk::Button third_page_density_button;
 	Gtk::Button third_page_thickness_button;
+	Gtk::Button third_page_fix_thickness_density_button;
 	void on_third_page_open_rho_or_T_clicked(bool is_it_density);
+	void on_third_page_open_fix_thickness_density_clicked();
 	void on_third_page_selection_changed();
+	void on_third_page_fix_thickness_density_toggled(const Glib::ustring &path);
 
 	//fourth page: XMSI file 
 	BAM::File::XMSI *fourth_page_xmsi_file;

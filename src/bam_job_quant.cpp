@@ -85,7 +85,7 @@ Quant::Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_
 			exit_message << "Summary" << std::endl;
 			
 
-			for (int i = 0 ; i < multi_rxi->GetNumberOfSamples() ; i++) {
+			for (unsigned int i = 0 ; i < multi_rxi->GetNumberOfSamples() ; i++) {
 				BAM::Data::RXI::Sample sample = multi_rxi->GetSample(i);
 
 				if (options.verbose)
@@ -201,10 +201,16 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 
 	int iteration = 0;
 
-	if (options.verbose) 
+	if (options.verbose) {
 		std::cout << "Start simulations of the sample" << std::endl <<
 			     "===============================" << std::endl << std::endl;
+		if (sample.GetDensityThicknessFixed())
+			std::cout << "Density and thickness are fixed!";
+		else
+			std::cout << "Density and thickness are variable!";
 		
+	}
+
 	std::map<std::string, double, bool(*)(std::string,std::string)> rxi_rel(element_comp);
 	for (std::vector<std::string>::iterator it = sample_elements.begin() ; it != sample_elements.end() ; ++it) {
 		rxi_rel[*it] = BAM_QUANT_CONV_THRESHOLD*10.0;
@@ -212,6 +218,8 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 
 	BAM::Job::XMSI *job(0);
 	int counted = 0;
+
+
 
 	do {
 		//the big do while loop
@@ -289,7 +297,7 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 		}
 
 	}
-	while (counted != rxi_rel.size());
+	while (counted != (int) rxi_rel.size());
 
 	BAM::File::XMSO rv = job->GetFileXMSO();
 	delete job;

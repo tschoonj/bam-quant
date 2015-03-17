@@ -11,6 +11,8 @@
 #include <map>
 #include <xraylib.h>
 #include "bam_file_xmsi.h"
+#include <xraylib.h>
+#include <cmath>
 
 
 
@@ -43,7 +45,7 @@ namespace BAM {
 				}
 				std::map<std::string,double> GetZandWeightMap() {
 					std::map<std::string,double> rv;
-					for (int i = 0 ; i < Z.size() ; i++) {
+					for (unsigned int i = 0 ; i < Z.size() ; i++) {
 						char *symbol = AtomicNumberToSymbol(Z[i]);
 						std::string element(symbol);
 						xrlFree(symbol);
@@ -51,12 +53,53 @@ namespace BAM {
 					}
 					return rv;
 				}
+				double Mu(double energy) {
+					double rv(0.0);
+					for (unsigned int i = 0 ; i < Z.size() ; i++)
+						rv += CS_Total_Kissel(Z[i], energy)*weight[i];
+
+					return rv;
+				}
+				double Chi(double energy_exc, double energy_xrf, double angle_exc = M_PI_4, double angle_xrf = M_PI_4) {
+					double rv(0.0);
+					if (energy_xrf >= energy_exc)
+						throw BAM::Exception("BAM::Data::XMSI::Chi -> energy_xrf must be less than energy_exc");	
+					rv += Mu(energy_exc)/sin(angle_exc);
+					rv += Mu(energy_xrf)/sin(angle_xrf);
+					return rv;
+				}
+				double BLB(double energy) {
+					return exp(-1.0 * Mu(energy) * density * thickness);
+				}
+				enum AcorrCases {
+					ACORR_CASE_THIN = 1,
+					ACORR_CASE_INTERMEDIATE = 2,
+					ACORR_CASE_THICK =3
+				};
+				double Acorr(double energy_exc, double energy_xrf, enum AcorrCases *Acorr_case = 0, double angle_exc = M_PI_4, double angle_xrf = M_PI_4) {
+					double rv(0.0);
+					double chi(Chi(energy_exc, energy_xrf, angle_exc, angle_xrf));
+					double denominator(chi*density*thickness);
+					double numerator(-1.0*expm1(-1.0*denominator));
+				
+					if (Acorr_case) {
+						if (numerator < 1E-4)
+							*Acorr_case = ACORR_CASE_THIN;
+						else if (numerator > 0.9999)
+							*Acorr_case = ACORR_CASE_THICK;
+						else
+							*Acorr_case = ACORR_CASE_INTERMEDIATE;
+					}					
+	
+					rv = numerator/denominator;
+					return rv;
+				}
 				friend class Composition;
 				friend std::ostream& operator<< (std::ostream &out, const Layer &layer);
 			};
 			class Composition {
 			private:
-				int reference_layer;
+				unsigned int reference_layer;
 				std::vector <struct xmi_layer> layers;
 				Composition(struct xmi_composition *composition) {
 					reference_layer = composition->reference_layer;
@@ -75,8 +118,8 @@ namespace BAM {
 					}
 				}
 				void AddLayer(const Layer &layer_new);
-				void ReplaceLayer(const Layer &layer_new, int layer_index);
-				void SetReferenceLayer(int reference_layer_new);
+				void ReplaceLayer(const Layer &layer_new, unsigned int layer_index);
+				void SetReferenceLayer(unsigned int reference_layer_new);
 				Layer GetLayer(int layer_index) {
 					try {
 						return Layer(layers.at(layer_index-1));

@@ -33,6 +33,7 @@ namespace BAM {
 			struct xmi_input *GetInternalCopy() {
 				struct xmi_input *rv;
 				xmi_copy_input(input, &rv);
+				//do not forget to free this memory afterwards with xmi_free_input
 				return rv;
 			}
 			struct xmi_input *GetInternalPointer() {
@@ -47,6 +48,7 @@ namespace BAM {
 					free(input->general->outputfile);
 				input->general->outputfile = (char *) xmi_memdup(file.c_str(), sizeof(char)*(file.length()+1));
 			}
+			void EnsureMonochromaticExcitation();
 			std::string GetOutputFile() {
 				return std::string(input->general->outputfile);
 			}

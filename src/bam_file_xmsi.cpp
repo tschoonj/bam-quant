@@ -124,3 +124,12 @@ void XMSI::ReplaceComposition(const BAM::Data::XMSI::Composition &composition_ne
 	xmi_free(composition.layers);
 }
 
+
+void XMSI::EnsureMonochromaticExcitation() {
+	//all this function does is throw an exception if the input is not monochromatic
+	if (!input) 
+		throw BAM::Exception("BAM::File::XMSI::EnsureMonochromaticExcitation -> input is zero");
+
+	if (input->excitation->n_discrete != 1 || input->excitation->n_continuous != 0)
+		throw BAM::Exception("BAM::File::XMSI::EnsureMonochromaticExcitation -> input excitation must have exactly one discrete component and zero continuous components.");
+}

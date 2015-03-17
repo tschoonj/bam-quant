@@ -92,7 +92,7 @@ namespace BAM {
 		namespace XMSI {
 			std::ostream& operator<< (std::ostream &out, const Layer &layer) {
 				out << "Layer " << std::endl;
-                		for (int j = 0 ; j < layer.Z.size() ; j++) {
+                		for (unsigned int j = 0 ; j < layer.Z.size() ; j++) {
 					char *element = AtomicNumberToSymbol(layer.Z[j]);
                         		out << element << " -> weight: " << layer.weight[j] << std::endl;
 					xrlFree(element);
@@ -122,14 +122,14 @@ void Composition::AddLayer(const Layer &layer_new) {
 	layers.push_back(layer);
 }
 
-void Composition::SetReferenceLayer(int reference_layer_new) {
+void Composition::SetReferenceLayer(unsigned int reference_layer_new) {
 	if (reference_layer_new < 1 || reference_layer_new > layers.size()) {
 		throw BAM::Exception("BAM::Data::XMSI::Composition::SetReferenceLayer -> Invalid reference layer detected");
 	}	
 	reference_layer = reference_layer_new;
 }
 
-void Composition::ReplaceLayer(const Layer &layer_new, int layer_index) {
+void Composition::ReplaceLayer(const Layer &layer_new, unsigned int layer_index) {
 	//make sure layer_index is valid!
 	if (layer_index < 1 || layer_index > layers.size())
 		throw BAM::Exception("BAM::Data::Composition::ReplaceLayer -> Invalid layer_index detected");

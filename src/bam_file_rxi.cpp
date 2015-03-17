@@ -17,6 +17,17 @@ static Sample ConvertXMLToSample(xmlpp::Element *element) {
 	Glib::ustring asrfile = dynamic_cast<xmlpp::Element*>(element->get_first_child("asrfile"))->get_child_text()->get_content();
 	Glib::ustring density_str = dynamic_cast<xmlpp::Element*>(element->get_first_child("density"))->get_child_text()->get_content();
 	Glib::ustring thickness_str = dynamic_cast<xmlpp::Element*>(element->get_first_child("thickness"))->get_child_text()->get_content();
+ 	Glib::ustring density_thickness_str = element->get_attribute_value("density_thickness");
+
+	bool density_thickness_fixed;
+
+	if (density_thickness_str == "fixed") {
+		density_thickness_fixed = true;
+	}
+	else {
+		density_thickness_fixed = false;
+	}
+
 	double density;
 	double thickness;
 	{
@@ -29,7 +40,7 @@ static Sample ConvertXMLToSample(xmlpp::Element *element) {
 		ss << thickness_str;
 		ss >> thickness;
 	}
-	Sample rv(asrfile, density, thickness);
+	Sample rv(asrfile, density, thickness, density_thickness_fixed);
 	
 	xmlpp::Node::NodeList list = element->get_children("element_rxi");
 	for (xmlpp::Node::NodeList::iterator it = list.begin() ; it != list.end() ; ++it) {
@@ -61,11 +72,12 @@ static void ConvertSampleToXML(xmlpp::Element *sampleXML, Sample &sampleBAM) {
 	sampleXML->add_child("asrfile")->add_child_text(sampleBAM.GetASRfile());
 	sampleXML->add_child("density")->add_child_text(sampleBAM.GetDensityString());
 	sampleXML->add_child("thickness")->add_child_text(sampleBAM.GetThicknessString());
+	sampleXML->set_attribute("density_thickness", sampleBAM.GetDensityThicknessFixedString());
 
 	return;
 }
 
-Single::Single(std::string filename) : Common(filename) ,sample("", 0.0, 0.0) {
+Single::Single(std::string filename) : Common(filename) ,sample("", 0.0, 0.0, true) {
 	try {
 		Parse();
 	}
@@ -109,6 +121,7 @@ void Single::Parse() {
         }
 	xmimsim_input = new BAM::File::XMSI(input);
 	xmi_free_input(input);
+	xmimsim_input->EnsureMonochromaticExcitation();
 }
 
 void Single::Write() {
@@ -203,6 +216,7 @@ void Multi::Parse() {
        }
 	xmimsim_input = new BAM::File::XMSI(input);
 	xmi_free_input(input);
+	xmimsim_input->EnsureMonochromaticExcitation();
 }
 
 void Multi::Write() {
