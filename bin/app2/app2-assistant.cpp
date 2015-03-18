@@ -979,7 +979,7 @@ void App2Assistant::on_fourth_page_open_clicked(Gtk::EntryIconPosition icon_posi
 	BAM::File::XMSI *temp_xmsi_file;
 	try {
 		temp_xmsi_file = new BAM::File::XMSI(filename);
-		temp_xmsi_file->EnsureMonochromaticExcitation();
+		temp_xmsi_file->GetExcitation().EnsureMonochromaticExcitation();
 	}
 	catch (ifstream::failure &e) {
 		Gtk::MessageDialog dialog(*this, "Error reading in "+filename, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);

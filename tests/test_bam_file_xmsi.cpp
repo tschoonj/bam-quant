@@ -43,6 +43,9 @@ int main(int argc, char *argv[]) {
 
 		composition->SetReferenceLayer(2);
 		xmsi_file->ReplaceComposition(*composition);
+
+		BAM::Data::XMSI::Composition composition_copy(*composition);
+
 		delete composition;
 	}
 	catch (BAM::Exception &e) {

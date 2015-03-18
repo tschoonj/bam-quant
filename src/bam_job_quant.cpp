@@ -193,7 +193,7 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 	layer2.Normalize();
 
 	if (options.verbose) {
-		std::cout << std::endl << "Initial composition" << std::endl << layer2;
+		std::cout << std::endl << "Initial composition" << std::endl << layer2 << std::endl;
 	}
 	composition.AddLayer(layer2);
 	composition.SetReferenceLayer(2);
@@ -246,10 +246,20 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 		std::map<std::string, double> layer_old_map(layer_old.GetZandWeightMap());
 
 		BAM::Data::XMSI::Layer layer_new(layer_old);
-		layer_new.RemoveElements();
+
+		if (!sample.GetDensityThicknessFixed() && iteration % 2 == 0) {
+			//variable density/thickness mode
+		}
+		else {
+			layer_new.RemoveElements();
+
+		}
 
 		//calculate RXIs
 		//and update the concentrations
+		std::string it_max_xrf_energy;
+		double max_xrf_energy(0.0);
+
 		for (std::vector<std::string>::iterator it = sample_elements.begin() ; it != sample_elements.end() ; ++it) {
 			BAM::Data::RXI::SingleElement single_element = sample.GetSingleElement(*it);
 			double rxi = calculate_rxi(*it, output, single_element);	
@@ -258,34 +268,53 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 
 			//make sure that rxi_scale doesnt go wild!
 			double max_scale;
-			if (layer_old_map[*it] <= 0.0001)
-				max_scale = 100.0;
-			else if (layer_old_map[*it] <= 0.01)
-				max_scale = 10.0;
-			else if (layer_old_map[*it] <= 0.1)
-				max_scale = 2.5;
-			else if (layer_old_map[*it] <= 0.25)
-				max_scale = 1.5;
-			else if (layer_old_map[*it] <= 0.375)
-				max_scale = 1.2;
-			else if (layer_old_map[*it] <= 0.50)
-				max_scale = 1.1;
-			else if (layer_old_map[*it] <= 0.6)
-				max_scale = 1.05;
-			else if (layer_old_map[*it] <= 0.7)
-				max_scale = 1.025;
-			else 
-				max_scale = 1.01;
+			if (!sample.GetDensityThicknessFixed() && iteration % 2 == 0) {
+				//variable density/thickness mode
+				//basically look for the element whose XRF has the highest energy and therefore the highest Acorr	
+				if (single_element.GetLineEnergy() < max_xrf_energy) {
+					it_max_xrf_energy = *it;
+					max_xrf_energy = single_element.GetLineEnergy();
+				}
+			}
+			else {
+				if (layer_old_map[*it] <= 0.0001)
+					max_scale = 100.0;
+				else if (layer_old_map[*it] <= 0.01)
+					max_scale = 10.0;
+				else if (layer_old_map[*it] <= 0.1)
+					max_scale = 2.5;
+				else if (layer_old_map[*it] <= 0.25)
+					max_scale = 1.5;
+				else if (layer_old_map[*it] <= 0.375)
+					max_scale = 1.2;
+				else if (layer_old_map[*it] <= 0.50)
+					max_scale = 1.1;
+				else if (layer_old_map[*it] <= 0.6)
+					max_scale = 1.05;
+				else if (layer_old_map[*it] <= 0.7)
+					max_scale = 1.025;
+				else 
+					max_scale = 1.01;
+
+				double new_weight = layer_old_map[*it]*std::min(rxi_scale, max_scale);
+				layer_new.AddElement(*it, new_weight);
+			}
 			
 			if (options.verbose)
 				std::cout << *it << ": RXI -> " << rxi << " [" << single_element.GetRXI() << "]" << std::endl;
 
-			double new_weight = layer_old_map[*it]*std::min(rxi_scale, max_scale);
-			layer_new.AddElement(*it, new_weight);
 		}
-		layer_new.Normalize();
-		if (options.verbose) {
-			std::cout << std::endl << "New composition" << std::endl << layer_new;
+		if (!sample.GetDensityThicknessFixed() && iteration % 2 == 0) {
+			//variable density/thickness mode
+			//get new density/thickness
+
+
+		}
+		else {
+			layer_new.Normalize();
+			if (options.verbose) {
+				std::cout << std::endl << "New composition" << std::endl << layer_new << std::endl;
+			}
 		}
 		composition_old.ReplaceLayer(layer_new, 2);
 		input_sample.ReplaceComposition(composition_old);

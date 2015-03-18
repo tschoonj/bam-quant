@@ -132,7 +132,7 @@ void Composition::SetReferenceLayer(unsigned int reference_layer_new) {
 void Composition::ReplaceLayer(const Layer &layer_new, unsigned int layer_index) {
 	//make sure layer_index is valid!
 	if (layer_index < 1 || layer_index > layers.size())
-		throw BAM::Exception("BAM::Data::Composition::ReplaceLayer -> Invalid layer_index detected");
+		throw BAM::Exception("BAM::Data::XMSI::Composition::ReplaceLayer -> Invalid layer_index detected");
 	xmi_free_layer(&layers[layer_index-1]);
 
 	layers[layer_index-1].Z = (int *) xmi_memdup(&layer_new.Z[0], sizeof(int)*layer_new.Z.size());
@@ -142,3 +142,10 @@ void Composition::ReplaceLayer(const Layer &layer_new, unsigned int layer_index)
 	layers[layer_index-1].thickness = layer_new.thickness;
 	layers[layer_index-1].n_elements = layer_new.Z.size();
 }
+
+void Excitation::EnsureMonochromaticExcitation() {
+	//all this function does is throw an exception if the input is not monochromatic
+	if (discrete.size() != 1 || continuous.size() != 0)
+		throw BAM::Exception("BAM::Data::XMSI::Excitation::EnsureMonochromaticExcitation -> input excitation must have exactly one discrete component and zero continuous components.");
+}
+

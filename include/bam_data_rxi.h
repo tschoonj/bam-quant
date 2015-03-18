@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <xraylib.h>
 
 namespace BAM {
 	namespace Data {
@@ -16,8 +17,21 @@ namespace BAM {
 				std::string linetype;
 				std::string datatype;
 				double rxi;
+				double line_energy;
 				public:
-				SingleElement(std::string element, std::string linetype, std::string datatype, double rxi) : element(element), linetype(linetype), datatype(datatype), rxi(rxi) {}
+				SingleElement(std::string element, std::string linetype, std::string datatype, double rxi) : element(element), linetype(linetype), datatype(datatype), rxi(rxi) {
+					int atomic_number = SymbolToAtomicNumber((char*) element.c_str());
+					if (atomic_number == 0)
+						throw BAM::Exception("BAM::Data::RXI::SingleElement -> Unknown element");
+					if (linetype == "KA_LINE") {
+						line_energy = LineEnergy(atomic_number, KA_LINE);
+					}
+					else if (linetype == "LA_LINE") {
+						line_energy = LineEnergy(atomic_number, LA_LINE);
+					}
+					else
+						throw BAM::Exception("BAM::Data::RXI::SingleElement -> Unknown linetype: must be KA_LINE or LA_LINE");
+				}
 				std::string GetElement() {
 					return element;
 				}
@@ -34,6 +48,9 @@ namespace BAM {
 				}
 				double GetRXI() {
 					return rxi;
+				}
+				double GetLineEnergy() {
+					return line_energy;
 				}
 				friend class Sample;
 			};

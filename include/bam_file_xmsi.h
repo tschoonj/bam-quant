@@ -14,6 +14,8 @@ namespace BAM {
 		namespace XMSI {
 			//forward declaration
 			class Composition;
+			class Geometry;
+			class Excitation;
 		}
 	}
 	namespace File {
@@ -42,13 +44,14 @@ namespace BAM {
 			}
 			friend std::ostream& operator<< (std::ostream &out, const XMSI &xmsi);
 			BAM::Data::XMSI::Composition GetComposition();
+			BAM::Data::XMSI::Excitation  GetExcitation();
+			BAM::Data::XMSI::Geometry    GetGeometry();
 			void ReplaceComposition(const BAM::Data::XMSI::Composition &composition_new);
 			void SetOutputFile(std::string file) {
 				if (input->general->outputfile)
 					free(input->general->outputfile);
 				input->general->outputfile = (char *) xmi_memdup(file.c_str(), sizeof(char)*(file.length()+1));
 			}
-			void EnsureMonochromaticExcitation();
 			std::string GetOutputFile() {
 				return std::string(input->general->outputfile);
 			}

@@ -101,14 +101,13 @@ namespace BAM {
 			private:
 				unsigned int reference_layer;
 				std::vector <struct xmi_layer> layers;
-				Composition(struct xmi_composition *composition) {
-					reference_layer = composition->reference_layer;
+				Composition(struct xmi_composition *composition) : 
+					reference_layer(composition->reference_layer) {
 					struct xmi_composition *composition_copy;
 					xmi_copy_composition(composition, &composition_copy);
 					layers.assign(composition_copy->layers, composition_copy->layers+composition_copy->n_layers);
 					xmi_free(composition_copy->layers);
 					xmi_free(composition_copy);
-
 				}
 			public:
 				Composition() : reference_layer(0) {}
@@ -116,6 +115,27 @@ namespace BAM {
 					for (std::vector<struct xmi_layer>::iterator it = layers.begin() ; it != layers.end() ; ++it) {
 						xmi_free_layer(&(*it));	
 					}
+				}
+				Composition(const Composition &composition) : reference_layer(composition.reference_layer) {
+					for (std::vector<struct xmi_layer>::const_iterator it = composition.layers.begin() ; it != composition.layers.end() ; ++it) {
+						AddLayer(Layer(*it));
+					}
+				}
+				Composition& operator= (const Composition &composition) {
+					if (this == &composition)
+						return *this;
+
+					for (std::vector<struct xmi_layer>::iterator it = layers.begin() ; it != layers.end() ; ++it) {
+						xmi_free_layer(&(*it));	
+					}
+					layers.clear();
+
+					for (std::vector<struct xmi_layer>::const_iterator it = composition.layers.begin() ; it != composition.layers.end() ; ++it) {
+						AddLayer(Layer(*it));
+					}
+				
+					reference_layer = composition.reference_layer;
+					return *this;
 				}
 				void AddLayer(const Layer &layer_new);
 				void ReplaceLayer(const Layer &layer_new, unsigned int layer_index);
@@ -128,6 +148,64 @@ namespace BAM {
 						throw BAM::Exception(std::string("BAM::Data:XMSI::GetLayer: ")+e.what());
 					} 
 				}
+				friend class BAM::File::XMSI;
+			};
+			class Geometry {
+			private:
+				double d_sample_source;
+				std::vector <double> n_sample_orientation;
+				std::vector <double> p_detector_window;
+				std::vector <double> n_detector_orientation;
+				double area_detector;
+				double collimator_height;
+				double collimator_diameter;
+				double d_source_slit;
+				double slit_size_x;
+				double slit_size_y;
+
+				double alpha;
+				double beta;
+
+				Geometry(struct xmi_geometry *geometry) :
+					d_sample_source(geometry->d_sample_source),
+					n_sample_orientation(geometry->n_sample_orientation, geometry->n_sample_orientation+3),
+					p_detector_window(geometry->p_detector_window, geometry->p_detector_window+3),
+					n_detector_orientation(geometry->n_detector_orientation, geometry->n_detector_orientation+3),
+					area_detector(geometry->area_detector),
+					collimator_height(geometry->collimator_height),
+					collimator_diameter(geometry->collimator_diameter),
+					d_source_slit(geometry->d_source_slit),
+					slit_size_x(geometry->slit_size_x),
+					slit_size_y(geometry->slit_size_y) {
+
+					double beam[3] = {0, 0, 1};
+					double dot_prod = std::inner_product(beam, beam + 3, n_sample_orientation.begin(), 0);
+					alpha = M_PI_2 - acos(dot_prod);
+					dot_prod = std::inner_product(n_detector_orientation.begin(), n_detector_orientation.end(), n_sample_orientation.begin(), 0);
+					beta = M_PI - acos(dot_prod);
+				}
+			public:
+				double GetAlpha() {
+					return alpha;
+				}
+				double GetBeta() {
+					return beta;
+				}
+				friend class BAM::File::XMSI;
+			};
+			class Excitation {
+			private:
+				std::vector<struct xmi_energy_discrete> discrete;
+				std::vector<struct xmi_energy_continuous> continuous;
+				
+				Excitation(struct xmi_excitation *excitation) {
+					if (excitation->n_discrete)
+						discrete.assign(excitation->discrete, excitation->discrete + excitation->n_discrete);
+					if (excitation->n_continuous)
+						continuous.assign(excitation->continuous, excitation->continuous + excitation->n_continuous);
+				} 
+			public:
+				void EnsureMonochromaticExcitation();
 				friend class BAM::File::XMSI;
 			};
 		}

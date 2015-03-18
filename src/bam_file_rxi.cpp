@@ -121,7 +121,7 @@ void Single::Parse() {
         }
 	xmimsim_input = new BAM::File::XMSI(input);
 	xmi_free_input(input);
-	xmimsim_input->EnsureMonochromaticExcitation();
+	xmimsim_input->GetExcitation().EnsureMonochromaticExcitation();
 }
 
 void Single::Write() {
@@ -216,7 +216,7 @@ void Multi::Parse() {
        }
 	xmimsim_input = new BAM::File::XMSI(input);
 	xmi_free_input(input);
-	xmimsim_input->EnsureMonochromaticExcitation();
+	xmimsim_input->GetExcitation().EnsureMonochromaticExcitation();
 }
 
 void Multi::Write() {

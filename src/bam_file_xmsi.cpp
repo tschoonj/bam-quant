@@ -101,7 +101,15 @@ namespace BAM {
 }
 
 BAM::Data::XMSI::Composition XMSI::GetComposition() {
-	return BAM::Data::XMSI::Composition (input->composition);
+	return BAM::Data::XMSI::Composition(input->composition);
+}
+
+BAM::Data::XMSI::Geometry XMSI::GetGeometry() {
+	return BAM::Data::XMSI::Geometry(input->geometry);
+}
+
+BAM::Data::XMSI::Excitation XMSI::GetExcitation() {
+	return BAM::Data::XMSI::Excitation(input->excitation);
 }
 
 void XMSI::ReplaceComposition(const BAM::Data::XMSI::Composition &composition_new) {
@@ -125,11 +133,3 @@ void XMSI::ReplaceComposition(const BAM::Data::XMSI::Composition &composition_ne
 }
 
 
-void XMSI::EnsureMonochromaticExcitation() {
-	//all this function does is throw an exception if the input is not monochromatic
-	if (!input) 
-		throw BAM::Exception("BAM::File::XMSI::EnsureMonochromaticExcitation -> input is zero");
-
-	if (input->excitation->n_discrete != 1 || input->excitation->n_continuous != 0)
-		throw BAM::Exception("BAM::File::XMSI::EnsureMonochromaticExcitation -> input excitation must have exactly one discrete component and zero continuous components.");
-}
