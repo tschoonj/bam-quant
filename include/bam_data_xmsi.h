@@ -53,6 +53,18 @@ namespace BAM {
 					}
 					return rv;
 				}
+				void SetThickness(double thickness_new) {
+					thickness = thickness_new;
+				}
+				void SetDensity(double density_new) {
+					density = density_new;
+				}
+				double GetThickness() {
+					return thickness;
+				}
+				double GetDensity() {
+					return density;
+				}
 				double Mu(double energy) {
 					double rv(0.0);
 					for (unsigned int i = 0 ; i < Z.size() ; i++)
@@ -74,7 +86,7 @@ namespace BAM {
 				enum AcorrCases {
 					ACORR_CASE_THIN = 1,
 					ACORR_CASE_INTERMEDIATE = 2,
-					ACORR_CASE_THICK =3
+					ACORR_CASE_THICK = 3
 				};
 				double Acorr(double energy_exc, double energy_xrf, enum AcorrCases *Acorr_case = 0, double angle_exc = M_PI_4, double angle_xrf = M_PI_4) {
 					double rv(0.0);
@@ -145,7 +157,7 @@ namespace BAM {
 						return Layer(layers.at(layer_index-1));
 					}
 					catch (std::out_of_range &e) {
-						throw BAM::Exception(std::string("BAM::Data:XMSI::GetLayer: ")+e.what());
+						throw BAM::Exception(std::string("BAM::Data:XMSI::Composition::GetLayer: ")+e.what());
 					} 
 				}
 				friend class BAM::File::XMSI;
@@ -183,6 +195,8 @@ namespace BAM {
 					alpha = M_PI_2 - acos(dot_prod);
 					dot_prod = std::inner_product(n_detector_orientation.begin(), n_detector_orientation.end(), n_sample_orientation.begin(), 0);
 					beta = M_PI - acos(dot_prod);
+					std::cout << "Geometry alpha: " << alpha << std::endl;
+					std::cout << "Geometry beta: " << beta << std::endl;
 				}
 			public:
 				double GetAlpha() {
@@ -193,19 +207,83 @@ namespace BAM {
 				}
 				friend class BAM::File::XMSI;
 			};
+			class BaseEnergy {
+			private:
+				//basically I kill of the default constructor with this statement
+				BaseEnergy();
+			protected:
+				double energy;
+				double horizontal_intensity;
+				double vertical_intensity;
+				double sigma_x;
+				double sigma_xp;
+				double sigma_y;
+				double sigma_yp;
+				BaseEnergy(double energy, double horizontal_intensity, double vertical_intensity, double sigma_x = 0.0, double sigma_xp = 0.0, double sigma_y = 0.0, double sigma_yp = 0.0) : energy(energy), horizontal_intensity(horizontal_intensity), vertical_intensity(vertical_intensity), sigma_x(sigma_x), sigma_xp(sigma_xp), sigma_y(sigma_y), sigma_yp(sigma_yp) {
+					//ideally I check here the validity of the parameters
+				}
+			public:
+				double GetEnergy() {
+					return energy;
+				}
+			};
+			//forward declaration
+			class Excitation;
+
+			class ContinuousEnergy : public BaseEnergy {
+			private:
+				ContinuousEnergy(struct xmi_energy_continuous xec) : BaseEnergy(xec.energy, xec.horizontal_intensity, xec.vertical_intensity, xec.sigma_x, xec.sigma_xp, xec.sigma_y, xec.sigma_yp) {}
+			public:
+				ContinuousEnergy(double energy, double horizontal_intensity, double vertical_intensity, double sigma_x = 0.0, double sigma_xp = 0.0, double sigma_y = 0.0, double sigma_yp = 0.0) : BaseEnergy(energy, horizontal_intensity, vertical_intensity, sigma_x, sigma_xp, sigma_y, sigma_yp) {}
+				friend Excitation;
+			};
+
+			class DiscreteEnergy : public BaseEnergy {
+			private:
+				int distribution_type;
+				double scale_parameter;
+				DiscreteEnergy(struct xmi_energy_discrete xed) : BaseEnergy(xed.energy, xed.horizontal_intensity, xed.vertical_intensity, xed.sigma_x, xed.sigma_xp, xed.sigma_y, xed.sigma_yp), distribution_type(xed.distribution_type), scale_parameter(xed.scale_parameter) {}
+			public:
+				DiscreteEnergy(double energy, double horizontal_intensity, double vertical_intensity, double sigma_x = 0.0, double sigma_xp = 0.0, double sigma_y = 0.0, double sigma_yp = 0.0, int distribution_type = XMI_DISCRETE_MONOCHROMATIC, double scale_parameter = 0.0) : BaseEnergy(energy, horizontal_intensity, vertical_intensity, sigma_x, sigma_xp, sigma_y, sigma_yp), distribution_type(distribution_type), scale_parameter(scale_parameter) {}
+				friend Excitation;
+		
+			};
+
 			class Excitation {
 			private:
-				std::vector<struct xmi_energy_discrete> discrete;
-				std::vector<struct xmi_energy_continuous> continuous;
+				std::vector<DiscreteEnergy> discrete;
+				std::vector<ContinuousEnergy> continuous;
 				
 				Excitation(struct xmi_excitation *excitation) {
-					if (excitation->n_discrete)
-						discrete.assign(excitation->discrete, excitation->discrete + excitation->n_discrete);
-					if (excitation->n_continuous)
-						continuous.assign(excitation->continuous, excitation->continuous + excitation->n_continuous);
+					//ideally one would also check for duplicates and sort after every push_back
+					//however, this constructor is fed data straight from XMI-MSIM which is already sorted and verified for dupes
+					
+					for (int i = 0 ; i < excitation->n_discrete ; i++) {
+						discrete.push_back(DiscreteEnergy(excitation->discrete[i]));
+					}
+					for (int i = 0 ; i < excitation->n_continuous; i++) {
+						continuous.push_back(ContinuousEnergy(excitation->continuous[i]));
+					}
 				} 
 			public:
 				void EnsureMonochromaticExcitation();
+				DiscreteEnergy GetDiscreteEnergy(int index) {
+					try {
+						return discrete.at(index);
+					}
+					catch (std::out_of_range &e) {
+						throw BAM::Exception(std::string("BAM::Data:XMSI::Excitation::GetDiscreteEnergy: ")+e.what());
+					} 
+				}
+				ContinuousEnergy GetContinuousEnergy(int index) {
+					try {
+						return continuous.at(index);
+					}
+					catch (std::out_of_range &e) {
+						throw BAM::Exception(std::string("BAM::Data:XMSI::Excitation::GetContinuousEnergy: ")+e.what());
+					} 
+				}
+				
 				friend class BAM::File::XMSI;
 			};
 		}

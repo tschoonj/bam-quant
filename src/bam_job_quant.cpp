@@ -259,6 +259,7 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 		//and update the concentrations
 		std::string it_max_xrf_energy;
 		double max_xrf_energy(0.0);
+		double max_xrf_energy_rxi_scale(0.0);
 
 		for (std::vector<std::string>::iterator it = sample_elements.begin() ; it != sample_elements.end() ; ++it) {
 			BAM::Data::RXI::SingleElement single_element = sample.GetSingleElement(*it);
@@ -271,9 +272,10 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 			if (!sample.GetDensityThicknessFixed() && iteration % 2 == 0) {
 				//variable density/thickness mode
 				//basically look for the element whose XRF has the highest energy and therefore the highest Acorr	
-				if (single_element.GetLineEnergy() < max_xrf_energy) {
+				if (single_element.GetLineEnergy() > max_xrf_energy) {
 					it_max_xrf_energy = *it;
 					max_xrf_energy = single_element.GetLineEnergy();
+					max_xrf_energy_rxi_scale = rxi_scale;
 				}
 			}
 			else {
@@ -307,7 +309,24 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 		if (!sample.GetDensityThicknessFixed() && iteration % 2 == 0) {
 			//variable density/thickness mode
 			//get new density/thickness
+			//for this we will use the line with the highest energy
+			BAM::Data::RXI::SingleElement single_element = sample.GetSingleElement(it_max_xrf_energy);
+			//calculate Acorr to see what kind of sample we are dealing with
+			BAM::Data::XMSI::Layer::AcorrCases a_corr_case;
+			double a_corr = layer_new.Acorr(input_sample.GetExcitation().GetDiscreteEnergy(0).GetEnergy(), single_element.GetLineEnergy(), &a_corr_case, input_sample.GetGeometry().GetAlpha(), input_sample.GetGeometry().GetBeta()); 
+			if (options.verbose) {
+				std::cout << "Current Acorr: " << a_corr << std::endl;
+				std::cout << "Current Acorr case : " << a_corr_case << std::endl;
+			}
+			
+			//calculate Chi
+			double chi = layer_new.Chi(input_sample.GetExcitation().GetDiscreteEnergy(0).GetEnergy(), single_element.GetLineEnergy(), input_sample.GetGeometry().GetAlpha(), input_sample.GetGeometry().GetBeta());
 
+			double thickness_density_old = layer_new.GetDensity() * layer_new.GetThickness();
+			double thickness_density_new = a_corr *  thickness_density_old * max_xrf_energy_rxi_scale * chi;
+			thickness_density_new = 1.0 - thickness_density_new;
+			thickness_density_new = -1.0 * log(thickness_density_new) / chi;
+			layer_new.SetDensity(layer_new.GetDensity() * thickness_density_new / thickness_density_old);	
 
 		}
 		else {
