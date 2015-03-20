@@ -205,9 +205,9 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 		std::cout << "Start simulations of the sample" << std::endl <<
 			     "===============================" << std::endl << std::endl;
 		if (sample.GetDensityThicknessFixed())
-			std::cout << "Density and thickness are fixed!";
+			std::cout << "Density and thickness are fixed!" << std::endl;
 		else
-			std::cout << "Density and thickness are variable!";
+			std::cout << "Density and thickness are variable!" << std::endl;
 		
 	}
 
@@ -267,8 +267,6 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 			rxi_rel[*it] = fabs(rxi-single_element.GetRXI())/single_element.GetRXI();
 			double rxi_scale = single_element.GetRXI()/rxi;
 
-			//make sure that rxi_scale doesnt go wild!
-			double max_scale;
 			if (!sample.GetDensityThicknessFixed() && iteration % 2 == 0) {
 				//variable density/thickness mode
 				//basically look for the element whose XRF has the highest energy and therefore the highest Acorr	
@@ -279,6 +277,8 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 				}
 			}
 			else {
+				//make sure that rxi_scale doesnt go wild!
+				double max_scale;
 				if (layer_old_map[*it] <= 0.0001)
 					max_scale = 100.0;
 				else if (layer_old_map[*it] <= 0.01)
@@ -306,6 +306,17 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 				std::cout << *it << ": RXI -> " << rxi << " [" << single_element.GetRXI() << "]" << std::endl;
 
 		}
+
+		counted = std::count_if(rxi_rel.begin(), rxi_rel.end(), rxi_match);
+
+		if (options.verbose) {
+			std::cout << "Composition matched: " << counted << "/" << rxi_rel.size() << std::endl;
+		}
+		if (counted == (int) rxi_rel.size()) {
+			std::cout << std::endl << "Definitive composition" << std::endl << layer_old << std::endl;
+			break;
+		}
+
 		if (!sample.GetDensityThicknessFixed() && iteration % 2 == 0) {
 			//variable density/thickness mode
 			//get new density/thickness
@@ -319,6 +330,10 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 				std::cout << "Current Acorr case : " << a_corr_case << std::endl;
 			}
 			
+			if (options.verbose) {
+				std::cout << "Old density: " << layer_new.GetDensity() << std::endl;
+			}
+
 			//calculate Chi
 			double chi = layer_new.Chi(input_sample.GetExcitation().GetDiscreteEnergy(0).GetEnergy(), single_element.GetLineEnergy(), input_sample.GetGeometry().GetAlpha(), input_sample.GetGeometry().GetBeta());
 
@@ -327,25 +342,21 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 			thickness_density_new = 1.0 - thickness_density_new;
 			thickness_density_new = -1.0 * log(thickness_density_new) / chi;
 			layer_new.SetDensity(layer_new.GetDensity() * thickness_density_new / thickness_density_old);	
-
 		}
 		else {
 			layer_new.Normalize();
-			if (options.verbose) {
-				std::cout << std::endl << "New composition" << std::endl << layer_new << std::endl;
-			}
 		}
+
+		if (options.verbose) {
+			std::cout << std::endl << "New composition" << std::endl << layer_new << std::endl;
+		}
+
 		composition_old.ReplaceLayer(layer_new, 2);
 		input_sample.ReplaceComposition(composition_old);
 
-		counted = std::count_if(rxi_rel.begin(), rxi_rel.end(), rxi_match);
-
-		if (options.verbose) {
-			std::cout << "Composition matched: " << counted << "/" << rxi_rel.size() << std::endl;
-		}
 
 	}
-	while (counted != (int) rxi_rel.size());
+	while (1);
 
 	BAM::File::XMSO rv = job->GetFileXMSO();
 	delete job;

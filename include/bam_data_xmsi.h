@@ -191,12 +191,16 @@ namespace BAM {
 					slit_size_y(geometry->slit_size_y) {
 
 					double beam[3] = {0, 0, 1};
-					double dot_prod = std::inner_product(beam, beam + 3, n_sample_orientation.begin(), 0);
+					double dot_prod = std::inner_product(beam, beam + 3, n_sample_orientation.begin(), double(0.0));
+					//std::cout << "n_sample_orientation[2]: " << n_sample_orientation[2] << std::endl;
+					//std::cout << "beam[2]: " << beam[2] << std::endl;
+					//std::cout << "Alpha dot_prod: " << dot_prod << std::endl;
 					alpha = M_PI_2 - acos(dot_prod);
-					dot_prod = std::inner_product(n_detector_orientation.begin(), n_detector_orientation.end(), n_sample_orientation.begin(), 0);
-					beta = M_PI - acos(dot_prod);
-					std::cout << "Geometry alpha: " << alpha << std::endl;
-					std::cout << "Geometry beta: " << beta << std::endl;
+					dot_prod = std::inner_product(n_detector_orientation.begin(), n_detector_orientation.end(), n_sample_orientation.begin(), double(0.0));
+					//std::cout << "Beta dot_prod: " << dot_prod << std::endl;
+					beta = M_PI_2 - acos(dot_prod);
+					//std::cout << "Geometry alpha: " << alpha << std::endl;
+					//std::cout << "Geometry beta: " << beta << std::endl;
 				}
 			public:
 				double GetAlpha() {
