@@ -239,7 +239,7 @@ namespace BAM {
 				ContinuousEnergy(struct xmi_energy_continuous xec) : BaseEnergy(xec.energy, xec.horizontal_intensity, xec.vertical_intensity, xec.sigma_x, xec.sigma_xp, xec.sigma_y, xec.sigma_yp) {}
 			public:
 				ContinuousEnergy(double energy, double horizontal_intensity, double vertical_intensity, double sigma_x = 0.0, double sigma_xp = 0.0, double sigma_y = 0.0, double sigma_yp = 0.0) : BaseEnergy(energy, horizontal_intensity, vertical_intensity, sigma_x, sigma_xp, sigma_y, sigma_yp) {}
-				friend Excitation;
+				friend class Excitation;
 			};
 
 			class DiscreteEnergy : public BaseEnergy {
@@ -249,7 +249,7 @@ namespace BAM {
 				DiscreteEnergy(struct xmi_energy_discrete xed) : BaseEnergy(xed.energy, xed.horizontal_intensity, xed.vertical_intensity, xed.sigma_x, xed.sigma_xp, xed.sigma_y, xed.sigma_yp), distribution_type(xed.distribution_type), scale_parameter(xed.scale_parameter) {}
 			public:
 				DiscreteEnergy(double energy, double horizontal_intensity, double vertical_intensity, double sigma_x = 0.0, double sigma_xp = 0.0, double sigma_y = 0.0, double sigma_yp = 0.0, int distribution_type = XMI_DISCRETE_MONOCHROMATIC, double scale_parameter = 0.0) : BaseEnergy(energy, horizontal_intensity, vertical_intensity, sigma_x, sigma_xp, sigma_y, sigma_yp), distribution_type(distribution_type), scale_parameter(scale_parameter) {}
-				friend Excitation;
+				friend class Excitation;
 		
 			};
 
