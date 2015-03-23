@@ -56,12 +56,12 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
+	try {
 #ifdef HAVE_EXT_STDIO_FILEBUF_H
-	std::cout << *xmsi_file << std::endl;
+		std::cout << *xmsi_file << std::endl;
 #endif
 
-	xmsi_file->SetFilename("In_copy.xmsi");
-	try {
+		xmsi_file->SetFilename("In_copy.xmsi");
 		xmsi_file->Write();
 	}
 	catch(BAM::Exception &e) {

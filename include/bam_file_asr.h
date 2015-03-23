@@ -22,7 +22,7 @@ namespace BAM {
 				return static_cast<int> (data_asr.size());
 			}
 			Data::ASR GetData(int i) {
-				if (i < 0 || i >= data_asr.size()) {
+				if (i < 0 || i >= (int) data_asr.size()) {
 					throw BAM::Exception("Index out of bounds in BAM::File::GetData");
 				}			
 				return data_asr[i];

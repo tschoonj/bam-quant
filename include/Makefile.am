@@ -11,4 +11,6 @@ bam_quantinclude_HEADERS = bam_file.h \
 			   bam_data_rxi.h \
 			   bam_file_rxi.h \
 			   bam_job_xmsi.h \
-			   bam_job_quant.h
+			   bam_job_quant.h \
+			   bam_data_base.h \
+			   bam_data_xraylib.h

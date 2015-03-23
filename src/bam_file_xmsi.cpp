@@ -124,12 +124,20 @@ void XMSI::ReplaceComposition(const BAM::Data::XMSI::Composition &composition_ne
 	//first clear the current composition
 	if (input->composition)
 		xmi_free_composition(input->composition);
-	struct xmi_composition composition;
-	composition.reference_layer = composition_new.reference_layer;
-	composition.layers = (struct xmi_layer*) xmi_memdup(&composition_new.layers[0], sizeof(struct xmi_layer)*composition_new.layers.size());
-	composition.n_layers = composition_new.layers.size();
-	xmi_copy_composition(&composition, &input->composition);
-	xmi_free(composition.layers);
+	struct xmi_composition *composition = (struct xmi_composition *) xmi_malloc(sizeof(struct xmi_composition));
+	composition->reference_layer = composition_new.reference_layer;
+	composition->layers = (struct xmi_layer*) xmi_malloc(sizeof(struct xmi_layer)*composition_new.layers.size());
+	composition->n_layers = composition_new.layers.size();
+	
+	//std::cout << "composition->n_layers: " << composition->n_layers << std::endl;
+	
+	for (int i = 0 ; i < composition->n_layers ; i++) {
+		composition->layers[i] = composition_new.layers[i].Convert();
+	}
+	//xmi_print_layer(stdout, composition->layers, composition->n_layers);
+
+	xmi_copy_composition(composition, &input->composition);
+	xmi_free_composition(composition);
 }
 
 

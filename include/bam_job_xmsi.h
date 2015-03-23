@@ -70,7 +70,7 @@ namespace BAM {
 				xmimsim_input = new BAM::File::XMSI(xmsi_filename);
 
 				if (options.verbose)
-					std::cout << "Inputfile " << xmsi_filename << "successfully parsed" << std::endl;
+					std::cout << "Inputfile " << xmsi_filename << " successfully parsed" << std::endl;
 
 				if (options.extra_verbose)
 					xmi_print_input(stdout, xmimsim_input->GetInternalPointer());
@@ -101,7 +101,7 @@ namespace BAM {
 				xmimsim_input = new BAM::File::XMSI(xmimsim_input_new);
 
 				if (options.verbose)
-					std::cout << "Inputfile " << xmsi_filename << "successfully parsed" << std::endl;
+					std::cout << "Inputfile " << xmsi_filename << " successfully parsed" << std::endl;
 
 				if (options.extra_verbose)
 					xmi_print_input(stdout, xmimsim_input->GetInternalPointer());

@@ -6,7 +6,8 @@ check_PROGRAMS = test_bam_file_asr \
 		 test_bam_file_rxi_single \
 		 test_bam_file_rxi_multi \
 		 test_bam_file_rxi_common \
-		 test_bam_job_xmsi
+		 test_bam_job_xmsi \
+		 test_bam_data_xraylib
 
 test_bam_file_asr_SOURCES = test_bam_file_asr.cpp
 test_bam_file_asr_LDADD = ../src/libbam-quant.la
@@ -35,6 +36,10 @@ test_bam_file_rxi_common_CPPFLAGS = -DTEST_FILE_RXI_SINGLE=\"$(srcdir)/rxi_test_
 test_bam_job_xmsi_SOURCES = test_bam_job_xmsi.cpp
 test_bam_job_xmsi_LDADD = ../src/libbam-quant.la @xmimsim_LIBS@
 test_bam_job_xmsi_CPPFLAGS = -DTEST_JOB_XMSI=\"$(srcdir)/test_bam_job_xmsi.xmsi\" $(AM_CPPFLAGS) @xmimsim_CFLAGS@
+
+test_bam_data_xraylib_SOURCES = test_bam_data_xraylib.cpp
+test_bam_data_xraylib_LDADD = ../src/libbam-quant.la @xraylib_LIBS@
+test_bam_data_xraylib_CPPFLAGS = $(AM_CPPFLAGS) @xraylib_CFLAGS@
 
 TESTS = $(check_PROGRAMS)
 
