@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 		BAM::Data::Base::Composition compound_sum = *compound + *compoundNIST;
 		std::cout << compound_sum << std::endl; 
 	
-		std::vector<std::string> compoundNISTnames = BAM::Data::Xraylib::CompoundNIST::GetCompoundDataNISTList();
+		std::vector<std::string> compoundNISTnames = BAM::Data::Xraylib::CompoundNIST::GetList();
 		std::copy(compoundNISTnames.begin(), compoundNISTnames.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
 	
 		delete compound;

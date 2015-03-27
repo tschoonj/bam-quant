@@ -15,3 +15,29 @@ namespace BAM {
 		}
 	}
 }
+
+using namespace BAM::Data;
+
+
+Base::Composition *BAM::Data::Xraylib::Parse(std::string compound) {
+	Base::Composition *rv;
+
+	try {
+		rv = new BAM::Data::Xraylib::CompoundNIST(compound);
+	}
+	catch (BAM::Exception &e) {
+		try {
+			rv = new BAM::Data::Xraylib::Compound(compound);
+		}
+		catch (BAM::Exception &e) {
+			throw BAM::Exception("BAM::Data::Xraylib::Parse -> could not parse compound");
+		}
+		catch (...) {
+			throw BAM::Exception("BAM::Data::Xraylib::Parse -> unknown exception caught");
+		}
+	}
+	catch (...) {
+		throw BAM::Exception("BAM::Data::Xraylib::Parse -> unknown exception caught");
+	}
+	return rv;
+}

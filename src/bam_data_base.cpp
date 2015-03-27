@@ -68,3 +68,14 @@ void Composition::Normalize() {
 	for (std::map<int,double>::iterator it = composition.begin() ; it != composition.end() ; ++it)
 		it->second /= sum;
 }
+
+bool Composition::MatchesAnyFrom(const std::vector<int> &elements) {
+	for (std::vector<int>::const_iterator it = elements.begin() ; it != elements.end() ; ++it) {
+		if (composition.find(*it) != composition.end())
+			return true;
+	}
+
+	return false;
+}
+	
+

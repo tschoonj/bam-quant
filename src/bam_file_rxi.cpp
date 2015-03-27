@@ -18,6 +18,7 @@ static Sample ConvertXMLToSample(xmlpp::Element *element) {
 	Glib::ustring density_str = dynamic_cast<xmlpp::Element*>(element->get_first_child("density"))->get_child_text()->get_content();
 	Glib::ustring thickness_str = dynamic_cast<xmlpp::Element*>(element->get_first_child("thickness"))->get_child_text()->get_content();
  	Glib::ustring density_thickness_str = element->get_attribute_value("density_thickness");
+ 	Glib::ustring matrix_str = element->get_attribute_value("matrix");
 
 	bool density_thickness_fixed;
 
@@ -40,7 +41,7 @@ static Sample ConvertXMLToSample(xmlpp::Element *element) {
 		ss << thickness_str;
 		ss >> thickness;
 	}
-	Sample rv(asrfile, density, thickness, density_thickness_fixed);
+	Sample rv(asrfile, density, thickness, density_thickness_fixed, matrix_str);
 	
 	xmlpp::Node::NodeList list = element->get_children("element_rxi");
 	for (xmlpp::Node::NodeList::iterator it = list.begin() ; it != list.end() ; ++it) {
@@ -73,11 +74,12 @@ static void ConvertSampleToXML(xmlpp::Element *sampleXML, Sample &sampleBAM) {
 	sampleXML->add_child("density")->add_child_text(sampleBAM.GetDensityString());
 	sampleXML->add_child("thickness")->add_child_text(sampleBAM.GetThicknessString());
 	sampleXML->set_attribute("density_thickness", sampleBAM.GetDensityThicknessFixedString());
+	sampleXML->set_attribute("matrix", sampleBAM.GetMatrix());
 
 	return;
 }
 
-Single::Single(std::string filename) : Common(filename) ,sample("", 0.0, 0.0, true) {
+Single::Single(std::string filename) : Common(filename) ,sample("", 0.0, 0.0, true, "none") {
 	try {
 		Parse();
 	}
@@ -267,26 +269,20 @@ void Multi::Write(std::string new_filename) {
 }
 
 
-namespace BAM {
-	namespace File {
-		namespace RXI {
-			Common* Parse(std::string filename) {
-				Common *rv;
-				try {
-					//first try Single
-					rv = new Single(filename);	
-				}
-				catch (BAM::Exception &e){
-					try {
-						//then try multi
-						rv = new Multi(filename);	
-					}
-					catch (BAM::Exception &e){
-						throw BAM::Exception("BAM::File::RXI::Common::Parse -> file is neither Single nor Multi");
-					}
-				}
-				return rv;
-			}
+Common* BAM::File::RXI::Parse(std::string filename) {
+	Common *rv;
+	try {
+		//first try Single
+		rv = new Single(filename);	
+	}
+	catch (BAM::Exception &e){
+		try {
+			//then try multi
+			rv = new Multi(filename);	
+		}
+		catch (BAM::Exception &e){
+			throw BAM::Exception("BAM::File::RXI::Common::Parse -> file is neither Single nor Multi");
 		}
 	}
+	return rv;
 }

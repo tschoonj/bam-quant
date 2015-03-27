@@ -4,7 +4,9 @@ AM_CPPFLAGS = -I${top_srcdir}/include -I${top_builddir}/include -I${top_srcdir}/
 
 app2_SOURCES = main.cpp \
 	       app2-assistant.h \
-	       app2-assistant.cpp
+	       app2-assistant.cpp \
+	       app2-matrixdialog.cpp \
+	       app2-matrixdialog.h
 
 
 

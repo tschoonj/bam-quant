@@ -80,6 +80,7 @@ private:
 				add(col_density);
 				add(col_thickness);
 				add(col_fix_thickness_density);
+				add(col_matrix);
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_elements;
 			Gtk::TreeModelColumn<std::string> col_filename;
@@ -89,18 +90,23 @@ private:
 			Gtk::TreeModelColumn<double> col_density;
 			Gtk::TreeModelColumn<double> col_thickness;
 			Gtk::TreeModelColumn<bool> col_fix_thickness_density;
+			Gtk::TreeModelColumn<std::string> col_matrix;
 	};
 	Gtk::ButtonBox third_page_buttons;
 	ThirdPageColumns third_page_columns;	
 	Gtk::Button third_page_open_button;
 	void on_third_page_open_clicked();
+	void on_third_page_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
+	Gtk::TreeViewColumn *third_page_matrix_column;
 	bool on_third_page_backspace_clicked(GdkEventKey *key);
 	void on_third_page_edited(const Glib::ustring & path, const Glib::ustring &new_text, bool is_it_density);
 	Gtk::Button third_page_density_button;
 	Gtk::Button third_page_thickness_button;
 	Gtk::Button third_page_fix_thickness_density_button;
+	Gtk::Button third_page_matrix_button;
 	void on_third_page_open_rho_or_T_clicked(bool is_it_density);
 	void on_third_page_open_fix_thickness_density_clicked();
+	void on_third_page_open_matrix_clicked();
 	void on_third_page_selection_changed();
 	void on_third_page_fix_thickness_density_toggled(const Glib::ustring &path);
 

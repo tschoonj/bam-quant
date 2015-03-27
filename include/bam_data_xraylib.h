@@ -51,11 +51,13 @@ namespace BAM {
 					SetComposition(cdn);
 					FreeCompoundDataNIST(cdn);
 				}
-				static std::vector<std::string> GetCompoundDataNISTList() {
+				static std::vector<std::string> GetList() {
 					int nCompounds;
 					char **compoundsNIST = ::GetCompoundDataNISTList(&nCompounds);
 					std::vector<std::string> rv(compoundsNIST, compoundsNIST + nCompounds);
-					//for (int i = 0 ; i < nCompounds ; i
+					for (int i = 0 ; i < nCompounds ; i++)
+						xrlFree(compoundsNIST[i]);
+					xrlFree(compoundsNIST);
 					return rv;
 				}
 				void SetDensity(double density_new) {
@@ -66,6 +68,9 @@ namespace BAM {
 				}
 				friend std::ostream& operator<< (std::ostream &out, const CompoundNIST &c);
 			};
+
+			::BAM::Data::Base::Composition *Parse(std::string);
+			
 		}
 	}
 }

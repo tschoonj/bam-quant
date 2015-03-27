@@ -1,3 +1,4 @@
+#include "app2-matrixdialog.h"
 #include "app2-assistant.h"
 #include <iostream>
 #include <gtkmm/application.h>
@@ -14,6 +15,7 @@
 #include <glibmm/convert.h>
 #include <algorithm>
 #include <bam_file_rxi.h>
+#include <gsl/gsl_linalg.h>
 
 using namespace std;
 
@@ -36,10 +38,11 @@ using namespace std;
 App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will produce a file containing\n"
 							"relative X-ray intensities based on the net-line intensities\n"
 							"obtained from pure elemental standards and samples."),
+		third_page_buttons(Gtk::ORIENTATION_HORIZONTAL),
 		third_page_density_button("Set density"),
 		third_page_thickness_button("Set thickness"),
 		third_page_fix_thickness_density_button("Set fixed thickness"),
-		third_page_buttons(Gtk::ORIENTATION_HORIZONTAL),
+		third_page_matrix_button("Set matrix"),
 		xmimsim_paused(false),
 		xmimsim_pid(0),
 		timer(0),
@@ -112,10 +115,12 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 	third_page_density_button.set_sensitive(false);
 	third_page_thickness_button.set_sensitive(false);
 	third_page_fix_thickness_density_button.set_sensitive(false);
+	third_page_matrix_button.set_sensitive(false);
 	third_page_buttons.pack_start(third_page_open_button);
 	third_page_buttons.pack_start(third_page_density_button);
 	third_page_buttons.pack_start(third_page_thickness_button);
 	third_page_buttons.pack_start(third_page_fix_thickness_density_button);
+	third_page_buttons.pack_start(third_page_matrix_button);
 	third_page_buttons.set_layout(Gtk::BUTTONBOX_CENTER);
 	third_page_buttons.set_spacing(10);
 	third_page_buttons.set_vexpand(false);
@@ -149,6 +154,15 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 		cell->signal_toggled().connect(sigc::mem_fun(*this, &App2Assistant::on_third_page_fix_thickness_density_toggled));
 	}
 	
+	{
+		Gtk::CellRendererText* cell = Gtk::manage(new Gtk::CellRendererText);
+		int cols_count = third_page_tv.append_column("Matrix", *cell);
+		third_page_matrix_column = third_page_tv.get_column(cols_count-1);
+		third_page_matrix_column->add_attribute(cell->property_text(), third_page_columns.col_matrix);
+		cell->property_ellipsize_set() = true;
+		cell->property_ellipsize() = Pango::ELLIPSIZE_END;
+	}
+	third_page_tv.signal_row_activated().connect(sigc::mem_fun(*this, &App2Assistant::on_third_page_row_activated) );	
 
 	third_page_sw.add(third_page_tv);
 	third_page_sw.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
@@ -166,6 +180,7 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 	third_page_density_button.signal_clicked().connect(sigc::bind(sigc::mem_fun(*this, &App2Assistant::on_third_page_open_rho_or_T_clicked), true));
 	third_page_thickness_button.signal_clicked().connect(sigc::bind(sigc::mem_fun(*this, &App2Assistant::on_third_page_open_rho_or_T_clicked), false));
 	third_page_fix_thickness_density_button.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_third_page_open_fix_thickness_density_clicked));
+	third_page_matrix_button.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_third_page_open_matrix_clicked));
 	//fourth page
 	fourth_page_xmsi_file = 0; //set to zero when initializing
 	label = Gtk::manage(new Gtk::Label("Select an XMI-MSIM input-file\nthat properly describes the\nexcitation conditions as well as the\nexperimental geometry"));
@@ -377,11 +392,44 @@ void App2Assistant::on_assistant_close() {
 			std::cout << "average phi simple: " << phi << std::endl;
 
 			if (pld.x.size() > 3) {
+				//get starting values
+				gsl_matrix *square_mat = gsl_matrix_alloc(3, 3);
+				gsl_matrix_set(square_mat, 0, 0, pld.x[0]*pld.x[0]);
+				gsl_matrix_set(square_mat, 0, 1, pld.x[0]);
+				gsl_matrix_set(square_mat, 0, 2, 1);
+				gsl_matrix_set(square_mat, 1, 0, pld.x[pld.x.size()/2]*pld.x[pld.x.size()/2]);
+				gsl_matrix_set(square_mat, 1, 1, pld.x[pld.x.size()/2]);
+				gsl_matrix_set(square_mat, 1, 2, 1);
+				gsl_matrix_set(square_mat, 2, 0, pld.x[pld.x.size()-1]*pld.x[pld.x.size()-1]);
+				gsl_matrix_set(square_mat, 2, 1, pld.x[pld.x.size()-1]);
+				gsl_matrix_set(square_mat, 2, 2, 1);
+
+				gsl_vector *y_vec = gsl_vector_alloc(3);
+				gsl_vector_set(y_vec, 0, pld.y[0]);
+				gsl_vector_set(y_vec, 1, pld.y[pld.x.size()/2]);
+				gsl_vector_set(y_vec, 2, pld.y[pld.x.size()-1]);
+
+				gsl_permutation *p = gsl_permutation_alloc(3);
+				gsl_vector *x_vec = gsl_vector_alloc(3);
+				int res;
+
+				gsl_linalg_LU_decomp(square_mat, p, &res);
+				gsl_linalg_LU_solve(square_mat, p, y_vec, x_vec);
+				
+
+				gsl_matrix_free(square_mat);
+				gsl_permutation_free (p);
+				gsl_vector_free(y_vec);
+				double x_init[3] = {gsl_vector_get(x_vec, 0), gsl_vector_get(x_vec, 1), gsl_vector_get(x_vec, 2)};
+				std::cout << "Initial values: " << x_init[0] << "  " << x_init[1] << "  " << x_init[2] << std::endl;
+				gsl_vector_free(x_vec);
+
+
+
 				//complicated phi using non-linear least-squares fit
 				const gsl_multifit_fdfsolver_type *T = gsl_multifit_fdfsolver_lmsder;
 				gsl_multifit_function_fdf f;
 				pld.sigma.assign(pld.x.size(), 0.1);
-				double x_init[3] = {1E-6, 1E-4, phi};
 				gsl_vector_view x = gsl_vector_view_array(x_init, 3);
 				f.f = &App2Assistant::phi_lqfit_f;
 				f.df = &App2Assistant::phi_lqfit_df;
@@ -392,7 +440,7 @@ void App2Assistant::on_assistant_close() {
 
 				s = gsl_multifit_fdfsolver_alloc(T, pld.x.size(), 3);
 				gsl_multifit_fdfsolver_set(s, &f, &x.vector);
-				int status = gsl_multifit_fdfsolver_driver(s, 500, 1E-2, 1E-2);
+				int status = gsl_multifit_fdfsolver_driver(s, 50000, 10, 1E-2);
 
 				if (status != GSL_SUCCESS) {
 					message += "No convergence while calculating scaling factor phi using GSL non-linear least squares fitting. ";
@@ -413,7 +461,7 @@ void App2Assistant::on_assistant_close() {
 		Gtk::TreeModel::Children kids = third_page_model->children();
 		for (Gtk::TreeModel::Children::iterator iter = kids.begin() ; iter != kids.end() ; ++iter) {
 			Gtk::TreeModel::Row row = *iter;
-			BAM::Data::RXI::Sample sample(row[third_page_columns.col_filename_full], row[third_page_columns.col_density], row[third_page_columns.col_thickness], row[third_page_columns.col_fix_thickness_density]);
+			BAM::Data::RXI::Sample sample(row[third_page_columns.col_filename_full], row[third_page_columns.col_density], row[third_page_columns.col_thickness], row[third_page_columns.col_fix_thickness_density], row[third_page_columns.col_matrix]);
 			
 			//loop over all elements in the sample
 			std::vector<int> *col_elements_int = row[third_page_columns.col_elements_int];
@@ -790,11 +838,13 @@ void App2Assistant::on_third_page_selection_changed() {
 		third_page_density_button.set_sensitive();
 		third_page_thickness_button.set_sensitive();
 		third_page_fix_thickness_density_button.set_sensitive();
+		third_page_matrix_button.set_sensitive();
 	}
 	else {
 		third_page_density_button.set_sensitive(false);
 		third_page_thickness_button.set_sensitive(false);
 		third_page_fix_thickness_density_button.set_sensitive(false);
+		third_page_matrix_button.set_sensitive(false);
 	}
 }
 
@@ -892,6 +942,7 @@ void App2Assistant::on_third_page_open_clicked() {
 		row[third_page_columns.col_density] = 0.0;
 		row[third_page_columns.col_thickness] = 0.0;
 		row[third_page_columns.col_fix_thickness_density] = true;
+		row[third_page_columns.col_matrix] = "none";
 	}
 	if (third_page_model->children().size() >= 1) {
 		//check density and thickness
@@ -1289,6 +1340,32 @@ void App2Assistant::on_third_page_open_fix_thickness_density_clicked() {
 
 }
 
+void App2Assistant::on_third_page_open_matrix_clicked() {
+	//prepare vector with all elements
+	std::vector<int> elements_all;
+	Glib::RefPtr<Gtk::TreeSelection> selection = third_page_tv.get_selection();
+	std::vector<Gtk::TreeModel::Path> paths = selection->get_selected_rows();
+	for (std::vector<Gtk::TreeModel::Path>::iterator rit = paths.begin() ; rit != paths.end() ; ++rit) {
+		Gtk::TreeModel::Row row = *(third_page_model->get_iter(*rit));
+		std::vector<int> *elements_int = row[third_page_columns.col_elements_int];
+		elements_all.insert(elements_all.end(), elements_int->begin(), elements_int->end());
+	}
+
+	//get uniques and sort
+	std::sort(elements_all.begin(), elements_all.end() );
+	elements_all.erase(unique(elements_all.begin(), elements_all.end()), elements_all.end());
+
+	App2MatrixDialog matrix_dialog("Set the matrix", *this, true, elements_all);
+	int result = matrix_dialog.run();
+
+	if (result == Gtk::RESPONSE_OK) {
+		for (std::vector<Gtk::TreeModel::Path>::iterator rit = paths.begin() ; rit != paths.end() ; ++rit) {
+			Gtk::TreeModel::Row row = *(third_page_model->get_iter(*rit));
+			row[third_page_columns.col_matrix] = matrix_dialog.GetCompound();
+		}
+	}
+}
+
 void App2Assistant::on_third_page_open_rho_or_T_clicked(bool is_it_density) {
 	//prepare a dialog with a label and an entry
 	Gtk::Dialog dialog(is_it_density ? "Set the density" : "Set the thickness", *this, true);
@@ -1640,6 +1717,24 @@ void App2Assistant::on_third_page_fix_thickness_density_toggled(const Glib::ustr
 	row[third_page_columns.col_fix_thickness_density] = !row[third_page_columns.col_fix_thickness_density];
 }
 
+void App2Assistant::on_third_page_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column) {
+
+	if (column != third_page_matrix_column) {
+		return;
+	}
+	Gtk::TreeModel::Row row = *(third_page_model->get_iter(path));
+
+	std::cout << "on_third_page_row_activated" << std::endl;
+
+	App2MatrixDialog matrix_dialog("Set the matrix", *this, true, *row[third_page_columns.col_elements_int]);
+	int result = matrix_dialog.run();
+
+	if (result == Gtk::RESPONSE_OK) {
+		row[third_page_columns.col_matrix] = matrix_dialog.GetCompound();
+	}
+
+
+}
 /*
  *
  * Remember: y(x) = a * x^2 + b * x + c

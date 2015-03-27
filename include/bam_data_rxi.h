@@ -61,9 +61,10 @@ namespace BAM {
 				double density;
 				double thickness;
 				bool density_thickness_fixed;
+				std::string matrix;
 				std::map<std::string,SingleElement,bool(*)(std::string,std::string)> single_elements;
 				public:
-				Sample(std::string asrfile, double density, double thickness, bool density_thickness_fixed) : asrfile(asrfile), density(density), thickness(thickness), density_thickness_fixed(density_thickness_fixed), single_elements(element_comp) {}
+				Sample(std::string asrfile, double density, double thickness, bool density_thickness_fixed, std::string matrix) : asrfile(asrfile), density(density), thickness(thickness), density_thickness_fixed(density_thickness_fixed), matrix(matrix), single_elements(element_comp) {}
 				std::string GetASRfile() {
 					return asrfile;
 				}
@@ -107,6 +108,9 @@ namespace BAM {
 						rv.push_back(it->first);
 					}
 					return rv;
+				}
+				std::string GetMatrix() {
+					return matrix;
 				}
 			};
 		}

@@ -55,6 +55,7 @@ namespace BAM {
 					rv += Mu(energy_xrf)/sin(angle_xrf);
 					return rv;
 				}
+				bool MatchesAnyFrom(const std::vector<int> &elements);
 				friend Composition operator+(const Composition &c1, const Composition &c2);
 				friend std::ostream& operator<< (std::ostream &out, const Composition &c);
 			};
