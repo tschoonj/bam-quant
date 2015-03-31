@@ -74,7 +74,7 @@ static void ConvertSampleToXML(xmlpp::Element *sampleXML, Sample &sampleBAM) {
 	sampleXML->add_child("density")->add_child_text(sampleBAM.GetDensityString());
 	sampleXML->add_child("thickness")->add_child_text(sampleBAM.GetThicknessString());
 	sampleXML->set_attribute("density_thickness", sampleBAM.GetDensityThicknessFixedString());
-	sampleXML->set_attribute("matrix", sampleBAM.GetMatrix());
+	sampleXML->set_attribute("matrix", sampleBAM.GetMatrixString());
 
 	return;
 }

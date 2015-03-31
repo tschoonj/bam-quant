@@ -13,14 +13,16 @@ namespace BAM {
 			//wrapper around xraylib's CompoundParser
 			class Compound : public Base::Composition {
 			protected:
+			using Base::Composition::SetComposition;
 				Compound() {}
 				void SetComposition(struct compoundData *cd) {
 					if (cd == 0) {
 						throw BAM::Exception("BAM::Data::Xraylib::Compound::SetComposition -> Invalid chemical formula provided");
 					}
-					Base::Composition::SetComposition(cd->Elements, cd->massFractions, cd->nElements);
+					SetComposition(cd->Elements, cd->massFractions, cd->nElements);
 				}
 			public:	
+				virtual ~Compound() {};
 				Compound(std::string compound) {
 					struct compoundData *cd = CompoundParser(compound.c_str());
 					SetComposition(cd);
@@ -30,6 +32,7 @@ namespace BAM {
 			class CompoundNIST : public Compound {
 			private:
 			protected:
+			using Compound::SetComposition;
 				double density;
 				CompoundNIST() {}
 				CompoundNIST(double density) : density(density) {}
@@ -37,10 +40,11 @@ namespace BAM {
 					if (cdn == 0) {
 						throw BAM::Exception("BAM::Data::Xraylib::CompoundNIST::SetComposition -> Invalid NIST compound provided");
 					}
-					Base::Composition::SetComposition(cdn->Elements, cdn->massFractions, cdn->nElements);
+					SetComposition(cdn->Elements, cdn->massFractions, cdn->nElements);
 					density = cdn->density;
 				}
 			public:
+				virtual ~CompoundNIST() {};
 				CompoundNIST(std::string compoundNIST) {
 					struct compoundDataNIST *cdn = GetCompoundDataNISTByName(compoundNIST.c_str());
 					SetComposition(cdn);

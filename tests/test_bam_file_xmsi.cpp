@@ -36,8 +36,14 @@ int main(int argc, char *argv[]) {
 
 		layer = new BAM::Data::XMSI::Layer(2.0, 0.5);
 		layer->AddElement(26, 70.0);
+		std::cout << "New layer sum: " << layer->GetSum() << std::endl;
 		layer->AddElement(24, 18.0);
+		std::cout << "New layer sum: " << layer->GetSum() << std::endl;
 		layer->AddElement(28, 12.0);
+		std::cout << "New layer sum: " << layer->GetSum() << std::endl;
+		layer->Normalize();
+		std::cout << "New layer sum: " << layer->GetSum() << std::endl;
+		std::cout << "Layer composition: " << *layer << std::endl;
 		composition->AddLayer(*layer);
 		delete layer;
 

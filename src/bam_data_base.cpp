@@ -1,5 +1,6 @@
 #include "bam_data_base.h"
 #include <xraylib.h>
+#include <numeric>
 
 namespace BAM {
 	namespace Data {
@@ -11,6 +12,13 @@ namespace BAM {
 						rv.composition[it->first] = it->second;
 					else
 						rv.composition[it->first] += it->second;
+				}
+				return rv;
+			}
+			Composition operator*(const double multiplier, const Composition &c) {
+				Composition rv(c);
+				for (std::map<int,double>::iterator it = rv.composition.begin(); it != rv.composition.end() ; ++it) {
+					it->second *= multiplier;
 				}
 				return rv;
 			}
@@ -59,11 +67,7 @@ void Composition::AddElement(std::string Z_new, double weight_new) {
 }
 
 void Composition::Normalize() {
-	
-	double sum(0.0);
-	
-	for (std::map<int,double>::iterator it = composition.begin() ; it != composition.end() ; ++it)
-		sum += it->second;
+	double sum(GetSum());
 	
 	for (std::map<int,double>::iterator it = composition.begin() ; it != composition.end() ; ++it)
 		it->second /= sum;
@@ -77,5 +81,8 @@ bool Composition::MatchesAnyFrom(const std::vector<int> &elements) {
 
 	return false;
 }
-	
+
+double Composition::GetSum() const {
+	return std::accumulate(composition.begin(), composition.end(), double(0.0), SumAccumulator);	
+}
 

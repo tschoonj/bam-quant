@@ -11,7 +11,6 @@
 #include <map>
 #include <xraylib.h>
 #include "bam_file_xmsi.h"
-#include <xraylib.h>
 #include <cmath>
 #include "bam_data_xraylib.h"
 
@@ -28,10 +27,11 @@ namespace BAM {
 			private:
 				double thickness;
 				Layer(struct xmi_layer layer) : Xraylib::CompoundNIST(layer.density), thickness(layer.thickness) {
-					::BAM::Data::Base::Composition::SetComposition(layer.Z, layer.weight, layer.n_elements);
+					SetComposition(layer.Z, layer.weight, layer.n_elements);
 				}
 				Layer() {};
 			public:
+			using BAM::Data::Xraylib::CompoundNIST::SetComposition;
 				Layer(double density_new, double thickness_new);
 				Layer(std::string compound, double density_new, double thickness_new);
 				Layer(std::string nistcompound, double thickness_new);
@@ -83,6 +83,10 @@ namespace BAM {
 				}
 				friend class BAM::Data::XMSI::Composition;
 				friend std::ostream& operator<< (std::ostream &out, const Layer &layer);
+				Layer& operator*=(double multiplier) {
+					this->SetComposition(multiplier * *this);
+					return *this;
+				}
 			};
 			class Composition {
 			private:

@@ -13,11 +13,15 @@ namespace BAM {
 		namespace Base {
 			class Composition {
 			private:
+				static double SumAccumulator(double total, const std::map<int,double>::value_type &data) {
+					return total + data.second;
+				}
 			protected:
 				std::map <int,double> composition;
 				Composition() {}
 				void SetComposition(int *Z_new, double *weight_new, int n_elements);
 			public:
+				virtual ~Composition() {}
 				void AddElement(int Z_new, double weight_new);
 				void AddElement(std::string Z_new, double weight_new);
 				size_t GetNumberOfElements() const {
@@ -27,6 +31,7 @@ namespace BAM {
 				void RemoveElements() {
 					composition.clear();
 				}
+				double GetSum() const;
 				std::map<std::string,double> GetZandWeightMap() {
 					std::map<std::string,double> rv;
 					for (std::map<int,double>::iterator it = composition.begin() ; it != composition.end() ; ++it) {
@@ -56,7 +61,11 @@ namespace BAM {
 					return rv;
 				}
 				bool MatchesAnyFrom(const std::vector<int> &elements);
+				void SetComposition(const Composition &comp) {
+					composition = comp.composition;
+				}
 				friend Composition operator+(const Composition &c1, const Composition &c2);
+				friend Composition operator*(const double multiplier, const Composition &c);
 				friend std::ostream& operator<< (std::ostream &out, const Composition &c);
 			};
 		}

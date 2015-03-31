@@ -30,7 +30,7 @@ Layer::Layer(std::string compound, double density_new, double thickness_new) : X
 
 	struct compoundData *cd;
 	cd = CompoundParser(compound.c_str());
-	Xraylib::Compound::SetComposition(cd);
+	SetComposition(cd);
 
 	FreeCompoundData(cd);
 

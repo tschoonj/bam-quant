@@ -3,6 +3,7 @@
 #include "bam_exception.h"
 #include <libxml++/libxml++.h>
 #include <cmath>
+#include <xraylib.h>
 
 using namespace BAM::Job;
 
@@ -48,6 +49,7 @@ double Quant::calculate_rxi(std::string element, BAM::File::XMSO &sample_output,
 }
 
 Quant::Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_main_options options) : pure_map(element_comp), options(options), initial_input(common->GetFileXMSI()) {
+
 	//only constructor in the class
 	//check if we are dealing with single or multi
 	if (dynamic_cast<BAM::File::RXI::Single*>(common)) {
@@ -190,7 +192,20 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 		layer2.AddElement(single_element.GetElement(), single_element.GetRXI());
 	}
 
-	layer2.Normalize();
+	//if matrix available -> intervene
+	const BAM::Data::Base::Composition *matrix = sample.GetMatrix();
+
+	if (matrix) {
+		double current_sum = layer2.GetSum();
+		if (current_sum < 1.0) {
+			layer2 *= 0.5/current_sum;
+			current_sum = 0.5;
+		}
+		layer2.SetComposition(layer2 + (1.0-current_sum) * *matrix);
+	}
+	else {
+		layer2.Normalize();
+	}
 
 	if (options.verbose) {
 		std::cout << std::endl << "Initial composition" << std::endl << layer2 << std::endl;
@@ -205,10 +220,14 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 		std::cout << "Start simulations of the sample" << std::endl <<
 			     "===============================" << std::endl << std::endl;
 		if (sample.GetDensityThicknessFixed())
-			std::cout << "Density and thickness are fixed!" << std::endl;
+			std::cout << "Density and thickness are fixed!" << std::endl << std::endl;
 		else
-			std::cout << "Density and thickness are variable!" << std::endl;
+			std::cout << "Density and thickness are variable!" << std::endl << std::endl;
 		
+		if (matrix)
+			std::cout << "Matrix detected: " << sample.GetMatrixString() << std::endl << std::endl;
+		else 
+			std::cout << "No Matrix detected" << std::endl << std::endl;
 	}
 
 	std::map<std::string, double, bool(*)(std::string,std::string)> rxi_rel(element_comp);
@@ -219,7 +238,7 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 	BAM::Job::XMSI *job(0);
 	int counted = 0;
 
-
+	int layer_trouble = 0;
 
 	do {
 		//the big do while loop
@@ -342,6 +361,24 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 			thickness_density_new = 1.0 - thickness_density_new;
 			thickness_density_new = -1.0 * log(thickness_density_new) / chi;
 			layer_new.SetDensity(layer_new.GetDensity() * thickness_density_new / thickness_density_old);	
+		}
+		else if (matrix) {
+			//check current sum
+			double current_sum = layer_new.GetSum();
+			if (current_sum >= 1.0) {
+				//this should not happen -> it would indicate that something very fishy is going on with the RXI's
+				layer_trouble++;
+				layer_new.Normalize();
+				std::cout << "BAM::Job::Quant::SimulateSample -> matrix detected but sum of quantifiable elements greater than 100%!!!" << std::endl;
+				if (layer_trouble == 5) {
+					throw BAM::Exception("BAM::Job::Quant::SimulateSample -> sum of quantifiable elements was 5 times greater than 100%");
+				}
+			}
+			else {
+				if (layer_trouble > 0)
+					layer_trouble--;
+				layer_new.SetComposition(layer_new + (1.0-current_sum) * *matrix);
+			}
 		}
 		else {
 			layer_new.Normalize();

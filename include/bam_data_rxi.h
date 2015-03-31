@@ -62,9 +62,43 @@ namespace BAM {
 				double thickness;
 				bool density_thickness_fixed;
 				std::string matrix;
+				BAM::Data::Base::Composition *matrix_composition;
 				std::map<std::string,SingleElement,bool(*)(std::string,std::string)> single_elements;
 				public:
-				Sample(std::string asrfile, double density, double thickness, bool density_thickness_fixed, std::string matrix) : asrfile(asrfile), density(density), thickness(thickness), density_thickness_fixed(density_thickness_fixed), matrix(matrix), single_elements(element_comp) {}
+				Sample(std::string asrfile, double density, double thickness, bool density_thickness_fixed, std::string matrix) : asrfile(asrfile), density(density), thickness(thickness), density_thickness_fixed(density_thickness_fixed), matrix(matrix), matrix_composition(0), single_elements(element_comp) {
+					if (matrix != "none") {
+						matrix_composition = BAM::Data::Xraylib::Parse(matrix);
+					}
+				}
+				~Sample() {
+					if (matrix_composition)
+						delete matrix_composition;
+				}
+				Sample(const Sample &sample) : asrfile(sample.asrfile), density(sample.density), thickness(sample.thickness), density_thickness_fixed(sample.density_thickness_fixed), matrix(sample.matrix), matrix_composition(0), single_elements(sample.single_elements) {
+					if (matrix != "none") {
+						matrix_composition = BAM::Data::Xraylib::Parse(matrix);
+					}
+				}
+				Sample& operator= (const Sample &sample) {
+					if (this == &sample)
+						return *this;
+					asrfile = sample.asrfile;
+					density = sample.density;
+					thickness = sample.thickness;
+					density_thickness_fixed = sample.density_thickness_fixed;
+					matrix = sample.matrix;
+					single_elements = sample.single_elements;
+
+					if (matrix_composition)
+						delete matrix_composition;
+
+					matrix_composition = 0;
+
+					if (matrix != "none") {
+						matrix_composition = BAM::Data::Xraylib::Parse(matrix);
+					}
+					return *this;
+				}
 				std::string GetASRfile() {
 					return asrfile;
 				}
@@ -109,8 +143,12 @@ namespace BAM {
 					}
 					return rv;
 				}
-				std::string GetMatrix() {
+				std::string GetMatrixString() {
 					return matrix;
+				}
+				const BAM::Data::Base::Composition *GetMatrix() {
+					//do not delete this!!!!
+					return matrix_composition;
 				}
 			};
 		}

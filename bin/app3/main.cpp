@@ -118,6 +118,9 @@ int main(int argc, char **argv) {
 	try {
 		BAM::Job::XMSI::RandomNumberAcquisitionStart();
 
+		//disable xraylib's error messages	
+		SetErrorMessages(0);		
+
 		//start by reading in the inputfile
 		BAM::File::RXI::Common *common = BAM::File::RXI::Parse(argv_files[0]);
 		

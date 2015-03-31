@@ -17,7 +17,6 @@
 #include <bam_file_rxi.h>
 #include <gsl/gsl_linalg.h>
 
-using namespace std;
 
 #ifdef G_OS_UNIX
 	#include <sys/types.h>
@@ -43,10 +42,10 @@ App2Assistant::App2Assistant() : first_page("Welcome!\n\nIn this wizard you will
 		third_page_thickness_button("Set thickness"),
 		third_page_fix_thickness_density_button("Set fixed thickness"),
 		third_page_matrix_button("Set matrix"),
+		fifth_page_buttons(Gtk::ORIENTATION_VERTICAL),
 		xmimsim_paused(false),
 		xmimsim_pid(0),
 		timer(0),
-		fifth_page_buttons(Gtk::ORIENTATION_VERTICAL),
 		seventh_page("Just one more thing to do!\n\nClick the apply button and the file will be saved...")
 	{
 
@@ -329,8 +328,8 @@ App2Assistant::~App2Assistant() {
 	if (xmimsim_pid) {
 		//a process is still running!
 #ifdef G_OS_UNIX
-		int kill_rv;
-		kill_rv = kill((pid_t) xmimsim_pid, SIGTERM);
+		//int kill_rv;
+		/*kill_rv =*/ kill((pid_t) xmimsim_pid, SIGTERM);
 #if !GLIB_CHECK_VERSION (2, 35, 0)
 		waitpid(xmimsim_pid, NULL, WNOHANG);
 #endif
@@ -467,7 +466,7 @@ void App2Assistant::on_assistant_close() {
 			std::vector<int> *col_elements_int = row[third_page_columns.col_elements_int];
 			BAM::File::ASR *col_bam_file_asr = row[third_page_columns.col_bam_file_asr];
 			double norm_factor_sample = col_bam_file_asr->GetNormfactor();
-			for (int i = 0 ; i < col_elements_int->size() ; i++) {
+			for (unsigned int i = 0 ; i < col_elements_int->size() ; i++) {
 				//BAM::Data::RXI::SingleElement;
 				int Z = col_elements_int->at(i);
 				std::string element(AtomicNumberToSymbol(Z));
@@ -560,7 +559,7 @@ void App2Assistant::on_assistant_close() {
 		if (s)
 			gsl_multifit_fdfsolver_free(s);	
 		//produce a message dialog telling the user to change the filename
-		Gtk::MessageDialog dialog(*this, string("BAM::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+		Gtk::MessageDialog dialog(*this, std::string("BAM::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   		dialog.set_secondary_text(Glib::ustring("BAM error: ")+e.what());
   		dialog.run();
 		previous_page();	
@@ -571,7 +570,7 @@ void App2Assistant::on_assistant_close() {
 		if (s)
 			gsl_multifit_fdfsolver_free(s);	
 		//produce a message dialog telling the user to change the filename
-		Gtk::MessageDialog dialog(*this, string("std::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+		Gtk::MessageDialog dialog(*this, std::string("std::Exception detected while writing to ")+sixth_page_bpq2_entry.get_text(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   		dialog.set_secondary_text(Glib::ustring("error: ")+e.what());
   		dialog.run();
 		previous_page();
@@ -581,7 +580,7 @@ void App2Assistant::on_assistant_close() {
 	catch (...) {
 		if (s)
 			gsl_multifit_fdfsolver_free(s);	
-		Gtk::MessageDialog dialog(*this, string("Some weird exception detected while writing to ")+sixth_page_bpq2_entry.get_text(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+		Gtk::MessageDialog dialog(*this, std::string("Some weird exception detected while writing to ")+sixth_page_bpq2_entry.get_text(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   		dialog.run();
 		previous_page();
 		set_page_complete(sixth_page, false);
@@ -680,7 +679,7 @@ void App2Assistant::on_assistant_prepare(Gtk::Widget *page) {
 		}
 		
 		//create xmsi files
-		row[fifth_page_columns.col_xmsi_filename] = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<ostringstream*>( &(ostringstream() << getpid()))->str() + row[fifth_page_columns.col_element] + ".xmsi");
+		row[fifth_page_columns.col_xmsi_filename] = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<std::ostringstream*>( &(std::ostringstream() << getpid()))->str() + row[fifth_page_columns.col_element] + ".xmsi");
 		row[fifth_page_columns.col_xmsi_file] = new BAM::File::XMSI(*fourth_page_xmsi_file);
 		row[fifth_page_columns.col_xmso_file] = 0;
 		row[fifth_page_columns.col_xmso_counts_KA] = 0.0;
@@ -758,7 +757,7 @@ void App2Assistant::on_second_page_open_clicked() {
 		try {
 			asr_file = new BAM::File::ASR(*it);
 		}
-		catch (ifstream::failure &e) {
+		catch (std::ifstream::failure &e) {
 			Gtk::MessageDialog dialog(*this, "Error reading in "+*it, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   			dialog.set_secondary_text(Glib::ustring("I/O error: ")+e.what());
   			dialog.run();
@@ -907,7 +906,7 @@ void App2Assistant::on_third_page_open_clicked() {
 		try {
 			asr_file = new BAM::File::ASR(*it);
 		}
-		catch (ifstream::failure &e) {
+		catch (std::ifstream::failure &e) {
 			Gtk::MessageDialog dialog(*this, "Error reading in "+*it, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   			dialog.set_secondary_text(Glib::ustring("I/O error: ")+e.what());
   			dialog.run();
@@ -1032,7 +1031,7 @@ void App2Assistant::on_fourth_page_open_clicked(Gtk::EntryIconPosition icon_posi
 		temp_xmsi_file = new BAM::File::XMSI(filename);
 		temp_xmsi_file->GetExcitation().EnsureMonochromaticExcitation();
 	}
-	catch (ifstream::failure &e) {
+	catch (std::ifstream::failure &e) {
 		Gtk::MessageDialog dialog(*this, "Error reading in "+filename, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   		dialog.set_secondary_text(Glib::ustring("I/O error: ")+e.what());
   		dialog.run();
@@ -1069,16 +1068,16 @@ void App2Assistant::on_fifth_page_play_clicked() {
 #endif
 
 		if (kill_rv == 0) {
-			stringstream ss;
-			ss << get_elapsed_time() <<"Process " << real_xmimsim_pid << " was successfully resumed" << endl;
+			std::stringstream ss;
+			ss << get_elapsed_time() <<"Process " << real_xmimsim_pid << " was successfully resumed" << std::endl;
 			update_console(ss.str(), "pause-continue-stopped");
 			xmimsim_paused = false;
 			fifth_page_pause_button.set_sensitive(true);
 		}
 		else {
 			//if this happens, we're in serious trouble!
-			stringstream ss;
-			ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " could not be resumed" << endl;
+			std::stringstream ss;
+			ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " could not be resumed" << std::endl;
 			update_console(ss.str(), "pause-continue-stopped");
 			fifth_page_play_button.set_sensitive(true);
 			xmimsim_pid = 0;
@@ -1143,7 +1142,7 @@ void App2Assistant::on_fifth_page_pause_clicked() {
 	kill_rv = (int) NtSuspendProcess((HANDLE) xmimsim_pid);
 #endif
 	if (kill_rv == 0) {
-		stringstream ss;
+		std::stringstream ss;
 		ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " was successfully paused. Press the Play button to continue or Stop to kill the process" << std::endl;
 		update_console(ss.str(), "pause-continue-stopped");
 		xmimsim_paused = true;
@@ -1173,12 +1172,12 @@ void App2Assistant::on_fifth_page_stop_clicked() {
 	waitpid(xmimsim_pid, NULL, WNOHANG);
 #endif
 	if (kill_rv == 0) {
-		stringstream ss;
+		std::stringstream ss;
 		ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " was successfully terminated before completion" << std::endl;
 		update_console(ss.str(), "pause-continue-stopped");
 	}
 	else {
-		stringstream ss;
+		std::stringstream ss;
 		ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " could not be terminated with the SIGTERM signal" << std::endl;
 		update_console(ss.str(), "error");
 		xmimsim_pid = 0;
@@ -1189,12 +1188,12 @@ void App2Assistant::on_fifth_page_stop_clicked() {
 	terminate_rv = TerminateProcess((HANDLE) xmimsim_pid, (UINT) 1);
 
 	if (terminate_rv == TRUE) {
-		stringstream ss;
+		std::stringstream ss;
 		ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " was successfully terminated before completion" << std::endl;
 		update_console(ss.str(), "pause-continue-stopped");
 	}
 	else {
-		stringstream ss;
+		std::stringstream ss;
 		ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " could not be terminated with the TerminateProcess call" << std::endl;
 		update_console(ss.str(), "error");
 		xmimsim_pid = 0;
@@ -1238,8 +1237,8 @@ void App2Assistant::xmimsim_start_recursive() {
 	temp_xmsi_file->Write();
 	
 
-	std::cout << "Processing " << temp_xmsi_file->GetFilename() << endl;
-	std::cout << "Outputfile will be " << temp_xmsi_file->GetOutputFile() << endl;
+	std::cout << "Processing " << temp_xmsi_file->GetFilename() << std::endl;
+	std::cout << "Outputfile will be " << temp_xmsi_file->GetOutputFile() << std::endl;
 	argv.push_back(temp_xmsi_file->GetFilename());
 
 
@@ -1248,14 +1247,14 @@ void App2Assistant::xmimsim_start_recursive() {
 		Glib::spawn_async_with_pipes(std::string(""), argv, Glib::SPAWN_SEARCH_PATH | Glib::SPAWN_DO_NOT_REAP_CHILD, sigc::slot<void>(), &xmimsim_pid, 0, &out_fh, &err_fh);	
 	}
 	catch (Glib::SpawnError &e) {
-		throw BAM::Exception(string("App2Assistant::on_fifth_page_play_clicked -> ") + e.what());
+		throw BAM::Exception(std::string("App2Assistant::on_fifth_page_play_clicked -> ") + e.what());
 	}
 
 	//update treemodel
 	row[fifth_page_columns.col_status] = Glib::ustring("0 %");
 	
 
-	stringstream ss;
+	std::stringstream ss;
 	ss << get_elapsed_time() << argv.back() << " was started with process id " << real_xmimsim_pid << std::endl;
 	update_console(ss.str());
 
@@ -1442,13 +1441,13 @@ void App2Assistant::xmimsim_child_watcher(GPid pid, int status) {
 #ifdef G_OS_UNIX
 	if (WIFEXITED(status)) {
 		if (WEXITSTATUS(status) == 0) { /* child was terminated due to a call to exit */
-			stringstream ss;
+			std::stringstream ss;
 			ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited normally without errors" << std::endl;
 			update_console(ss.str(), "success");
 			success = 1;
 		}
 		else {
-			stringstream ss;
+			std::stringstream ss;
 			ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited with an error (code " << WEXITSTATUS(status) << ")" << std::endl;
 			update_console(ss.str(), "error");
 			success = 0;
@@ -1456,15 +1455,15 @@ void App2Assistant::xmimsim_child_watcher(GPid pid, int status) {
 		}
 	}
 	else if (WIFSIGNALED(status)) { /* child was terminated due to a signal */
-		stringstream ss;
+		std::stringstream ss;
 		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " was terminated by signal " << WTERMSIG(status) << std::endl;
 		update_console(ss.str(), "error");
 		xmimsim_pid = 0;
 		success = 0;
 	}
 	else {
-		stringstream ss;
-		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " was terminated in some special way" << endl;
+		std::stringstream ss;
+		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " was terminated in some special way" << std::endl;
 		update_console(ss.str(), "error");
 		xmimsim_pid = 0;
 		success = 0;
@@ -1472,13 +1471,13 @@ void App2Assistant::xmimsim_child_watcher(GPid pid, int status) {
 
 #elif defined(G_OS_WIN32)
 	if (status == 0) {
-		stringstream ss;
-		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited normally without errors" << endl;
+		std::stringstream ss;
+		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited normally without errors" << std::endl;
 		update_console(ss.str(), "success");
 		success = 1;
 	}
 	else {
-		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited with an error (code " << status << ")" << endl;
+		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited with an error (code " << status << ")" << std::endl;
 		update_console(ss.str(), "error");
 		success = 0;
 		xmimsim_pid = 0;
@@ -1624,14 +1623,14 @@ bool App2Assistant::xmimsim_iochannel_watcher(Glib::IOCondition condition, Glib:
 			if (pipe_status == Glib::IO_STATUS_NORMAL) {
 				if (sscanf(pipe_string.c_str(), "Simulating interactions at %i",&progress) == 1) {
 					Gtk::TreeModel::Row row = *fifth_page_iter;
-					stringstream ss;
+					std::stringstream ss;
 					ss << progress << " %";
 					row[fifth_page_columns.col_status] = ss.str();
 					row[fifth_page_columns.col_progress] = progress;
 					
 				}
 				else {
-					stringstream ss;
+					std::stringstream ss;
 					ss << get_elapsed_time() << pipe_string;
 					update_console(ss.str());
 					std::cout << pipe_string;
@@ -1641,15 +1640,15 @@ bool App2Assistant::xmimsim_iochannel_watcher(Glib::IOCondition condition, Glib:
 				return false;
 		}
 		catch (Glib::IOChannelError &e) {
-			stringstream ss;
-			ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " had an I/O channel error: " << e.what() << endl;
+			std::stringstream ss;
+			ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " had an I/O channel error: " << e.what() << std::endl;
 			update_console(ss.str(), "error");
 			xmimsim_pid = 0;
 			return false;
 		}
 		catch (Glib::ConvertError &e) {
-			stringstream ss;
-			ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " had a convert error: " << e.what() << endl;
+			std::stringstream ss;
+			ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " had a convert error: " << e.what() << std::endl;
 			update_console(ss.str(), "error");
 			xmimsim_pid = 0;
 			return false;
@@ -1663,7 +1662,7 @@ bool App2Assistant::xmimsim_iochannel_watcher(Glib::IOCondition condition, Glib:
 	return true;
 }
 
-void App2Assistant::update_console(string line, string tag) {
+void App2Assistant::update_console(std::string line, std::string tag) {
 	/*
 	Glib::RefPtr<Gtk::TextBuffer::Mark> cur_mark = console_buffer->create_mark(console_buffer->end());
 	if (tag == "") {
@@ -1688,11 +1687,11 @@ void App2Assistant::on_sixth_page_open_clicked() {
 	dialog.add_button("Select", Gtk::RESPONSE_OK);
 	
 	int result = dialog.run();
-	string filename;
+	std::string filename;
 	switch(result) {
 		case(Gtk::RESPONSE_OK):
 			filename = dialog.get_filename();
-			if (filename.compare(filename.length()-4, string::npos, ".rxi") != 0)
+			if (filename.compare(filename.length()-4, std::string::npos, ".rxi") != 0)
 				filename += ".rxi";
 			std::cout << "Open clicked: " << filename << std::endl;
       			break;
@@ -1747,7 +1746,7 @@ int App2Assistant::phi_lqfit_f(const gsl_vector *x, void *data, gsl_vector *f) {
 	double b = gsl_vector_get(x, 1);
 	double c = gsl_vector_get(x, 2);
 
-	for (int i = 0 ; i < pld->x.size() ; i++) {
+	for (unsigned int i = 0 ; i < pld->x.size() ; i++) {
 		double t = pld->x[i];
 		double Yi = a * t * t + b * t + c;
 		gsl_vector_set(f, i, (Yi - pld->y[i]) / pld->sigma[i]);
@@ -1757,11 +1756,11 @@ int App2Assistant::phi_lqfit_f(const gsl_vector *x, void *data, gsl_vector *f) {
 
 int App2Assistant::phi_lqfit_df(const gsl_vector *x, void *data, gsl_matrix *J) {
 	struct phi_lqfit_data *pld = (struct phi_lqfit_data *) data;
-	double a = gsl_vector_get(x, 0);
-	double b = gsl_vector_get(x, 1);
-	double c = gsl_vector_get(x, 2);
+	//double a = gsl_vector_get(x, 0);
+	//double b = gsl_vector_get(x, 1);
+	//double c = gsl_vector_get(x, 2);
 
-	for (int i = 0 ; i < pld->x.size() ; i++) {
+	for (unsigned int i = 0 ; i < pld->x.size() ; i++) {
 		double t = pld->x[i];
 		gsl_matrix_set(J, i, 0, t * t / pld->sigma[i]);	
 		gsl_matrix_set(J, i, 1, t / pld->sigma[i]);	

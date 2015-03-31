@@ -3,6 +3,7 @@
 #include "bam_exception.h"
 #include <algorithm>
 #include <iterator>
+#include <typeinfo>
 
 int main(int argc, char **argv) {
 
@@ -27,6 +28,13 @@ int main(int argc, char **argv) {
 	
 		delete compound;
 		delete compoundNIST;
+
+		BAM::Data::Base::Composition *comp = BAM::Data::Xraylib::Parse("CuSO4");
+		std::cout << "Type *comp: " << typeid(*comp).name() << std::endl;
+		delete comp;
+		comp = BAM::Data::Xraylib::Parse("Cadmium Tungstate");
+		std::cout << "Type *comp: " << typeid(*comp).name() << std::endl;
+		delete comp;
 	}
 	catch (BAM::Exception &e) {
 		std::cerr << "BAM::Exception caught: " << e.what() << std::endl; 
