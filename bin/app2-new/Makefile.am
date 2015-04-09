@@ -10,7 +10,9 @@ app2_new_SOURCES = main.cpp \
 		   app2-energiesgrid.h \
 		   app2-energiesgrid.cpp \
 		   app2-puresgrid.h \
-		   app2-puresgrid.cpp
+		   app2-puresgrid.cpp \
+		   app2-samplesgrid.h \
+		   app2-samplesgrid.cpp
 
 
 

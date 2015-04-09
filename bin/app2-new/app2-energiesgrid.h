@@ -44,6 +44,7 @@ namespace App2 {
 		void on_open_button_clicked();
 		bool on_backspace_clicked(GdkEventKey *key);
 		friend class PuresGrid;
+		friend class SamplesGrid;
 	};
 }
 #endif

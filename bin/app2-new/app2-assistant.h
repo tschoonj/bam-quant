@@ -5,6 +5,7 @@
 #include <gtkmm/label.h>
 #include "app2-energiesgrid.h"
 #include "app2-puresgrid.h"
+#include "app2-samplesgrid.h"
 #include <vector>
 
 
@@ -15,6 +16,7 @@ namespace App2 {
 		virtual ~Assistant() {};
 		//vector of pures_grid's
 		std::vector<PuresGrid*> pures_grid_vec;
+		std::vector<SamplesGrid*> samples_grid_vec;
 
 	private:
 		//void on_assistant_cancel();
