@@ -16,10 +16,20 @@ namespace BAM {
 			void Parse();
 		public:
 			ASR(std::string, bool keep_negative_counts = false);
-			ASR(double normfactor);
+			ASR(double normfactor = 0.0);
 			~ASR();
 			int GetNPeaks() {
 				return static_cast<int> (data_asr.size());
+			}
+			ASR(const ASR &asr) : File(asr.filename), data_asr(asr.data_asr), normfactor(asr.normfactor), keep_negative_counts(asr.keep_negative_counts) {}
+			ASR& operator= (const ASR &asr) {
+				if (this == &asr)
+					return *this;
+				data_asr = asr.data_asr;
+				normfactor = asr.normfactor;
+				keep_negative_counts = asr.keep_negative_counts;
+				filename = asr.filename;
+				return *this;
 			}
 			Data::ASR GetData(int i) {
 				if (i < 0 || i >= (int) data_asr.size()) {

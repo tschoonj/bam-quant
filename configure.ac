@@ -100,6 +100,7 @@ AC_CONFIG_FILES([	Makefile
 			bin/app1/Makefile
 			bin/app2/Makefile
 			bin/app3/Makefile
+			bin/app2-new/Makefile
 			xml/Makefile
 			])
 AC_CONFIG_HEADERS([config.h])

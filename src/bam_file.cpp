@@ -1,4 +1,5 @@
 #include "bam_file.h"
+#include "bam_exception.h"
 #include <iostream>
 
 using namespace BAM::File;
@@ -13,8 +14,16 @@ File::~File() {
 
 void File::Open(){
 	if (filename != "") {
-		fs.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		fs.open(filename.c_str());
+		try {
+			fs.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+			fs.open(filename.c_str());
+		}
+		catch (std::ifstream::failure &e) {
+			throw BAM::Exception(std::string("BAM::File::File::Open -> I/O error: ")+e.what());
+		}
+		catch (...) {
+			throw BAM::Exception(std::string("BAM::File::File::Open -> unknown exception caught: this should not happen!!!"));
+		}
 	}
 }
 

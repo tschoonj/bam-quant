@@ -222,7 +222,7 @@ namespace BAM {
 				} 
 			public:
 				void EnsureMonochromaticExcitation();
-				DiscreteEnergy GetDiscreteEnergy(int index) {
+				DiscreteEnergy GetDiscreteEnergy(int index = 0) {
 					try {
 						return discrete.at(index);
 					}

@@ -22,8 +22,8 @@ namespace BAM {
 		class XMSI : public File {
 		private:
 			struct xmi_input *input;
-			XMSI() : File(""), input(0) {}
 		public:
+			XMSI() : File(""), input(0) {}
 			XMSI(std::string);
 			XMSI(struct xmi_input *, std::string filename="");
 			~XMSI();
@@ -69,6 +69,7 @@ namespace BAM {
 					xmi_copy_input(xmsi.input, &input);
 				else
 					input = 0;
+				filename = xmsi.filename;
 				return *this;
 			}
 		};
