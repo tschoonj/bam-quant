@@ -136,26 +136,66 @@ void App2::EnergiesGrid::on_open_button_clicked() {
 		}
 		Gtk::TreeModel::Row row = *iter;
 		row[columns.col_pures_grid_page_index] = counter + 2;
+
 		//if matched -> do nothing
 		//if not matched -> add a new page to assistant
 		if (match) {
 			counter++;
 			continue;
 		}
-		
-		//assistant->set_page_complete(*assistant->get_nth_page(), false);
+	
+		//PuresGrid	
 		App2::PuresGrid *pures_grid = *assistant->pures_grid_vec.insert(assistant->pures_grid_vec.begin()+counter, Gtk::manage(new App2::PuresGrid(assistant, this, Gtk::TreeRowReference(model, model->get_path(*iter)))));
-		assistant->insert_page(*pures_grid, counter + 2);
+		assistant->insert_page(*pures_grid, row[columns.col_pures_grid_page_index]);
 		assistant->set_page_type(*pures_grid, Gtk::ASSISTANT_PAGE_CONTENT);
 		assistant->set_page_complete(*pures_grid, false);
-		std::ostringstream oss;
-		oss << "Pure elements at " 
-	    	<< pures_grid->GetEnergy()
-	    	<< "keV";
-		assistant->set_page_title(*pures_grid, oss.str());
-
+		{
+			std::ostringstream oss;
+			oss << "Pure elements at " 
+	    		<< row[columns.col_bam_file_xmsi_energy] 
+	    		<< "keV";
+			assistant->set_page_title(*pures_grid, oss.str());
+		}
 		counter++;
 	}
+
+
+	//create SamplesGrid
+	//loop over all rows
+	counter = 0;
+	for (Gtk::TreeModel::Children::iterator iter = model->children().begin() ; iter != model->children().end() ; ++iter) {
+		//comparison with assistant's samples_grid_vec will happen by comparing paths
+		bool match = false;
+		for (std::vector<App2::SamplesGrid*>::iterator iter_vec = assistant->samples_grid_vec.begin() ; iter_vec != assistant->samples_grid_vec.end() ; ++iter_vec) {
+			if ((*iter_vec)->GetEnergiesGridPath() == model->get_path(*iter)) {
+				match = true;
+				break;
+			}
+		}
+		Gtk::TreeModel::Row row = *iter;
+		row[columns.col_samples_grid_page_index] = model->children().size() + counter + 2;
+
+		//if matched -> do nothing
+		//if not matched -> add a new page to assistant
+		if (match) {
+			counter++;
+			continue;
+		}
+		//SamplesGrid	
+		App2::SamplesGrid *samples_grid = *assistant->samples_grid_vec.insert(assistant->samples_grid_vec.begin()+counter, Gtk::manage(new App2::SamplesGrid(assistant, this, Gtk::TreeRowReference(model, model->get_path(*iter)))));
+		assistant->insert_page(*samples_grid, row[columns.col_samples_grid_page_index]);
+		assistant->set_page_type(*samples_grid, Gtk::ASSISTANT_PAGE_CONTENT);
+		assistant->set_page_complete(*samples_grid, false);
+		{
+			std::ostringstream oss;
+			oss << "Samples at " 
+	    		<< row[columns.col_bam_file_xmsi_energy] 
+	    		<< "keV";
+			assistant->set_page_title(*samples_grid, oss.str());
+		}
+		counter++;
+	}
+
 	assistant->show_all_children();
 
 
@@ -165,6 +205,7 @@ void App2::EnergiesGrid::on_open_button_clicked() {
 	else
 		assistant->set_page_complete(*this, false);
 
+	assistant->update_buttons_state();
 }
 
 bool App2::EnergiesGrid::on_backspace_clicked(GdkEventKey *event) {
@@ -174,15 +215,20 @@ bool App2::EnergiesGrid::on_backspace_clicked(GdkEventKey *event) {
 		std::vector<Gtk::TreeModel::Path> paths = selection->get_selected_rows();
 		for (std::vector<Gtk::TreeModel::Path>::reverse_iterator rit = paths.rbegin() ; rit != paths.rend() ; ++rit) {
 			Gtk::TreeModel::Row row = *(model->get_iter(*rit));
+			//remove samples_grid page
+			assistant->remove_page(row[columns.col_samples_grid_page_index]);
+			assistant->samples_grid_vec.erase(assistant->samples_grid_vec.begin()+row[columns.col_pures_grid_page_index]-2);
+			//remove pures_grid page
 			assistant->remove_page(row[columns.col_pures_grid_page_index]);
 			assistant->pures_grid_vec.erase(assistant->pures_grid_vec.begin()+row[columns.col_pures_grid_page_index]-2);
 			model->erase(row);
 		}
-		//update col_pures_grid_page_index for all
+		//update col_pures_grid_page_index and col_samples_grid_page_index for all
 		unsigned int counter = 0;
 		for (Gtk::TreeModel::Children::iterator iter = model->children().begin() ; iter != model->children().end() ; ++iter) {
 			Gtk::TreeModel::Row row = *iter;
 			row[columns.col_pures_grid_page_index] = counter + 2;
+			row[columns.col_samples_grid_page_index] = model->children().size() + counter + 2;
 		}
 		if (model->children().size() >= 1) {
 			assistant->set_page_complete(*this, true);
@@ -192,6 +238,7 @@ bool App2::EnergiesGrid::on_backspace_clicked(GdkEventKey *event) {
 		}
 		
 		assistant->show_all_children();
+		assistant->update_buttons_state();
 		
                	return true;
         }

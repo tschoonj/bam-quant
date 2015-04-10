@@ -32,12 +32,14 @@ namespace App2 {
 				add(col_bam_file_xmsi);
 				add(col_bam_file_xmsi_energy);
 				add(col_pures_grid_page_index);
+				add(col_samples_grid_page_index);
 			}
 			Gtk::TreeModelColumn<std::string> col_filename_base;
 			Gtk::TreeModelColumn<std::string> col_filename_full;
 			Gtk::TreeModelColumn<BAM::File::XMSI> col_bam_file_xmsi;
 			Gtk::TreeModelColumn<double> col_bam_file_xmsi_energy;
-			Gtk::TreeModelColumn<int> col_pures_grid_page_index;
+			Gtk::TreeModelColumn<unsigned int> col_pures_grid_page_index;
+			Gtk::TreeModelColumn<unsigned int> col_samples_grid_page_index;
 		};
 		Columns columns;	
 		Gtk::Button open_button;
