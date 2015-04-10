@@ -12,7 +12,9 @@ app2_new_SOURCES = main.cpp \
 		   app2-puresgrid.h \
 		   app2-puresgrid.cpp \
 		   app2-samplesgrid.h \
-		   app2-samplesgrid.cpp
+		   app2-samplesgrid.cpp \
+		   app2-samplessummarygrid.h \
+		   app2-samplessummarygrid.cpp
 
 
 

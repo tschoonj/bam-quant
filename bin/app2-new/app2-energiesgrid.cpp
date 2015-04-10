@@ -14,7 +14,6 @@ App2::EnergiesGrid::EnergiesGrid(App2::Assistant *assistant) :
 	set_row_spacing(5);
 	set_row_homogeneous(false);
 	set_column_homogeneous(false);
-	//label->set_vexpand();
 	label->set_hexpand();
 	label->set_margin_bottom(10);
 	label->set_margin_top(10);
