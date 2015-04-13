@@ -18,7 +18,7 @@ namespace App2 {
 	public:
 		SamplesSummaryGrid(Assistant *assistant);
 		virtual ~SamplesSummaryGrid() {}
-		void PrepareSummary(); //this will be a big one...	
+		void prepare();
 	private:
 		Assistant *assistant;
 		Glib::RefPtr<Gtk::ListStore> model;
@@ -46,6 +46,7 @@ namespace App2 {
 		Gtk::Button fix_thickness_density_button;
 		Gtk::Button matrix_button;
 		Gtk::TreeViewColumn *matrix_column;
+
 		void on_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
 		bool on_backspace_clicked(GdkEventKey *key);
 		void on_edited(const Glib::ustring & path, const Glib::ustring &new_text, bool is_it_density);

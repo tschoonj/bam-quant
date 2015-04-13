@@ -204,6 +204,9 @@ void App2::EnergiesGrid::on_open_button_clicked() {
 	else
 		assistant->set_page_complete(*this, false);
 
+	//In case the samples_summary_grid was complete, undo this
+	assistant->set_page_complete(assistant->samples_summary_grid, false);
+
 	assistant->update_buttons_state();
 }
 
@@ -236,6 +239,9 @@ bool App2::EnergiesGrid::on_backspace_clicked(GdkEventKey *event) {
 			assistant->set_page_complete(*this, false);
 		}
 		
+		//In case the samples_summary_grid was complete, undo this
+		assistant->set_page_complete(assistant->samples_summary_grid, false);
+
 		assistant->show_all_children();
 		assistant->update_buttons_state();
 		

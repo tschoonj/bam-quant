@@ -1352,7 +1352,7 @@ void App2Assistant::on_third_page_open_matrix_clicked() {
 
 	//get uniques and sort
 	std::sort(elements_all.begin(), elements_all.end() );
-	elements_all.erase(unique(elements_all.begin(), elements_all.end()), elements_all.end());
+	elements_all.erase(std::unique(elements_all.begin(), elements_all.end()), elements_all.end());
 
 	App2MatrixDialog matrix_dialog("Set the matrix", *this, true, elements_all);
 	int result = matrix_dialog.run();

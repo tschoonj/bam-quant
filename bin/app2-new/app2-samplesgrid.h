@@ -15,6 +15,7 @@ namespace App2 {
 	//forward class declaration
 	class Assistant;
 	class EnergiesGrid;
+	class SamplesSummaryGrid;
 
 	class SamplesGrid: public Gtk::Grid {
 	public:
@@ -56,8 +57,13 @@ namespace App2 {
 		Gtk::Button open_button;
 		void on_open_button_clicked();
 		bool on_backspace_clicked(GdkEventKey *key);
+		void on_row_deleted_or_inserted();
+
+		sigc::connection signal_row_deleted_handler;
+		sigc::connection signal_row_inserted_handler;
 
 		Glib::RefPtr<Gtk::TreeModel> model_ref_energy;
+		friend SamplesSummaryGrid;
 	};
 }
 #endif
