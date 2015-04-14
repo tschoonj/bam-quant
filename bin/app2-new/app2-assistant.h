@@ -7,6 +7,7 @@
 #include "app2-puresgrid.h"
 #include "app2-samplesgrid.h"
 #include "app2-samplessummarygrid.h"
+#include "app2-simulategrid.h"
 #include <vector>
 
 
@@ -27,6 +28,9 @@ namespace App2 {
 
 		//sample summary page -> will get filled up by prepare event
 		SamplesSummaryGrid samples_summary_grid;
+
+		//simulate page: perform the Monte Carlo simulations necessary to approximate RXI's, if necessary
+		SimulateGrid simulate_grid;
 
 		//last page: confirmation
 		Gtk::Label confirm_page;

@@ -15,6 +15,7 @@ namespace App2 {
 	//forward class declaration
 	class Assistant;
 	class EnergiesGrid;
+	class SimulateGrid;
 
 	class PuresGrid: public Gtk::Grid {
 	public:
@@ -57,7 +58,7 @@ namespace App2 {
 		bool on_backspace_clicked(GdkEventKey *key);
 
 		Glib::RefPtr<Gtk::TreeModel> model_ref_energy;
-		//friend class EnergiesGrid;
+		friend class SimulateGrid;
 	};
 }
 #endif

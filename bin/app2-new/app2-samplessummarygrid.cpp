@@ -4,6 +4,7 @@
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/switch.h>
 #include <iostream>
+#include <algorithm>
 
 App2::SamplesSummaryGrid::SamplesSummaryGrid(App2::Assistant *assistant_arg) : 
 	assistant(assistant_arg),
