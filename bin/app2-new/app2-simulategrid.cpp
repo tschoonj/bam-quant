@@ -7,9 +7,37 @@
 #include <glibmm/miscutils.h>
 #include <glib.h>
 #include <glibmm/spawn.h>
+#include <glibmm/convert.h>
+#include <gtkmm/messagedialog.h>
+#include <gtkmm/cellrenderertoggle.h>
+#include <gtkmm/cellrendererprogress.h>
 
 
-App2::SimulateGrid::SimulateGrid(App2::Assistant *assistant_arg) : assistant(assistant_arg), buttons(Gtk::ORIENTATION_VERTICAL), columns(0), diff_elements(0), union_elements(0) {
+#ifdef G_OS_UNIX
+  #include <sys/types.h>
+  #include <sys/wait.h>
+  #include <signal.h>
+  #define real_xmimsim_pid ((int) xmimsim_pid)
+#elif defined(G_OS_WIN32)
+  #include <windows.h>
+  #define real_xmimsim_pid ((int) GetProcessId((HANDLE) xmimsim_pid))
+  typedef LONG (NTAPI *pNtSuspendProcess )(IN HANDLE ProcessHandle );
+  typedef LONG (NTAPI *pNtResumeProcess )(IN HANDLE ProcessHandle );
+  static pNtSuspendProcess NtSuspendProcess = NULL;
+  static pNtResumeProcess NtResumeProcess = NULL;
+#endif
+
+
+
+App2::SimulateGrid::SimulateGrid(App2::Assistant *assistant_arg) : 
+	assistant(assistant_arg),
+	buttons(Gtk::ORIENTATION_VERTICAL),
+	columns(0),
+	diff_elements(0),
+	union_elements(0),
+	xmimsim_paused(false),
+	xmimsim_pid(0),
+	timer(0) {
 	
 	pause_button.set_image_from_icon_name("media-playback-pause", Gtk::ICON_SIZE_DIALOG);	
 	stop_button.set_image_from_icon_name("media-playback-stop", Gtk::ICON_SIZE_DIALOG);	
@@ -43,7 +71,7 @@ App2::SimulateGrid::SimulateGrid(App2::Assistant *assistant_arg) : assistant(ass
 
 	tv.signal_query_tooltip().connect(sigc::mem_fun(*this, &App2::SimulateGrid::on_query_tooltip));
 	//pause_button.signal_clicked().connect(sigc::mem_fun(*this, &App2::SimulateGrid::on_pause_clicked));
-	//play_button.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_play_clicked));
+	play_button.signal_clicked().connect(sigc::mem_fun(*this, &App2::SimulateGrid::on_play_clicked));
 	//stop_button.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_stop_clicked));
 
 	show_all_children();
@@ -62,8 +90,10 @@ void App2::SimulateGrid::prepare() {
 	tv.set_model(model);
 	tv.append_column("Element", columns->col_element);
 	tv.get_column(0)->set_alignment(0.5);
+	tv.get_column_cell_renderer(0)->set_alignment(0.5, 0.5);
 
 	for (unsigned int i = 0 ; i < n_energies ; i++) {
+		//add first cellrenderer
 		Gtk::CellRendererToggle* cell = Gtk::manage(new Gtk::CellRendererToggle);
 		std::stringstream ss;
 		ss << assistant->pures_grid_vec[i]->GetEnergy();
@@ -75,6 +105,12 @@ void App2::SimulateGrid::prepare() {
 		temp_column->add_attribute(cell->property_active(), columns->col_simulate_active[i]);
 		temp_column->add_attribute(cell->property_sensitive(), columns->col_simulate_sensitive[i]);
 		cell->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::on_simulate_active_toggled), i));
+		//add second cellrenderer
+		Gtk::CellRendererProgress *cell2 = Gtk::manage(new Gtk::CellRendererProgress);
+		cell2->set_visible(false);
+		temp_column->pack_end(*cell2);
+		temp_column->add_attribute(cell2->property_value(), columns->col_progress[i]);
+		temp_column->add_attribute(cell2->property_text(), columns->col_status[i]);
 	} 
 
 	//next: throw the data into the model
@@ -187,7 +223,7 @@ void App2::SimulateGrid::prepare() {
 		
 			//create xmsi files
 			row[columns->col_xmsi_filename[i]] = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<std::ostringstream*>( &(std::ostringstream() << getpid()))->str() + row[columns->col_element] + ".xmsi");
-			row[columns->col_xmso_file[i]] = 0;
+			//row[columns->col_xmso_file[i]] = 0;
 			row[columns->col_xmso_counts_KA[i]] = 0.0;
 			row[columns->col_xmso_counts_LA[i]] = 0.0;
 			std::string temp_xmsi_filename(row[columns->col_xmsi_filename[i]]);
@@ -260,4 +296,430 @@ bool App2::SimulateGrid::on_query_tooltip(int x, int y, bool keyboard_tooltip, c
 		}
 	}
 	return false;
+}
+
+void App2::SimulateGrid::on_play_clicked() {
+
+	if (xmimsim_paused) {
+		/* Simulations have been paused! */
+		int kill_rv;
+
+		play_button.set_sensitive(false);	
+
+		//glibmm doesn't have the continue method so let's use glib for this
+		g_timer_continue(timer->gobj());
+#ifdef G_OS_UNIX
+		kill_rv = kill((pid_t) xmimsim_pid, SIGCONT);
+#elif defined(G_OS_WIN32)
+		kill_rv = (int) NtResumeProcess((HANDLE) xmimsim_pid);
+#else
+		#error "Neither G_OS_UNIX nor G_OS_WIN32 is defined!"
+#endif
+
+		if (kill_rv == 0) {
+			std::stringstream ss;
+			ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " was successfully resumed" << std::endl;
+			update_console(ss.str(), "pause-continue-stopped");
+			xmimsim_paused = false;
+			pause_button.set_sensitive(true);
+		}
+		else {
+			//if this happens, we're in serious trouble!
+			std::stringstream ss;
+			ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " could not be resumed" << std::endl;
+			update_console(ss.str(), "pause-continue-stopped");
+			play_button.set_sensitive(true);
+			xmimsim_pid = 0;
+		}
+		return;
+	}
+
+	//normal case -> check if input is valid
+	unsigned int n_energies = assistant->pures_grid_vec.size();
+	
+	std::stringstream ss;
+
+	for (unsigned int i = 0 ; i < n_energies ; i++) {
+		int n_to_be_interpolated = 0;
+		int n_used_for_interpolation = 0;
+		for (Gtk::TreeModel::Children::iterator iter = model->children().begin() ;
+		     iter != model->children().end() ;
+		     ++iter) {
+			//count how many elements need to be interpolated
+			//count how many elements will be used for the interpolation
+			Gtk::TreeModel::Row row = *iter;
+			if (!row[columns->col_simulate_active[i]])
+				continue;
+			if (row[columns->col_simulate_sensitive[i]])
+				n_used_for_interpolation++;
+			else
+				n_to_be_interpolated++;
+		}
+		if (n_to_be_interpolated > 0 && n_used_for_interpolation < 2) 
+			ss << tv.get_column(i+1)->get_title() << std::endl;
+	}
+	if (ss.str().length() > 0) {
+		Gtk::MessageDialog dialog(*assistant, "At least two elements have to be selected for the interpolation to work in columns", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+  		dialog.set_secondary_text(ss.str());
+  		dialog.run();
+		return;
+	}
+
+	//start the preparations
+	xmimsim_paused = false;
+	play_button.set_sensitive(false);
+
+	//switch to the second cellrenderer
+	for (unsigned int i = 0 ; i < n_energies ; i++) {
+		std::vector<Gtk::CellRenderer *> cells = tv.get_column(i+1)->get_cells();
+		cells[0]->set_visible(false);
+		cells[1]->set_visible(true);
+
+		Gtk::TreeModel::Children kids = model->children();
+		for (Gtk::TreeModel::Children::iterator iter = kids.begin() ; iter != kids.end() ; ++iter) {
+			Gtk::TreeModel::Row row = *iter;
+			if (row[columns->col_simulate_active[i]])
+				row[columns->col_status[i]] = Glib::ustring("Waiting");
+			else
+				row[columns->col_status[i]] = Glib::ustring("Ignored");
+		}
+	}
+	
+	tv.queue_draw();
+
+	//let's start the clock!
+	timer = new Glib::Timer();
+
+	//create argv vector
+	//at some point these could be read from preferences or so...
+	argv.push_back("xmimsim");
+	argv.push_back("--enable-M-lines");
+	argv.push_back("--enable-radiative-cascade");
+	argv.push_back("--enable-auger-cascade");
+	argv.push_back("--enable-variance-reduction");
+	argv.push_back("--disable-pile-up");
+	argv.push_back("--disable-poisson");
+	argv.push_back("--enable-escape-peaks");
+	argv.push_back("--disable-advanced-compton");
+	argv.push_back("--enable-opencl");
+	argv.push_back("--verbose");
+	//on windows; dont forget to set the solid angles and escape ratios hdf5 files
+
+
+
+	try {
+		unsigned int row = 0;
+		unsigned int column = 1;
+		xmimsim_start_recursive(row, column);
+	}
+	catch (BAM::Exception &e) {
+		Gtk::MessageDialog dialog(*assistant, "Error occurred in XMI-MSIM dialog", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+		Glib::ustring error_message = Glib::ustring(e.what());
+		std::cout << e.what() << std::endl;
+  		dialog.set_secondary_text(error_message);
+  		dialog.run();
+	}
+
+
+}
+
+void App2::SimulateGrid::update_console(std::string line, std::string tag) {
+	//this function doesnt do anything for the moment, but this may change in the future
+	//if I would decide to add a log window
+
+	/*
+	Glib::RefPtr<Gtk::TextBuffer::Mark> cur_mark = console_buffer->create_mark(console_buffer->end());
+	if (tag == "") {
+		console_buffer->insert(console_buffer->end(), line);
+	}
+	else {
+		console_buffer->insert_with_tag(console_buffer->end(), line, tag);
+	}
+	console_buffer->move_mark(cur_mark, console_buffer->end());
+	console_view.scroll_to(cur_mark, 0.0);*/
+}
+
+void App2::SimulateGrid::xmimsim_start_recursive(unsigned int &current_row, unsigned int &current_column) {
+	int out_fh, err_fh;
+
+	std::cout << "Entering App2::SimulateGrid::xmimsim_start_recursive" << std::endl;
+	std::cout << "current_row: " << current_row << std::endl;
+	std::cout << "current_column: " << current_column << std::endl;
+
+	//let's start work with a nap!
+	g_usleep(G_USEC_PER_SEC/2);
+
+
+	Gtk::TreeModel::Row row = model->children()[current_row];
+
+	if (row[columns->col_simulate_active[current_column]] == false) {
+		//skip this one
+		current_row++;
+		if (current_row == model->children().size()) {
+			current_column++;
+			current_row = 0;
+		}
+		if (current_column > tv.get_n_columns()-1) {
+			//this was the last one
+			play_button.set_sensitive(false);
+			stop_button.set_sensitive(false);
+			pause_button.set_sensitive(false);
+			assistant->set_page_complete(*this, true);
+			xmimsim_pid = 0;
+			return;
+		}
+		else {
+			//and the beat goes on...
+			xmimsim_start_recursive(current_row, current_column);
+			return;
+		}
+	}
+
+	//write inputfile
+	BAM::File::XMSI temp_xmsi_file = row[columns->col_xmsi_file[current_column]];
+	temp_xmsi_file.Write();
+	
+
+	//std::cout << "Processing " << temp_xmsi_file->GetFilename() << std::endl;
+	//std::cout << "Outputfile will be " << temp_xmsi_file->GetOutputFile() << std::endl;
+	argv.push_back(temp_xmsi_file.GetFilename());
+
+
+	//spawn process
+	try {
+		Glib::spawn_async_with_pipes(std::string(""), argv, Glib::SPAWN_SEARCH_PATH | Glib::SPAWN_DO_NOT_REAP_CHILD, sigc::slot<void>(), &xmimsim_pid, 0, &out_fh, &err_fh);	
+	}
+	catch (Glib::SpawnError &e) {
+		throw BAM::Exception(std::string("App2::SimulateGrid::xmimsim_start_recursive -> ") + e.what());
+	}
+
+	//update treemodel
+	row[columns->col_status[current_column]] = Glib::ustring("0 %");
+	
+
+	std::stringstream ss;
+	ss << get_elapsed_time() << argv.back() << " was started with process id " << real_xmimsim_pid << std::endl;
+	update_console(ss.str());
+
+	xmimsim_paused = false;
+	pause_button.set_sensitive(true);
+	stop_button.set_sensitive(true);
+		
+	xmimsim_stderr = Glib::IOChannel::create_from_fd(err_fh);
+	xmimsim_stdout = Glib::IOChannel::create_from_fd(out_fh);
+
+	xmimsim_stderr->set_close_on_unref(true);
+	xmimsim_stdout->set_close_on_unref(true);
+
+	//add watchers
+	Glib::signal_child_watch().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_child_watcher), sigc::ref(current_row), sigc::ref(current_column)), xmimsim_pid);
+	Glib::signal_io().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stdout_watcher), sigc::ref(current_row), sigc::ref(current_column)), xmimsim_stdout, Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
+	Glib::signal_io().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stderr_watcher), sigc::ref(current_row), sigc::ref(current_column)), xmimsim_stderr, Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
+	//Glib::signal_io().connect(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stderr_watcher), xmimsim_stderr,Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
+
+	//remove xmsi file from argv
+	argv.pop_back();
+}
+
+void App2::SimulateGrid::xmimsim_child_watcher(GPid pid, int status, unsigned int &current_row, unsigned int &current_column) {
+	std::cout << "Entering App2::SimulateGrid::xmimsim_child_watcher" << std::endl;
+	std::cout << "current_row: " << current_row << std::endl;
+	std::cout << "current_column: " << current_column << std::endl;
+
+	int success;
+	//end of process
+	stop_button.set_sensitive(false);
+	pause_button.set_sensitive(false);
+
+	//windows <-> unix issues here
+	//unix allows to obtain more info about the way the process was terminated, windows will just have the exit code (status)
+	//conditional compilation here
+#ifdef G_OS_UNIX
+	if (WIFEXITED(status)) {
+		if (WEXITSTATUS(status) == 0) { /* child was terminated due to a call to exit */
+			std::stringstream ss;
+			ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited normally without errors" << std::endl;
+			update_console(ss.str(), "success");
+			success = 1;
+		}
+		else {
+			std::stringstream ss;
+			ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited with an error (code " << WEXITSTATUS(status) << ")" << std::endl;
+			update_console(ss.str(), "error");
+			success = 0;
+			xmimsim_pid = 0;
+		}
+	}
+	else if (WIFSIGNALED(status)) { /* child was terminated due to a signal */
+		std::stringstream ss;
+		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " was terminated by signal " << WTERMSIG(status) << std::endl;
+		update_console(ss.str(), "error");
+		xmimsim_pid = 0;
+		success = 0;
+	}
+	else {
+		std::stringstream ss;
+		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " was terminated in some special way" << std::endl;
+		update_console(ss.str(), "error");
+		xmimsim_pid = 0;
+		success = 0;
+	}
+
+#elif defined(G_OS_WIN32)
+	if (status == 0) {
+		std::stringstream ss;
+		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited normally without errors" << std::endl;
+		update_console(ss.str(), "success");
+		success = 1;
+	}
+	else {
+		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited with an error (code " << status << ")" << std::endl;
+		update_console(ss.str(), "error");
+		success = 0;
+		xmimsim_pid = 0;
+	}
+#endif
+
+	Glib::spawn_close_pid(xmimsim_pid);
+	
+	if (success == 0) {
+		//something went badly wrong
+		Gtk::TreeModel::Row row = model->children()[current_row];
+		row[columns->col_status[current_column]] = Glib::ustring("FAILED");
+		play_button.set_sensitive(false);
+		stop_button.set_sensitive(false);
+		pause_button.set_sensitive(false);
+		return;
+	}
+
+	Gtk::TreeModel::Row row = model->children()[current_row];
+	BAM::File::XMSO *xmso_file;
+	std::string xmso_filename = row[columns->col_xmso_filename[current_column]];
+	
+	try {
+		xmso_file = new BAM::File::XMSO(xmso_filename);
+	}
+	catch (BAM::Exception &e) {
+		throw BAM::Exception("App2::SimulateGrid::xmimsim_start_recursive -> Could not read XMSO file");
+	}
+	row[columns->col_xmso_file[current_column]] = *xmso_file;
+	int Z = row[columns->col_atomic_number];
+	double col_xmso_counts_KA = 0;
+	double col_xmso_counts_LA = 0;
+
+	if (Z == 0)
+		throw BAM::Exception("App2::SimulateGrid::xmimsim_start_recursive -> Invalid col_element");
+			
+	try {
+		col_xmso_counts_KA += xmso_file->GetCountsForElementForLine(Z, "KL2");
+	}
+	catch (BAM::Exception &e) {}
+	try {
+		col_xmso_counts_KA += xmso_file->GetCountsForElementForLine(Z, "KL3");
+	}
+	catch (BAM::Exception &e) {}
+	try {
+		col_xmso_counts_LA += xmso_file->GetCountsForElementForLine(Z, "L3M4");
+	}
+	catch (BAM::Exception &e) {}
+	try {
+		col_xmso_counts_LA += xmso_file->GetCountsForElementForLine(Z, "L3M5");
+	}
+	catch (BAM::Exception &e) {}
+
+	//both values should not be zero
+	if (col_xmso_counts_KA == 0.0 && col_xmso_counts_LA == 0.0)
+		throw BAM::Exception("App2::SimulateGrid::xmimsim_start_recursive -> Ka and La counts cannot both be 0");
+
+	row[columns->col_xmso_counts_KA[current_column]] = col_xmso_counts_KA;
+	row[columns->col_xmso_counts_LA[current_column]] = col_xmso_counts_LA;
+
+	delete xmso_file;
+	
+	row[columns->col_status[current_column]] = Glib::ustring("Completed");
+
+	//delete temparary XMI-MSIM files
+	//g_unlink(buttonVector[buttonIndex-1]->xmsi_file->GetOutputFile().c_str());
+	//g_unlink(buttonVector[buttonIndex-1]->xmsi_file->GetFilename().c_str());
+
+	//update current_row and current_column
+	current_row++;
+	if (current_row == model->children().size()) {
+		current_column++;
+		current_row = 0;
+	}
+	if (current_column > tv.get_n_columns()-1) {
+		//this was the last one
+		play_button.set_sensitive(false);
+		stop_button.set_sensitive(false);
+		pause_button.set_sensitive(false);
+		assistant->set_page_complete(*this, true);
+		xmimsim_pid = 0;
+	}
+	else {
+		//and the beat goes on...
+		xmimsim_start_recursive(current_row, current_column);
+	}
+}
+
+bool App2::SimulateGrid::xmimsim_stdout_watcher(Glib::IOCondition cond, unsigned int &current_row, unsigned int &current_column) {
+	return xmimsim_iochannel_watcher(cond, xmimsim_stdout, current_row, current_column);
+}
+
+bool App2::SimulateGrid::xmimsim_stderr_watcher(Glib::IOCondition cond, unsigned int &current_row, unsigned int &current_column) {
+	return xmimsim_iochannel_watcher(cond, xmimsim_stderr, current_row, current_column);
+}
+
+bool App2::SimulateGrid::xmimsim_iochannel_watcher(Glib::IOCondition condition, Glib::RefPtr<Glib::IOChannel> iochannel, unsigned int &current_row, unsigned int &current_column) {
+	std::cout << "Entering App2::SimulateGrid::xmimsim_iochannel_watcher" << std::endl;
+	std::cout << "current_row: " << current_row << std::endl;
+	std::cout << "current_column: " << current_column << std::endl;
+
+	Glib::IOStatus pipe_status;
+	Glib::ustring pipe_string;
+	int progress;
+
+	if (condition & (Glib::IO_IN | Glib::IO_PRI)) {
+		try {
+			pipe_status = iochannel->read_line(pipe_string);	
+			if (pipe_status == Glib::IO_STATUS_NORMAL) {
+				if (sscanf(pipe_string.c_str(), "Simulating interactions at %i",&progress) == 1) {
+					Gtk::TreeModel::Row row = model->children()[current_row];
+					std::stringstream ss;
+					ss << progress << " %";
+					row[columns->col_status[current_column]] = ss.str();
+					row[columns->col_progress[current_column]] = progress;
+					
+				}
+				else {
+					std::stringstream ss;
+					ss << get_elapsed_time() << pipe_string;
+					update_console(ss.str());
+					std::cout << pipe_string;
+				}
+			}
+			else
+				return false;
+		}
+		catch (Glib::IOChannelError &e) {
+			std::stringstream ss;
+			ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " had an I/O channel error: " << e.what() << std::endl;
+			update_console(ss.str(), "error");
+			xmimsim_pid = 0;
+			return false;
+		}
+		catch (Glib::ConvertError &e) {
+			std::stringstream ss;
+			ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " had a convert error: " << e.what() << std::endl;
+			update_console(ss.str(), "error");
+			xmimsim_pid = 0;
+			return false;
+		}
+	}
+	else if (condition & (Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL)) {
+		//hung up...
+		return false;
+	}
+
+	return true;
 }

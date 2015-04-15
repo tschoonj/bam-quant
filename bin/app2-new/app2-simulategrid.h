@@ -12,6 +12,11 @@
 #include "bam_file_xmso.h"
 #include "bam_file_asr.h"
 #include <vector>
+#include <glibmm/timer.h>
+#include <glibmm/spawn.h>
+#include <glibmm/main.h>
+#include <iomanip>
+#include <iostream>
 
 namespace App2 {
 	//forward class declaration
@@ -78,7 +83,7 @@ namespace App2 {
 			std::vector<Gtk::TreeModelColumn<Glib::ustring> > col_status;
 			std::vector<Gtk::TreeModelColumn<int> > col_progress;
 			std::vector<Gtk::TreeModelColumn<BAM::File::XMSI> > col_xmsi_file;
-                	std::vector<Gtk::TreeModelColumn<BAM::File::XMSO *> > col_xmso_file;
+                	std::vector<Gtk::TreeModelColumn<BAM::File::XMSO> > col_xmso_file;
 			std::vector<Gtk::TreeModelColumn<std::string> > col_xmsi_filename;
 			std::vector<Gtk::TreeModelColumn<std::string> > col_xmso_filename;
 			std::vector<Gtk::TreeModelColumn<double> > col_xmso_counts_KA;
@@ -89,10 +94,39 @@ namespace App2 {
 			std::vector<Gtk::TreeModelColumn<Glib::ustring> > col_linetype;
 		};
 		Columns *columns;	
-
 		std::vector<int> *diff_elements;
 		std::vector<int> *union_elements;
 		std::vector<int> elements_int;
+	
+		//XMI-MSIM related stuff
+		Glib::RefPtr<Glib::IOChannel> xmimsim_stderr;
+		Glib::RefPtr<Glib::IOChannel> xmimsim_stdout;
+		bool xmimsim_paused;
+		GPid xmimsim_pid;
+		Glib::Timer *timer;
+		std::vector<std::string> argv;
+		void xmimsim_child_watcher(GPid pid, int child_status, unsigned int &current_row, unsigned int &current_column);
+		bool xmimsim_stdout_watcher(Glib::IOCondition cond, unsigned int &current_row, unsigned int &current_column);
+		bool xmimsim_stderr_watcher(Glib::IOCondition cond, unsigned int &current_row, unsigned int &current_column);
+		bool xmimsim_iochannel_watcher(Glib::IOCondition cond, Glib::RefPtr<Glib::IOChannel> iochannel, unsigned int &current_row, unsigned int &current_column);
+		void xmimsim_start_recursive(unsigned int &current_row, unsigned int &current_column);
+		std::string get_elapsed_time() {
+			if (!timer)
+				return std::string("timer error");
+
+			long time_elapsed = (long) timer->elapsed();
+			long hours = time_elapsed / 3600;
+			time_elapsed = time_elapsed % 3600;
+			long minutes = time_elapsed / 60;
+			long seconds = time_elapsed % 60;
+			std::stringstream ss;
+			ss.fill('0');
+			ss << std::setw(2) << hours << ":" << std::setw(2) << minutes << ":" << std::setw(2) << seconds << " ";
+			std::string rv = ss.str();
+			return rv; 
+		}
+		void update_console(std::string line, std::string tag="");
+
 		void on_play_clicked();
 		void on_pause_clicked();
 		void on_stop_clicked();
