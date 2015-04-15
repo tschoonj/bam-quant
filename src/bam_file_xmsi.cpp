@@ -25,7 +25,8 @@ XMSI::XMSI(struct xmi_input *new_input, std::string filename) : File::File(filen
 }
 
 XMSI::~XMSI() {
-	xmi_free_input(input);
+	if (input)
+		xmi_free_input(input);
 }
 
 void XMSI::Open() {

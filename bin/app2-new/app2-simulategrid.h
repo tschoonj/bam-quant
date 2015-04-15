@@ -24,9 +24,9 @@ namespace App2 {
 			if (columns)
 				delete columns;
 			if (diff_elements)
-				delete diff_elements;
+				delete[] diff_elements;
 			if (union_elements)
-				delete union_elements;
+				delete[] union_elements;
 		};
 		void prepare();
 
@@ -43,7 +43,19 @@ namespace App2 {
 	
 		class Columns : public Gtk::TreeModel::ColumnRecord {
 		public:
-			Columns(unsigned int n_energies) {
+			Columns(unsigned int n_energies) : 
+				col_status(n_energies),
+				col_progress(n_energies),
+				col_xmsi_file(n_energies),
+				col_xmso_file(n_energies),
+				col_xmsi_filename(n_energies),
+				col_xmso_filename(n_energies),
+				col_xmso_counts_KA(n_energies),
+				col_xmso_counts_LA(n_energies),
+				col_bam_file_asr(n_energies),
+				col_simulate_active(n_energies),
+				col_simulate_sensitive(n_energies),
+				col_linetype(n_energies) {
 				add(col_element);
 				add(col_atomic_number);
 				for (unsigned int i = 0 ; i < n_energies ; i++) {
@@ -58,13 +70,14 @@ namespace App2 {
 					add(col_bam_file_asr[i]);
 					add(col_simulate_active[i]);
 					add(col_simulate_sensitive[i]);
+					add(col_linetype[i]);
 				}
 			}
 			Gtk::TreeModelColumn<Glib::ustring> col_element;
 			Gtk::TreeModelColumn<int> col_atomic_number;
 			std::vector<Gtk::TreeModelColumn<Glib::ustring> > col_status;
 			std::vector<Gtk::TreeModelColumn<int> > col_progress;
-			std::vector<Gtk::TreeModelColumn<BAM::File::XMSI *> > col_xmsi_file;
+			std::vector<Gtk::TreeModelColumn<BAM::File::XMSI> > col_xmsi_file;
                 	std::vector<Gtk::TreeModelColumn<BAM::File::XMSO *> > col_xmso_file;
 			std::vector<Gtk::TreeModelColumn<std::string> > col_xmsi_filename;
 			std::vector<Gtk::TreeModelColumn<std::string> > col_xmso_filename;
@@ -73,6 +86,7 @@ namespace App2 {
 			std::vector<Gtk::TreeModelColumn<BAM::File::ASR> > col_bam_file_asr;
 			std::vector<Gtk::TreeModelColumn<bool> > col_simulate_active;
 			std::vector<Gtk::TreeModelColumn<bool> > col_simulate_sensitive;
+			std::vector<Gtk::TreeModelColumn<Glib::ustring> > col_linetype;
 		};
 		Columns *columns;	
 
@@ -83,6 +97,7 @@ namespace App2 {
 		void on_pause_clicked();
 		void on_stop_clicked();
 		void on_simulate_active_toggled(const Glib::ustring &path, unsigned int energy_index);
+		bool on_query_tooltip(int x, int y, bool keyboard_tooltip, const Glib::RefPtr<Gtk::Tooltip>& tooltip);
 	};
 }
 #endif

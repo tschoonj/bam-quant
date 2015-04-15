@@ -13,6 +13,7 @@ namespace App2 {
 	//forward class declaration
 	class Assistant;
 	class PuresGrid;
+	class SimulateGrid;
 
 	class EnergiesGrid: public Gtk::Grid {
 	public:
@@ -47,6 +48,7 @@ namespace App2 {
 		bool on_backspace_clicked(GdkEventKey *key);
 		friend class PuresGrid;
 		friend class SamplesGrid;
+		friend class SimulateGrid;
 	};
 }
 #endif

@@ -4,6 +4,9 @@
 #include <sstream>
 #include <algorithm>
 #include <xraylib.h>
+#include <glibmm/miscutils.h>
+#include <glib.h>
+#include <glibmm/spawn.h>
 
 
 App2::SimulateGrid::SimulateGrid(App2::Assistant *assistant_arg) : assistant(assistant_arg), buttons(Gtk::ORIENTATION_VERTICAL), columns(0), diff_elements(0), union_elements(0) {
@@ -19,6 +22,7 @@ App2::SimulateGrid::SimulateGrid(App2::Assistant *assistant_arg) : assistant(ass
 	buttons.set_vexpand(false);
 	buttons.set_hexpand(false);
 
+	tv.set_has_tooltip(true);
 	sw.add(tv);
 	sw.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 	sw.set_vexpand();
@@ -37,6 +41,7 @@ App2::SimulateGrid::SimulateGrid(App2::Assistant *assistant_arg) : assistant(ass
 	attach(buttons, 0, 1, 1, 1);
 	attach(sw, 1, 1, 1, 1);
 
+	tv.signal_query_tooltip().connect(sigc::mem_fun(*this, &App2::SimulateGrid::on_query_tooltip));
 	//pause_button.signal_clicked().connect(sigc::mem_fun(*this, &App2::SimulateGrid::on_pause_clicked));
 	//play_button.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_play_clicked));
 	//stop_button.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_stop_clicked));
@@ -56,6 +61,7 @@ void App2::SimulateGrid::prepare() {
 	model = Gtk::ListStore::create(*columns);
 	tv.set_model(model);
 	tv.append_column("Element", columns->col_element);
+	tv.get_column(0)->set_alignment(0.5);
 
 	for (unsigned int i = 0 ; i < n_energies ; i++) {
 		Gtk::CellRendererToggle* cell = Gtk::manage(new Gtk::CellRendererToggle);
@@ -65,6 +71,7 @@ void App2::SimulateGrid::prepare() {
 		int cols_count = tv.append_column(ss.str(), *cell);
 		Gtk::TreeViewColumn* temp_column = tv.get_column(cols_count-1);
 		temp_column->set_expand();
+		temp_column->set_alignment(0.5);
 		temp_column->add_attribute(cell->property_active(), columns->col_simulate_active[i]);
 		temp_column->add_attribute(cell->property_sensitive(), columns->col_simulate_sensitive[i]);
 		cell->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::on_simulate_active_toggled), i));
@@ -156,18 +163,56 @@ void App2::SimulateGrid::prepare() {
 
 			//check if element is present in union_elements[i]
 			it = std::find(union_elements[i].begin(), union_elements[i].end(), row[columns->col_atomic_number]);
-			if (it != union_elements[i].end()) {
-				row[columns->col_simulate_active[i]] = true;
 
-				//check if present in pure_elements
-				it = std::find(pure_elements.begin(), pure_elements.end(), row[columns->col_atomic_number]);
-				if (it != pure_elements.end()) {
-					Gtk::TreeModel::Row pure_row = pures_grid->model->children()[it-pure_elements.begin()];
-					row[columns->col_simulate_sensitive[i]] = true;
-					row[columns->col_bam_file_asr[i]] = BAM::File::ASR(pure_row[pures_grid->columns.col_bam_file_asr]);
-				}
+			//no point in doing anything for those elements not present in union_elements
+			if (it == union_elements[i].end())
+				continue;
+
+			row[columns->col_simulate_active[i]] = true;
+
+			if (pures_grid->GetEnergy() > EdgeEnergy(row[columns->col_atomic_number], K_SHELL))
+				row[columns->col_linetype[i]] = Glib::ustring("Kα");
+			else if (pures_grid->GetEnergy() > EdgeEnergy(row[columns->col_atomic_number], L3_SHELL))
+				row[columns->col_linetype[i]] = Glib::ustring("Lα");
+			else
+				throw BAM::Exception("Excitation energy lower than L3 edge!");
+
+			//check if present in pure_elements
+			it = std::find(pure_elements.begin(), pure_elements.end(), row[columns->col_atomic_number]);
+			if (it != pure_elements.end()) {
+				Gtk::TreeModel::Row pure_row = pures_grid->model->children()[it-pure_elements.begin()];
+				row[columns->col_simulate_sensitive[i]] = true;
+				row[columns->col_bam_file_asr[i]] = BAM::File::ASR(pure_row[pures_grid->columns.col_bam_file_asr]);
 			}
+		
+			//create xmsi files
+			row[columns->col_xmsi_filename[i]] = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<std::ostringstream*>( &(std::ostringstream() << getpid()))->str() + row[columns->col_element] + ".xmsi");
+			row[columns->col_xmso_file[i]] = 0;
+			row[columns->col_xmso_counts_KA[i]] = 0.0;
+			row[columns->col_xmso_counts_LA[i]] = 0.0;
+			std::string temp_xmsi_filename(row[columns->col_xmsi_filename[i]]);
+		
+			Gtk::TreeModel::Row energies_row = assistant->energies_grid.model->children()[i];
+			BAM::File::XMSI temp_xmsi_file = energies_row[assistant->energies_grid.columns.col_bam_file_xmsi];
 
+			//now change its composition
+			BAM::Data::XMSI::Composition composition;
+
+			BAM::Data::XMSI::Layer layer1("Air, Dry (near sea level)", 5.0);
+			composition.AddLayer(layer1);
+
+			BAM::Data::XMSI::Layer layer2(ElementDensity(row[columns->col_atomic_number]), 5.0);
+			layer2.AddElement(row[columns->col_atomic_number], 1.0);
+			composition.AddLayer(layer2);
+
+			composition.SetReferenceLayer(2);
+			temp_xmsi_file.ReplaceComposition(composition);
+			std::string temp_xmso_filename = temp_xmsi_filename;
+			temp_xmso_filename.replace(temp_xmso_filename.end()-1,temp_xmso_filename.end(), "o");
+			temp_xmsi_file.SetOutputFile(temp_xmso_filename);
+			temp_xmsi_file.SetFilename(temp_xmsi_filename);
+			row[columns->col_xmso_filename[i]] = temp_xmso_filename;
+			row[columns->col_xmsi_file[i]] = temp_xmsi_file;
 		}
 	}
 
@@ -188,3 +233,31 @@ void App2::SimulateGrid::on_simulate_active_toggled(const Glib::ustring &path, u
 	row[columns->col_simulate_active[energy_index]] = !row[columns->col_simulate_active[energy_index]];
 }
 
+bool App2::SimulateGrid::on_query_tooltip(int x, int y, bool keyboard_tooltip, const Glib::RefPtr<Gtk::Tooltip>& tooltip) {
+	int nx, ny, cellx, celly;
+	Gtk::TreeModel::Path path;
+	Gtk::TreeView::Column* column;
+	tv.convert_widget_to_bin_window_coords(x, y, nx, ny);
+	bool isRow = tv.get_path_at_pos(nx, ny, path, column, cellx, celly);
+
+	if (!isRow) // Cursor is not hovering over a row
+		return false;
+
+	tv.set_tooltip_cell(tooltip, &path, column, 0);
+	Gtk::TreeModel::Children::iterator  iter = model->get_iter(path);
+
+	//loop over all columns and see if it matches column
+	for (unsigned int i = 1 ; i < tv.get_n_columns() ; i++) {
+		if (tv.get_column(i) == column) {
+			Glib::ustring text = (*iter)[columns->col_linetype[i-1]];
+			if (text.length() > 0) {
+				tooltip->set_text(text);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+	return false;
+}
