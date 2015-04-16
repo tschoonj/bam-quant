@@ -2,11 +2,11 @@
 <!DOCTYPE bam-quant-rxi-single SYSTEM "http://www.bam.de/xml/bam-quant-rxi.dtd">
 <bam-quant-rxi-single>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.012436132</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.063684091</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.001818321</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.893697321</element_rxi>
-    <asrfile>csv_data0</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.012436132</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.063684091</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.001818321</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.893697321</element_rxi>
+    <asrfile excitation_energy="34">csv_data0</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>

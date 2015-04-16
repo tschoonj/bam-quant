@@ -18,8 +18,9 @@ namespace BAM {
 				std::string datatype;
 				double rxi;
 				double line_energy;
+				double excitation_energy;
 				public:
-				SingleElement(std::string element, std::string linetype, std::string datatype, double rxi) : element(element), linetype(linetype), datatype(datatype), rxi(rxi) {
+				SingleElement(std::string element, std::string linetype, std::string datatype, double rxi, double excitation_energy) : element(element), linetype(linetype), datatype(datatype), rxi(rxi), excitation_energy(excitation_energy) {
 					int atomic_number = SymbolToAtomicNumber((char*) element.c_str());
 					if (atomic_number == 0)
 						throw BAM::Exception("BAM::Data::RXI::SingleElement -> Unknown element");
@@ -52,12 +53,20 @@ namespace BAM {
 				double GetLineEnergy() {
 					return line_energy;
 				}
+				double GetExcitationEnergy() {
+					return excitation_energy;
+				}
+				std::string GetExcitationEnergyString() {
+					std::stringstream ss;
+					ss << excitation_energy;
+					return ss.str();
+				}
 				friend class Sample;
 			};
 			class Sample {
 				private:
 				static bool element_comp (std::string lhs, std::string rhs) {return SymbolToAtomicNumber((char *) lhs.c_str()) < SymbolToAtomicNumber((char *) rhs.c_str());}
-				std::string asrfile;
+				std::map<std::string,double> asrfiles;
 				double density;
 				double thickness;
 				bool density_thickness_fixed;
@@ -65,7 +74,8 @@ namespace BAM {
 				BAM::Data::Base::Composition *matrix_composition;
 				std::map<std::string,SingleElement,bool(*)(std::string,std::string)> single_elements;
 				public:
-				Sample(std::string asrfile, double density, double thickness, bool density_thickness_fixed, std::string matrix) : asrfile(asrfile), density(density), thickness(thickness), density_thickness_fixed(density_thickness_fixed), matrix(matrix), matrix_composition(0), single_elements(element_comp) {
+				Sample() : density(0.0), thickness(0.0), density_thickness_fixed(true), matrix("none"), matrix_composition(0), single_elements(element_comp) {}
+				Sample(std::map<std::string,double> asrfiles, double density, double thickness, bool density_thickness_fixed, std::string matrix) : asrfiles(asrfiles), density(density), thickness(thickness), density_thickness_fixed(density_thickness_fixed), matrix(matrix), matrix_composition(0), single_elements(element_comp) {
 					if (matrix != "none") {
 						matrix_composition = BAM::Data::Xraylib::Parse(matrix);
 					}
@@ -74,7 +84,7 @@ namespace BAM {
 					if (matrix_composition)
 						delete matrix_composition;
 				}
-				Sample(const Sample &sample) : asrfile(sample.asrfile), density(sample.density), thickness(sample.thickness), density_thickness_fixed(sample.density_thickness_fixed), matrix(sample.matrix), matrix_composition(0), single_elements(sample.single_elements) {
+				Sample(const Sample &sample) : asrfiles(sample.asrfiles), density(sample.density), thickness(sample.thickness), density_thickness_fixed(sample.density_thickness_fixed), matrix(sample.matrix), matrix_composition(0), single_elements(sample.single_elements) {
 					if (matrix != "none") {
 						matrix_composition = BAM::Data::Xraylib::Parse(matrix);
 					}
@@ -82,7 +92,7 @@ namespace BAM {
 				Sample& operator= (const Sample &sample) {
 					if (this == &sample)
 						return *this;
-					asrfile = sample.asrfile;
+					asrfiles = sample.asrfiles;
 					density = sample.density;
 					thickness = sample.thickness;
 					density_thickness_fixed = sample.density_thickness_fixed;
@@ -99,8 +109,8 @@ namespace BAM {
 					}
 					return *this;
 				}
-				std::string GetASRfile() {
-					return asrfile;
+				std::map<std::string,double> GetASRfiles() {
+					return asrfiles;
 				}
 				double GetDensity() {
 					return density;

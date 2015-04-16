@@ -2,875 +2,875 @@
 <!DOCTYPE bam-quant-rxi-multi SYSTEM "http://www.bam.de/xml/bam-quant-rxi.dtd">
 <bam-quant-rxi-multi>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.012436132</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.063684091</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.001818321</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.893697321</element_rxi>
-    <asrfile>csv_data0.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.012436132</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.063684091</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.001818321</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.893697321</element_rxi>
+    <asrfile excitation_energy="34">csv_data0.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.024942396</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.063720264</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.005141792</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.850915432</element_rxi>
-    <asrfile>csv_data1.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.024942396</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.063720264</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.005141792</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.850915432</element_rxi>
+    <asrfile excitation_energy="34">csv_data1.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.004145211</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.051263221</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.0042096</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.93346405</element_rxi>
-    <asrfile>csv_data2.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.004145211</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.051263221</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.0042096</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.93346405</element_rxi>
+    <asrfile excitation_energy="34">csv_data2.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.036263201</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.139967173</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.000698711</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.753579855</element_rxi>
-    <asrfile>csv_data3.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.036263201</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.139967173</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.000698711</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.753579855</element_rxi>
+    <asrfile excitation_energy="34">csv_data3.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.036937255</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.232352167</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.005638315</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.663305819</element_rxi>
-    <asrfile>csv_data4.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.036937255</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.232352167</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.005638315</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.663305819</element_rxi>
+    <asrfile excitation_energy="34">csv_data4.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.019136826</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.058990907</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.006427447</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.874789119</element_rxi>
-    <asrfile>csv_data5.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.019136826</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.058990907</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.006427447</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.874789119</element_rxi>
+    <asrfile excitation_energy="34">csv_data5.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.012141591</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.065476343</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.005884538</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.888313234</element_rxi>
-    <asrfile>csv_data6.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.012141591</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.065476343</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.005884538</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.888313234</element_rxi>
+    <asrfile excitation_energy="34">csv_data6.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.013231061</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.063276239</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.005199499</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.889094293</element_rxi>
-    <asrfile>csv_data7.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.013231061</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.063276239</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.005199499</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.889094293</element_rxi>
+    <asrfile excitation_energy="34">csv_data7.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.053668048</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.068626009</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.012638519</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.751743138</element_rxi>
-    <asrfile>csv_data8.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.053668048</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.068626009</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.012638519</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.751743138</element_rxi>
+    <asrfile excitation_energy="34">csv_data8.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.008317908</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.086166687</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.003586969</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.88918525</element_rxi>
-    <asrfile>csv_data9.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008317908</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.086166687</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.003586969</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.88918525</element_rxi>
+    <asrfile excitation_energy="34">csv_data9.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.057359871</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.033380266</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.017963141</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.76602155</element_rxi>
-    <asrfile>csv_data10.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.057359871</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.033380266</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.017963141</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.76602155</element_rxi>
+    <asrfile excitation_energy="34">csv_data10.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.079104044</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.364357382</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.031148287</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.425923944</element_rxi>
-    <asrfile>csv_data11.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.079104044</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.364357382</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.031148287</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.425923944</element_rxi>
+    <asrfile excitation_energy="34">csv_data11.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.019094359</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.037228253</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.006615546</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.891789198</element_rxi>
-    <asrfile>csv_data12.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.019094359</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.037228253</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.006615546</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.891789198</element_rxi>
+    <asrfile excitation_energy="34">csv_data12.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.018546071</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.037585683</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.008165861</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.894800484</element_rxi>
-    <asrfile>csv_data13.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.018546071</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.037585683</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008165861</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.894800484</element_rxi>
+    <asrfile excitation_energy="34">csv_data13.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.00576741</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.046797637</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.006852402</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.928746402</element_rxi>
-    <asrfile>csv_data14.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.00576741</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.046797637</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.006852402</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.928746402</element_rxi>
+    <asrfile excitation_energy="34">csv_data14.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.000539103</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.088913001</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.001763526</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.910497189</element_rxi>
-    <asrfile>csv_data15.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.000539103</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.088913001</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.001763526</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.910497189</element_rxi>
+    <asrfile excitation_energy="34">csv_data15.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.005513694</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.045392837</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.008320153</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.928954899</element_rxi>
-    <asrfile>csv_data16.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.005513694</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.045392837</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008320153</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.928954899</element_rxi>
+    <asrfile excitation_energy="34">csv_data16.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.003161337</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.089275338</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.008496067</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.895031214</element_rxi>
-    <asrfile>csv_data17.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.003161337</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.089275338</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008496067</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.895031214</element_rxi>
+    <asrfile excitation_energy="34">csv_data17.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.124255367</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.100375406</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.029463798</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.536347628</element_rxi>
-    <asrfile>csv_data18.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.124255367</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.100375406</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.029463798</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.536347628</element_rxi>
+    <asrfile excitation_energy="34">csv_data18.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.055222362</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.834683537</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.024472864</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.05999684</element_rxi>
-    <asrfile>csv_data19.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.055222362</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.834683537</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.024472864</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.05999684</element_rxi>
+    <asrfile excitation_energy="34">csv_data19.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.029801564</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.064540252</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.000603611</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.838401973</element_rxi>
-    <asrfile>csv_data20.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.029801564</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.064540252</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.000603611</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.838401973</element_rxi>
+    <asrfile excitation_energy="34">csv_data20.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.022162441</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.036752701</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.018520935</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.872485518</element_rxi>
-    <asrfile>csv_data21.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.022162441</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.036752701</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.018520935</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.872485518</element_rxi>
+    <asrfile excitation_energy="34">csv_data21.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.02084237</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.060929175</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.010915595</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.858611405</element_rxi>
-    <asrfile>csv_data22.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.02084237</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.060929175</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.010915595</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.858611405</element_rxi>
+    <asrfile excitation_energy="34">csv_data22.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.01339609</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.082341954</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.005262223</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.870249748</element_rxi>
-    <asrfile>csv_data23.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.01339609</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.082341954</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.005262223</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.870249748</element_rxi>
+    <asrfile excitation_energy="34">csv_data23.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.010295686</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.3901968</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.033895887</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.56577754</element_rxi>
-    <asrfile>csv_data24.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.010295686</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.3901968</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.033895887</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.56577754</element_rxi>
+    <asrfile excitation_energy="34">csv_data24.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.020451158</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.065573819</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.00041606</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.869117379</element_rxi>
-    <asrfile>csv_data25.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.020451158</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.065573819</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.00041606</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.869117379</element_rxi>
+    <asrfile excitation_energy="34">csv_data25.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.023053769</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.029069008</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.000631781</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.889159441</element_rxi>
-    <asrfile>csv_data26.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.023053769</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.029069008</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.000631781</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.889159441</element_rxi>
+    <asrfile excitation_energy="34">csv_data26.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.000841141</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.06267529</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.005489569</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.933873534</element_rxi>
-    <asrfile>csv_data27.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.000841141</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.06267529</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.005489569</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.933873534</element_rxi>
+    <asrfile excitation_energy="34">csv_data27.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.003257453</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.060245749</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.004063436</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.928544939</element_rxi>
-    <asrfile>csv_data28.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.003257453</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.060245749</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.004063436</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.928544939</element_rxi>
+    <asrfile excitation_energy="34">csv_data28.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.080171213</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.175266623</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.058457348</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.558087647</element_rxi>
-    <asrfile>csv_data29.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.080171213</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.175266623</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.058457348</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.558087647</element_rxi>
+    <asrfile excitation_energy="34">csv_data29.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.00960295</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.002197786</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.008327221</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.954016566</element_rxi>
-    <asrfile>csv_data30.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.00960295</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.002197786</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008327221</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.954016566</element_rxi>
+    <asrfile excitation_energy="34">csv_data30.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.012121093</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.156879604</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.003691165</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.807973444</element_rxi>
-    <asrfile>csv_data31.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.012121093</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.156879604</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.003691165</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.807973444</element_rxi>
+    <asrfile excitation_energy="34">csv_data31.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.049594101</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.062189963</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.003701343</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.777634919</element_rxi>
-    <asrfile>csv_data32.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.049594101</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.062189963</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.003701343</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.777634919</element_rxi>
+    <asrfile excitation_energy="34">csv_data32.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.041950032</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.161510557</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.002538893</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.713590264</element_rxi>
-    <asrfile>csv_data33.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.041950032</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.161510557</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.002538893</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.713590264</element_rxi>
+    <asrfile excitation_energy="34">csv_data33.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.008608632</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.031032266</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.007903642</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.93320787</element_rxi>
-    <asrfile>csv_data34.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008608632</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.031032266</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.007903642</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.93320787</element_rxi>
+    <asrfile excitation_energy="34">csv_data34.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.025908196</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.000112061</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.011273996</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.902138054</element_rxi>
-    <asrfile>csv_data35.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.025908196</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.000112061</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.011273996</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.902138054</element_rxi>
+    <asrfile excitation_energy="34">csv_data35.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.024270235</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.092805505</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.002442524</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.830735147</element_rxi>
-    <asrfile>csv_data36.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.024270235</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.092805505</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.002442524</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.830735147</element_rxi>
+    <asrfile excitation_energy="34">csv_data36.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.114016779</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.099733084</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.063335948</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.532833993</element_rxi>
-    <asrfile>csv_data37.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.114016779</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.099733084</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.063335948</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.532833993</element_rxi>
+    <asrfile excitation_energy="34">csv_data37.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.023807716</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.076683447</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.008017399</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.842290163</element_rxi>
-    <asrfile>csv_data38.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.023807716</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.076683447</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008017399</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.842290163</element_rxi>
+    <asrfile excitation_energy="34">csv_data38.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.025035577</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.010811177</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.012363834</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.891653061</element_rxi>
-    <asrfile>csv_data39.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.025035577</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.010811177</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.012363834</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.891653061</element_rxi>
+    <asrfile excitation_energy="34">csv_data39.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.054767866</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.147767916</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.005619861</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.688138366</element_rxi>
-    <asrfile>csv_data40.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.054767866</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.147767916</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.005619861</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.688138366</element_rxi>
+    <asrfile excitation_energy="34">csv_data40.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.048810784</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.111980043</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.004089723</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.737243831</element_rxi>
-    <asrfile>csv_data41.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.048810784</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.111980043</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.004089723</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.737243831</element_rxi>
+    <asrfile excitation_energy="34">csv_data41.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.009778025</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.092908062</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.008843664</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.869707346</element_rxi>
-    <asrfile>csv_data42.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.009778025</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.092908062</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008843664</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.869707346</element_rxi>
+    <asrfile excitation_energy="34">csv_data42.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.004300603</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.096072443</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.006657469</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.887454689</element_rxi>
-    <asrfile>csv_data43.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.004300603</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.096072443</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.006657469</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.887454689</element_rxi>
+    <asrfile excitation_energy="34">csv_data43.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.023164315</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.226672143</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.013932462</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.700860679</element_rxi>
-    <asrfile>csv_data44.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.023164315</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.226672143</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.013932462</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.700860679</element_rxi>
+    <asrfile excitation_energy="34">csv_data44.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.021284629</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.058177859</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.002091033</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.86901325</element_rxi>
-    <asrfile>csv_data45.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.021284629</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.058177859</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.002091033</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.86901325</element_rxi>
+    <asrfile excitation_energy="34">csv_data45.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.011588215</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.159476444</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.022302859</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.789121509</element_rxi>
-    <asrfile>csv_data46.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.011588215</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.159476444</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.022302859</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.789121509</element_rxi>
+    <asrfile excitation_energy="34">csv_data46.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.017761616</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.045955621</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.003097431</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.890627563</element_rxi>
-    <asrfile>csv_data47.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.017761616</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.045955621</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.003097431</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.890627563</element_rxi>
+    <asrfile excitation_energy="34">csv_data47.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.146999061</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.515937626</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.024541521</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.192888752</element_rxi>
-    <asrfile>csv_data48.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.146999061</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.515937626</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.024541521</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.192888752</element_rxi>
+    <asrfile excitation_energy="34">csv_data48.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.105351351</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.795222461</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.012335464</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.035505638</element_rxi>
-    <asrfile>csv_data49.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.105351351</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.795222461</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.012335464</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.035505638</element_rxi>
+    <asrfile excitation_energy="34">csv_data49.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.037932605</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.074943066</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.013940754</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.790123343</element_rxi>
-    <asrfile>csv_data50.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.037932605</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.074943066</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.013940754</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.790123343</element_rxi>
+    <asrfile excitation_energy="34">csv_data50.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.010087376</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.071375184</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.002450887</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.894556284</element_rxi>
-    <asrfile>csv_data51.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.010087376</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.071375184</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.002450887</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.894556284</element_rxi>
+    <asrfile excitation_energy="34">csv_data51.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.01228819</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.163894236</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.001974455</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.803790331</element_rxi>
-    <asrfile>csv_data52.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.01228819</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.163894236</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.001974455</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.803790331</element_rxi>
+    <asrfile excitation_energy="34">csv_data52.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.036411069</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.115813889</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.011308797</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.763721704</element_rxi>
-    <asrfile>csv_data53.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.036411069</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.115813889</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.011308797</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.763721704</element_rxi>
+    <asrfile excitation_energy="34">csv_data53.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.015231373</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.061074782</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.006108082</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.885299325</element_rxi>
-    <asrfile>csv_data54.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.015231373</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.061074782</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.006108082</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.885299325</element_rxi>
+    <asrfile excitation_energy="34">csv_data54.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.004019111</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.033194888</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">3.33E-05</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.9544276</element_rxi>
-    <asrfile>csv_data55.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.004019111</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.033194888</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">3.33E-05</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.9544276</element_rxi>
+    <asrfile excitation_energy="34">csv_data55.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.000439963</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.023194356</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.004653254</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.970668316</element_rxi>
-    <asrfile>csv_data56.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.000439963</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.023194356</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.004653254</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.970668316</element_rxi>
+    <asrfile excitation_energy="34">csv_data56.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.09055277</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.393757373</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.046051163</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.365547031</element_rxi>
-    <asrfile>csv_data57.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.09055277</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.393757373</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.046051163</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.365547031</element_rxi>
+    <asrfile excitation_energy="34">csv_data57.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.037683126</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.14186278</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.009085376</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.741043031</element_rxi>
-    <asrfile>csv_data58.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.037683126</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.14186278</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.009085376</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.741043031</element_rxi>
+    <asrfile excitation_energy="34">csv_data58.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.013625008</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.080992259</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.005144581</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.870650172</element_rxi>
-    <asrfile>csv_data59.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.013625008</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.080992259</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.005144581</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.870650172</element_rxi>
+    <asrfile excitation_energy="34">csv_data59.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.023390954</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.148128837</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.013595916</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.770718753</element_rxi>
-    <asrfile>csv_data60.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.023390954</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.148128837</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.013595916</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.770718753</element_rxi>
+    <asrfile excitation_energy="34">csv_data60.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.00211062</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.052580465</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">3.50E-05</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.944242775</element_rxi>
-    <asrfile>csv_data61.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.00211062</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.052580465</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">3.50E-05</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.944242775</element_rxi>
+    <asrfile excitation_energy="34">csv_data61.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.013098456</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.041117832</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.001454736</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.915526092</element_rxi>
-    <asrfile>csv_data62.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.013098456</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.041117832</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.001454736</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.915526092</element_rxi>
+    <asrfile excitation_energy="34">csv_data62.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.035277054</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.090294436</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.003661979</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.796752334</element_rxi>
-    <asrfile>csv_data63.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.035277054</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.090294436</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.003661979</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.796752334</element_rxi>
+    <asrfile excitation_energy="34">csv_data63.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.032533206</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.187742636</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.020337326</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.702184439</element_rxi>
-    <asrfile>csv_data64.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.032533206</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.187742636</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.020337326</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.702184439</element_rxi>
+    <asrfile excitation_energy="34">csv_data64.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.004384144</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.0255096</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.003420495</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.957313955</element_rxi>
-    <asrfile>csv_data65.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.004384144</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.0255096</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.003420495</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.957313955</element_rxi>
+    <asrfile excitation_energy="34">csv_data65.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.038358819</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.041371018</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.017847788</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.817271054</element_rxi>
-    <asrfile>csv_data66.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.038358819</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.041371018</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.017847788</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.817271054</element_rxi>
+    <asrfile excitation_energy="34">csv_data66.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.022826152</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.036510855</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.00723405</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.88098985</element_rxi>
-    <asrfile>csv_data67.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.022826152</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.036510855</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.00723405</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.88098985</element_rxi>
+    <asrfile excitation_energy="34">csv_data67.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.038770702</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.056850184</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.005229907</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.815074325</element_rxi>
-    <asrfile>csv_data68.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.038770702</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.056850184</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.005229907</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.815074325</element_rxi>
+    <asrfile excitation_energy="34">csv_data68.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.019761736</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.047985032</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.008491324</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.879862189</element_rxi>
-    <asrfile>csv_data69.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.019761736</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.047985032</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008491324</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.879862189</element_rxi>
+    <asrfile excitation_energy="34">csv_data69.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.01095922</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.116838433</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.007373822</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.84678632</element_rxi>
-    <asrfile>csv_data70.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.01095922</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.116838433</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.007373822</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.84678632</element_rxi>
+    <asrfile excitation_energy="34">csv_data70.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.001491281</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.03903047</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.019486096</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.940157354</element_rxi>
-    <asrfile>csv_data71.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.001491281</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.03903047</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.019486096</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.940157354</element_rxi>
+    <asrfile excitation_energy="34">csv_data71.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.026842546</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.059212334</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.002239929</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.849380016</element_rxi>
-    <asrfile>csv_data72.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.026842546</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.059212334</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.002239929</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.849380016</element_rxi>
+    <asrfile excitation_energy="34">csv_data72.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.021638848</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.070800677</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.001256993</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.855715036</element_rxi>
-    <asrfile>csv_data73.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.021638848</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.070800677</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.001256993</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.855715036</element_rxi>
+    <asrfile excitation_energy="34">csv_data73.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.012500171</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.056854073</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.001631131</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.90019232</element_rxi>
-    <asrfile>csv_data74.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.012500171</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.056854073</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.001631131</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.90019232</element_rxi>
+    <asrfile excitation_energy="34">csv_data74.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.014403086</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.078866877</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.006064275</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.868816674</element_rxi>
-    <asrfile>csv_data75.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.014403086</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.078866877</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.006064275</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.868816674</element_rxi>
+    <asrfile excitation_energy="34">csv_data75.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.00175995</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.006855375</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.00668085</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.98078382</element_rxi>
-    <asrfile>csv_data76.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.00175995</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.006855375</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.00668085</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.98078382</element_rxi>
+    <asrfile excitation_energy="34">csv_data76.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.009732342</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.049093541</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.006130499</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.914803982</element_rxi>
-    <asrfile>csv_data77.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.009732342</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.049093541</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.006130499</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.914803982</element_rxi>
+    <asrfile excitation_energy="34">csv_data77.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.025858639</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.002552382</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.006149444</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.899031579</element_rxi>
-    <asrfile>csv_data78.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.025858639</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.002552382</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.006149444</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.899031579</element_rxi>
+    <asrfile excitation_energy="34">csv_data78.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.017985942</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.548540235</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.000709476</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.426327556</element_rxi>
-    <asrfile>csv_data79.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.017985942</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.548540235</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.000709476</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.426327556</element_rxi>
+    <asrfile excitation_energy="34">csv_data79.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.052107383</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.013207124</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.008209183</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.807783723</element_rxi>
-    <asrfile>csv_data80.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.052107383</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.013207124</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008209183</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.807783723</element_rxi>
+    <asrfile excitation_energy="34">csv_data80.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.119034961</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.6365906</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.000101581</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.157773569</element_rxi>
-    <asrfile>csv_data81.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.119034961</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.6365906</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.000101581</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.157773569</element_rxi>
+    <asrfile excitation_energy="34">csv_data81.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.022387989</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.047399316</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.005546676</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.873839319</element_rxi>
-    <asrfile>csv_data82.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.022387989</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.047399316</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.005546676</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.873839319</element_rxi>
+    <asrfile excitation_energy="34">csv_data82.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.028627547</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.180072054</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.004465199</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.736378729</element_rxi>
-    <asrfile>csv_data83.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.028627547</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.180072054</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.004465199</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.736378729</element_rxi>
+    <asrfile excitation_energy="34">csv_data83.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.022198755</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.12328168</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.016458696</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.796078622</element_rxi>
-    <asrfile>csv_data84.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.022198755</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.12328168</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.016458696</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.796078622</element_rxi>
+    <asrfile excitation_energy="34">csv_data84.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.021229753</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.054903779</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.00435433</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.867921829</element_rxi>
-    <asrfile>csv_data85.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.021229753</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.054903779</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.00435433</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.867921829</element_rxi>
+    <asrfile excitation_energy="34">csv_data85.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.03565263</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.086941101</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.008479507</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.79222697</element_rxi>
-    <asrfile>csv_data86.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.03565263</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.086941101</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008479507</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.79222697</element_rxi>
+    <asrfile excitation_energy="34">csv_data86.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.070257664</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.226536676</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.045232143</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.550437868</element_rxi>
-    <asrfile>csv_data87.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.070257664</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.226536676</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.045232143</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.550437868</element_rxi>
+    <asrfile excitation_energy="34">csv_data87.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.007605577</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.05834502</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.001158133</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.918034732</element_rxi>
-    <asrfile>csv_data88.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.007605577</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.05834502</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.001158133</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.918034732</element_rxi>
+    <asrfile excitation_energy="34">csv_data88.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.01424925</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.196550295</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.003101258</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.765399754</element_rxi>
-    <asrfile>csv_data89.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.01424925</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.196550295</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.003101258</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.765399754</element_rxi>
+    <asrfile excitation_energy="34">csv_data89.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.133620024</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.495640635</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.041712541</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.217518613</element_rxi>
-    <asrfile>csv_data90.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.133620024</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.495640635</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.041712541</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.217518613</element_rxi>
+    <asrfile excitation_energy="34">csv_data90.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.021300359</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.070549794</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.000907496</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.860183656</element_rxi>
-    <asrfile>csv_data91.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.021300359</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.070549794</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.000907496</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.860183656</element_rxi>
+    <asrfile excitation_energy="34">csv_data91.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.014660916</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.014442083</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.003676474</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.928837419</element_rxi>
-    <asrfile>csv_data92.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.014660916</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.014442083</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.003676474</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.928837419</element_rxi>
+    <asrfile excitation_energy="34">csv_data92.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.014987087</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.047843374</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.002294269</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.900886714</element_rxi>
-    <asrfile>csv_data93.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.014987087</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.047843374</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.002294269</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.900886714</element_rxi>
+    <asrfile excitation_energy="34">csv_data93.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.03606201</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.055858295</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.004211396</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.826754689</element_rxi>
-    <asrfile>csv_data94.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.03606201</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.055858295</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.004211396</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.826754689</element_rxi>
+    <asrfile excitation_energy="34">csv_data94.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.039736908</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.044067364</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">6.62E-05</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.825067341</element_rxi>
-    <asrfile>csv_data95.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.039736908</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.044067364</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">6.62E-05</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.825067341</element_rxi>
+    <asrfile excitation_energy="34">csv_data95.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>
   <samples>
-    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental">0.010767743</element_rxi>
-    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental">0.088301234</element_rxi>
-    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental">0.008681539</element_rxi>
-    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental">0.869710684</element_rxi>
-    <asrfile>csv_data96.asr</asrfile>
+    <element_rxi element="Cu" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.010767743</element_rxi>
+    <element_rxi element="Ag" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.088301234</element_rxi>
+    <element_rxi element="Sn" linetype="KA_LINE" datatype="experimental" excitation_energy="34">0.008681539</element_rxi>
+    <element_rxi element="Au" linetype="LA_LINE" datatype="experimental" excitation_energy="34">0.869710684</element_rxi>
+    <asrfile excitation_energy="34">csv_data96.asr</asrfile>
     <density>19.32</density>
     <thickness>0.3</thickness>
   </samples>

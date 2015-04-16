@@ -12,9 +12,10 @@ libbam_quant_la_SOURCES = bam_file.cpp \
 			  bam_catalog.c \
 			  bam_file_rxi.cpp \
 			  bam_job_xmsi.cpp \
-			  bam_job_quant.cpp \
 			  bam_data_base.cpp \
 			  bam_data_xraylib.cpp
+#bam_job_quant.cpp
+
 libbam_quant_la_LIBADD = @xraylib_LIBS@ @xmimsim_LIBS@ @libxmlmm_LIBS@
 libbam_quant_la_CPPFLAGS = -DBAM_CATALOG=\"$(datadir)/bam-quant/bam-quant-cat.xml\" \
 			   @libxmlmm_CFLAGS@ \

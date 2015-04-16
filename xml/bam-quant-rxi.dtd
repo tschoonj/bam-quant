@@ -4,15 +4,17 @@
 %xmsi;
 
 
-<!ELEMENT bam-quant-rxi-multi (samples+, xmimsim-input)>
+<!ELEMENT bam-quant-rxi-multi (samples+, xmimsim-input+)>
 <!ELEMENT bam-quant-rxi-multi-output (xmimsim-results+)>
-<!ELEMENT bam-quant-rxi-single (samples, xmimsim-input)>
-<!ELEMENT samples (element_rxi+, asrfile, density, thickness)>
+<!ELEMENT bam-quant-rxi-single (samples, xmimsim-input+)>
+<!ELEMENT samples (element_rxi+, asrfile+, density, thickness)>
 <!ATTLIST samples density_thickness (fixed|variable) "fixed">
 <!ATTLIST samples matrix CDATA "none">
 <!ELEMENT element_rxi (#PCDATA)>
 <!ATTLIST element_rxi element CDATA #REQUIRED>
+<!ATTLIST element_rxi excitation_energy CDATA #REQUIRED>
 <!ATTLIST element_rxi linetype (KA_LINE|LA_LINE) #REQUIRED>
 <!ATTLIST element_rxi datatype (experimental|interpolated) #REQUIRED>
 <!ELEMENT asrfile (#PCDATA)>
+<!ATTLIST asrfile excitation_energy CDATA #REQUIRED>
 

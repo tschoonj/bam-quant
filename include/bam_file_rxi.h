@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <map>
 
 
 
@@ -17,18 +18,20 @@ namespace BAM {
 			//abstract class since it doesnt implement Parse!!!
 			private:
 			protected:
-				BAM::File::XMSI *xmimsim_input;
-				Common(BAM::File::XMSI input, std::string filename="") : File::File(filename) {
-					xmimsim_input = new BAM::File::XMSI(input);
+				std::map<double,BAM::File::XMSI> xmimsim_input;
+				//perhaps a constructor that takes a vector of a map would be useful??
+				Common(const std::map<double,BAM::File::XMSI> &input, std::string filename="") : File::File(""), xmimsim_input(input) {
+					if (!filename.empty())
+						SetFilename(filename);
 				}
-				Common(std::string filename) : File::File(filename), xmimsim_input(0) {}
+				Common(std::string filename) : File::File(filename) {}
 			public:
 				virtual ~Common() {
-					if (xmimsim_input)
-						delete xmimsim_input;
 				}
-				BAM::File::XMSI GetFileXMSI() {
-					return *xmimsim_input;
+				BAM::File::XMSI GetFileXMSI(double excitation_energy) {
+					if (xmimsim_input.find(excitation_energy) == xmimsim_input.end())
+						throw BAM::Exception("BAM::File::RXI::Common::GetFileXMSI -> Invalid excitation_energy requested");
+					return xmimsim_input[excitation_energy];
 				}
 			
 			};
@@ -38,22 +41,17 @@ namespace BAM {
 			public:
 				Single(std::string);
 				//Single() : File::File(""), xmimsim_input(0), sample() {}
-				Single(BAM::File::XMSI input, BAM::Data::RXI::Sample sample) : Common(input), sample(sample) {}
+				Single(const std::map<double,BAM::File::XMSI> &input, BAM::Data::RXI::Sample sample) : Common(input), sample(sample) {}
 				void Open();
 				void Close();
 				void Parse();
 				void Write();
 				void Write(std::string filename);
-				Single(const Single &single) : Common(*single.xmimsim_input, single.filename), sample(single.sample) {}
+				Single(const Single &single) : Common(single.xmimsim_input), sample(single.sample) {}
 				Single& operator= (const Single &single) {
 					if (this == &single)
 						return *this;
-					if (xmimsim_input)
-						delete xmimsim_input;
-					if (single.xmimsim_input)
-						xmimsim_input = new BAM::File::XMSI(*single.xmimsim_input);
-					else 
-						xmimsim_input = 0;
+					xmimsim_input = single.xmimsim_input;
 					sample = single.sample;
 					SetFilename(single.GetFilename());
 					return *this;
@@ -67,22 +65,17 @@ namespace BAM {
 				std::vector<BAM::Data::RXI::Sample> samples;
 			public:
 				Multi(std::string);
-				Multi(BAM::File::XMSI input, std::string filename = "") : Common(input, filename) {}
+				Multi(const std::map<double,BAM::File::XMSI> &input, std::string filename = "") : Common(input, filename) {}
 				void Open();
 				void Close();
 				void Parse();
 				void Write();
 				void Write(std::string filename);
-				Multi(const Multi &multi) : Common(*multi.xmimsim_input, multi.filename), samples(multi.samples) {}
+				Multi(const Multi &multi) : Common(multi.xmimsim_input, multi.filename), samples(multi.samples) {}
 				Multi& operator= (const Multi &multi) {
 					if (this == &multi)
 						return *this;
-					if (xmimsim_input)
-						delete xmimsim_input;
-					if (multi.xmimsim_input)
-						xmimsim_input = new BAM::File::XMSI(*multi.xmimsim_input);
-					else 
-						xmimsim_input = 0;
+					xmimsim_input = multi.xmimsim_input;
 					samples = multi.samples;
 					SetFilename(multi.GetFilename());
 					return *this;
@@ -102,7 +95,7 @@ namespace BAM {
 					samples.push_back(sample);
 				}
 				Single GetSingle(int index) {
-					return Single(*xmimsim_input, GetSample(index));
+					return Single(xmimsim_input, GetSample(index));
 				}
 			};
 			Common* Parse(std::string filename);
