@@ -6,6 +6,7 @@
 #include <xraylib.h>
 #include <glibmm/miscutils.h>
 #include <glib.h>
+#include <glib/gstdio.h>
 #include <glibmm/spawn.h>
 #include <glibmm/convert.h>
 #include <gtkmm/messagedialog.h>
@@ -222,7 +223,7 @@ void App2::SimulateGrid::prepare() {
 			}
 		
 			//create xmsi files
-			row[columns->col_xmsi_filename[i]] = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<std::ostringstream*>( &(std::ostringstream() << getpid()))->str() + row[columns->col_element] + ".xmsi");
+			row[columns->col_xmsi_filename[i]] = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<std::ostringstream*>( &(std::ostringstream() << getpid()))->str() + "-" + row[columns->col_element] + "-" + static_cast<std::ostringstream*>( &(std::ostringstream() << pures_grid->GetEnergy()))->str() + "keV.xmsi");
 			//row[columns->col_xmso_file[i]] = 0;
 			row[columns->col_xmso_counts_KA[i]] = 0.0;
 			row[columns->col_xmso_counts_LA[i]] = 0.0;
@@ -630,8 +631,8 @@ void App2::SimulateGrid::xmimsim_child_watcher(GPid pid, int status, unsigned in
 	row[columns->col_status[current_column]] = Glib::ustring("Completed");
 
 	//delete temparary XMI-MSIM files
-	//g_unlink(buttonVector[buttonIndex-1]->xmsi_file->GetOutputFile().c_str());
-	//g_unlink(buttonVector[buttonIndex-1]->xmsi_file->GetFilename().c_str());
+	g_unlink(std::string(row[columns->col_xmsi_filename[current_column]]).c_str());
+	g_unlink(std::string(row[columns->col_xmso_filename[current_column]]).c_str());
 
 	//update current_row and current_column
 	current_row++;
