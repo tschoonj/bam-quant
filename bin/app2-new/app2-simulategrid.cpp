@@ -70,9 +70,9 @@ App2::SimulateGrid::SimulateGrid(App2::Assistant *assistant_arg) :
 	attach(sw, 1, 1, 1, 1);
 
 	tv.signal_query_tooltip().connect(sigc::mem_fun(*this, &App2::SimulateGrid::on_query_tooltip));
-	//pause_button.signal_clicked().connect(sigc::mem_fun(*this, &App2::SimulateGrid::on_pause_clicked));
+	pause_button.signal_clicked().connect(sigc::mem_fun(*this, &App2::SimulateGrid::on_pause_clicked));
 	play_button.signal_clicked().connect(sigc::mem_fun(*this, &App2::SimulateGrid::on_play_clicked));
-	//stop_button.signal_clicked().connect(sigc::mem_fun(*this, &App2Assistant::on_stop_clicked));
+	stop_button.signal_clicked().connect(sigc::mem_fun(*this, &App2::SimulateGrid::on_stop_clicked));
 
 	show_all_children();
 }
@@ -409,7 +409,7 @@ void App2::SimulateGrid::on_play_clicked() {
 
 	try {
 		unsigned int row = 0;
-		unsigned int column = 1;
+		unsigned int column = 0;
 		xmimsim_start_recursive(row, column);
 	}
 	catch (BAM::Exception &e) {
@@ -442,13 +442,8 @@ void App2::SimulateGrid::update_console(std::string line, std::string tag) {
 void App2::SimulateGrid::xmimsim_start_recursive(unsigned int &current_row, unsigned int &current_column) {
 	int out_fh, err_fh;
 
-	std::cout << "Entering App2::SimulateGrid::xmimsim_start_recursive" << std::endl;
-	std::cout << "current_row: " << current_row << std::endl;
-	std::cout << "current_column: " << current_column << std::endl;
-
 	//let's start work with a nap!
 	g_usleep(G_USEC_PER_SEC/2);
-
 
 	Gtk::TreeModel::Row row = model->children()[current_row];
 
@@ -459,7 +454,7 @@ void App2::SimulateGrid::xmimsim_start_recursive(unsigned int &current_row, unsi
 			current_column++;
 			current_row = 0;
 		}
-		if (current_column > tv.get_n_columns()-1) {
+		if (current_column == tv.get_n_columns()-1) {
 			//this was the last one
 			play_button.set_sensitive(false);
 			stop_button.set_sensitive(false);
@@ -512,9 +507,9 @@ void App2::SimulateGrid::xmimsim_start_recursive(unsigned int &current_row, unsi
 	xmimsim_stdout->set_close_on_unref(true);
 
 	//add watchers
-	Glib::signal_child_watch().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_child_watcher), sigc::ref(current_row), sigc::ref(current_column)), xmimsim_pid);
-	Glib::signal_io().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stdout_watcher), sigc::ref(current_row), sigc::ref(current_column)), xmimsim_stdout, Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
-	Glib::signal_io().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stderr_watcher), sigc::ref(current_row), sigc::ref(current_column)), xmimsim_stderr, Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
+	Glib::signal_child_watch().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_child_watcher), current_row, current_column), xmimsim_pid);
+	Glib::signal_io().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stdout_watcher), current_row, current_column), xmimsim_stdout, Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
+	Glib::signal_io().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stderr_watcher), current_row, current_column), xmimsim_stderr, Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
 	//Glib::signal_io().connect(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stderr_watcher), xmimsim_stderr,Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
 
 	//remove xmsi file from argv
@@ -522,10 +517,6 @@ void App2::SimulateGrid::xmimsim_start_recursive(unsigned int &current_row, unsi
 }
 
 void App2::SimulateGrid::xmimsim_child_watcher(GPid pid, int status, unsigned int &current_row, unsigned int &current_column) {
-	std::cout << "Entering App2::SimulateGrid::xmimsim_child_watcher" << std::endl;
-	std::cout << "current_row: " << current_row << std::endl;
-	std::cout << "current_column: " << current_column << std::endl;
-
 	int success;
 	//end of process
 	stop_button.set_sensitive(false);
@@ -648,7 +639,7 @@ void App2::SimulateGrid::xmimsim_child_watcher(GPid pid, int status, unsigned in
 		current_column++;
 		current_row = 0;
 	}
-	if (current_column > tv.get_n_columns()-1) {
+	if (current_column == tv.get_n_columns()-1) {
 		//this was the last one
 		play_button.set_sensitive(false);
 		stop_button.set_sensitive(false);
@@ -671,10 +662,6 @@ bool App2::SimulateGrid::xmimsim_stderr_watcher(Glib::IOCondition cond, unsigned
 }
 
 bool App2::SimulateGrid::xmimsim_iochannel_watcher(Glib::IOCondition condition, Glib::RefPtr<Glib::IOChannel> iochannel, unsigned int &current_row, unsigned int &current_column) {
-	std::cout << "Entering App2::SimulateGrid::xmimsim_iochannel_watcher" << std::endl;
-	std::cout << "current_row: " << current_row << std::endl;
-	std::cout << "current_column: " << current_column << std::endl;
-
 	Glib::IOStatus pipe_status;
 	Glib::ustring pipe_string;
 	int progress;
@@ -723,3 +710,76 @@ bool App2::SimulateGrid::xmimsim_iochannel_watcher(Glib::IOCondition condition, 
 
 	return true;
 }
+
+void App2::SimulateGrid::on_stop_clicked() {
+
+	stop_button.set_sensitive(false);
+	pause_button.set_sensitive(false);
+	play_button.set_sensitive(false);
+
+	xmimsim_paused = false;
+
+#ifdef G_OS_UNIX
+	int kill_rv;
+	
+	kill_rv = kill((pid_t) xmimsim_pid, SIGTERM);
+#if !GLIB_CHECK_VERSION (2, 35, 0)
+	//starting with 2.36.0 (and some unstable versions before),
+	//waitpid is called from within the main loop
+	//causing all kinds of trouble if I would call wait here
+	//wait(NULL);
+	waitpid(xmimsim_pid, NULL, WNOHANG);
+#endif
+	if (kill_rv == 0) {
+		std::stringstream ss;
+		ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " was successfully terminated before completion" << std::endl;
+		update_console(ss.str(), "pause-continue-stopped");
+	}
+	else {
+		std::stringstream ss;
+		ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " could not be terminated with the SIGTERM signal" << std::endl;
+		update_console(ss.str(), "error");
+		xmimsim_pid = 0;
+	}
+#elif defined(G_OS_WIN32)
+	BOOL terminate_rv;
+
+	terminate_rv = TerminateProcess((HANDLE) xmimsim_pid, (UINT) 1);
+
+	if (terminate_rv == TRUE) {
+		std::stringstream ss;
+		ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " was successfully terminated before completion" << std::endl;
+		update_console(ss.str(), "pause-continue-stopped");
+	}
+	else {
+		std::stringstream ss;
+		ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " could not be terminated with the TerminateProcess call" << std::endl;
+		update_console(ss.str(), "error");
+		xmimsim_pid = 0;
+	}
+#endif
+
+	return;
+}
+
+void App2::SimulateGrid::on_pause_clicked() {
+	timer->stop();
+
+	pause_button.set_sensitive(false);
+	stop_button.set_sensitive(false);
+	int kill_rv;
+#ifdef G_OS_UNIX
+	kill_rv = kill((pid_t) xmimsim_pid, SIGSTOP);
+#elif defined(G_OS_WIN32)
+	kill_rv = (int) NtSuspendProcess((HANDLE) xmimsim_pid);
+#endif
+	if (kill_rv == 0) {
+		std::stringstream ss;
+		ss << get_elapsed_time() << "Process " << real_xmimsim_pid << " was successfully paused. Press the Play button to continue or Stop to kill the process" << std::endl;
+		update_console(ss.str(), "pause-continue-stopped");
+		xmimsim_paused = true;
+		stop_button.set_sensitive(true);
+		play_button.set_sensitive(true);
+	}
+}
+
