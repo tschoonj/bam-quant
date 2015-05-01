@@ -72,7 +72,7 @@ void XMSI::Start() {
 
 	        //check if solid angles are already precalculated
                 if (options.verbose)
-                        std::cout << "Querying " << xmimsim_hdf5_solid_angles << " for solid angle grid" << std::endl;
+                        std::cout << "Querying " << xmimsim_hdf5_solid_angles_c << " for solid angle grid" << std::endl;
 
                 if (xmi_find_solid_angle_match(xmimsim_hdf5_solid_angles_c , xmimsim_input->GetInternalPointer(), &solid_angles, options) == 0)
 			throw BAM::Exception("BAM::Job::XMSI::Start -> Error in xmi_find_solid_angle_match");
@@ -138,6 +138,9 @@ void XMSI::Start() {
 			throw BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_get_escape_ratios_file");
 
 		//check if escape ratios are already precalculated
+                if (options.verbose)
+                        std::cout << "Querying " << xmimsim_hdf5_escape_ratios_c << " for escape ratios" << std::endl;
+
                if (xmi_find_escape_ratios_match(xmimsim_hdf5_escape_ratios_c , xmimsim_input->GetInternalPointer(), &escape_ratios, options) == 0)
 			throw BAM::Exception("BAM::Job::XMSI::Initialize -> Error in xmi_find_escape_ratios_match");
 

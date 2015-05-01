@@ -64,8 +64,8 @@ namespace App2 {
 		sigc::connection signal_row_inserted_handler;
 
 		Glib::RefPtr<Gtk::TreeModel> model_ref_energy;
-		friend SamplesSummaryGrid;
-		friend SimulateGrid;
+		friend class SamplesSummaryGrid;
+		friend class SimulateGrid;
 	};
 }
 #endif

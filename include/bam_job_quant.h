@@ -16,15 +16,15 @@ namespace BAM {
 			//std::map<std::string,BAM::File::XMSO,bool(*)(std::string,std::string)> pure_map(element_comp);
 			std::map<std::string,BAM::File::XMSO,bool(*)(std::string,std::string)> pure_map;
 			struct xmi_main_options options;
+			BAM::File::RXI::Common *common;
 
 			static bool element_comp (std::string lhs, std::string rhs) {return SymbolToAtomicNumber(const_cast<char *> (lhs.c_str())) < SymbolToAtomicNumber(const_cast<char *> (rhs.c_str()));}
 			static bool rxi_match(std::pair<std::string,double> rxi_rel) {return rxi_rel.second < BAM_QUANT_CONV_THRESHOLD;}
 			
-			double calculate_rxi(std::string element, BAM::File::XMSO &sample_output, BAM::Data::RXI::SingleElement single_element);
+			double calculate_rxi(std::string element, std::map<double,BAM::File::XMSO> &sample_output, BAM::Data::RXI::SingleElement single_element);
 
 			void SimulatePure(BAM::Data::RXI::SingleElement single_element);
 			BAM::File::XMSO SimulateSample(BAM::Data::RXI::Sample &sample);
-			BAM::File::XMSI initial_input;
 		public:
 			Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_main_options options);
 			

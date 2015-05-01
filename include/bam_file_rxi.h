@@ -12,6 +12,9 @@
 
 
 namespace BAM {
+	namespace Job {
+		class Quant;
+	}
 	namespace File {
 		namespace RXI {
 			class Common: public File::File {
@@ -33,7 +36,7 @@ namespace BAM {
 						throw BAM::Exception("BAM::File::RXI::Common::GetFileXMSI -> Invalid excitation_energy requested");
 					return xmimsim_input[excitation_energy];
 				}
-			
+				friend class BAM::Job::Quant;	
 			};
 			class Single: public Common {
 			private:

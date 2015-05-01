@@ -17,38 +17,46 @@ namespace BAM {
 }
 
 
-double Quant::calculate_rxi(std::string element, BAM::File::XMSO &sample_output, BAM::Data::RXI::SingleElement single_element) {
+double Quant::calculate_rxi(std::string element, std::map<double,BAM::File::XMSO> &sample_output, BAM::Data::RXI::SingleElement single_element) {
 	double rxi;
+	std::map<double,BAM::File::XMSO>::iterator iter;
+
+	if ((iter = sample_output.find(single_element.GetExcitationEnergy())) == sample_output.end()) {
+		throw BAM::Exception("BAM::Quant::calculate_rxi -> Excitation energy not found in sample_output");
+	}
+
+	BAM::File::XMSO sample_output_local(iter->second);
+
 	//everything depends on linetype!
 	if (single_element.GetLineType() == "KA_LINE") {
-		double numerator = sample_output.GetCountsForElementForLine(element, "KL2") +
-				   sample_output.GetCountsForElementForLine(element, "KL3");
+		double numerator = sample_output_local.GetCountsForElementForLine(element, "KL2") +
+				   sample_output_local.GetCountsForElementForLine(element, "KL3");
 		double denominator = pure_map[element].GetCountsForElementForLine(element, "KL2") +
 				     pure_map[element].GetCountsForElementForLine(element, "KL3");
 		if (numerator == 0.0) 
-			throw BAM::Exception(std::string("Error in calculate_rxi: zero counts detected for ") + element + " in sample_output");
+			throw BAM::Exception(std::string("BAM::Job::Quant::calculate_rxi -> zero counts detected for ") + element + " in sample_output");
 		if (denominator == 0.0) 
-			throw BAM::Exception(std::string("Error in calculate_rxi: zero counts detected for ") + element + " in pure_map");
+			throw BAM::Exception(std::string("BAM::Job::Quant::calculate_rxi -> zero counts detected for ") + element + " in pure_map");
 		rxi = numerator / denominator;
 	}
 	else if (single_element.GetLineType() == "LA_LINE") {
-		double numerator = sample_output.GetCountsForElementForLine(element, "L3M4") +
-				   sample_output.GetCountsForElementForLine(element, "L3M5");
+		double numerator = sample_output_local.GetCountsForElementForLine(element, "L3M4") +
+				   sample_output_local.GetCountsForElementForLine(element, "L3M5");
 		double denominator = pure_map[element].GetCountsForElementForLine(element, "L3M4") +
 				     pure_map[element].GetCountsForElementForLine(element, "L3M5");
 		if (numerator == 0.0) 
-			throw BAM::Exception(std::string("Error in calculate_rxi: zero counts detected for ") + element + " in sample_output");
+			throw BAM::Exception(std::string("BAM::Job::Quant::calculate_rxi -> zero counts detected for ") + element + " in sample_output");
 		if (denominator == 0.0) 
-			throw BAM::Exception(std::string("Error in calculate_rxi: zero counts detected for ") + element + " in pure_map");
+			throw BAM::Exception(std::string("BAM::Job::Quant::calculate_rxi -> zero counts detected for ") + element + " in pure_map");
 		rxi = numerator / denominator;
 	}
 	else {
-		throw BAM::Exception("Error in calculate_rxi: unknown linetype");
+		throw BAM::Exception("BAM::Job::Quant::calculate_rxi -> unknown linetype");
 	}
 	return rxi;
 }
 
-Quant::Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_main_options options) : pure_map(element_comp), options(options), initial_input(common->GetFileXMSI()) {
+Quant::Quant(BAM::File::RXI::Common *common_arg, std::string outputfile, struct xmi_main_options options) : pure_map(element_comp), options(options), common(common_arg) {
 
 	//only constructor in the class
 	//check if we are dealing with single or multi
@@ -91,7 +99,7 @@ Quant::Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_
 				BAM::Data::RXI::Sample sample = multi_rxi->GetSample(i);
 
 				if (options.verbose)
-					std::cout << "Now processing: " << sample.GetASRfile() << std::endl << std::endl;				
+					std::cout << "Now processing Sample " << i << std::endl << std::endl;				
 
 				BAM::File::XMSO *xmso_file;
 				try {
@@ -100,14 +108,16 @@ Quant::Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_
 				catch (BAM::ExceptionLocal &e) {
 					//no convergence for our threshold
 					delete xmso_file;
-					exit_message << sample.GetASRfile() << ": no convergence" << std::endl;
+					exit_message << "Sample " << i << ": no convergence" << std::endl;
 					continue;
 				}
 				catch (BAM::Exception &e) {
 					throw BAM::Exception(e.what());
 				}
-				exit_message << sample.GetASRfile() << ": converged successfully" << std::endl;
-				xmso_file->SetInputfile(sample.GetASRfile());
+				exit_message << "Sample " << i << ": converged successfully" << std::endl;
+				std::stringstream ss;
+				ss << "Sample " << i;
+				xmso_file->SetInputfile(ss.str());
 				xmlpp::Element *xmimsim_results = rootnode->add_child("xmimsim-results");
 				xmlNodePtr node = xmimsim_results->cobj();
 				struct xmi_output *xmso_raw = xmso_file->GetInternalPointer();
@@ -143,7 +153,10 @@ Quant::Quant(BAM::File::RXI::Common *common, std::string outputfile, struct xmi_
 
 void Quant::SimulatePure(BAM::Data::RXI::SingleElement single_element) {
 	BAM::Data::XMSI::Composition composition_pure;
-	BAM::File::XMSI input_pure(initial_input);
+	//first we need to check if there is an XMSI file available for our excitation energy
+	if (common->xmimsim_input.find(single_element.GetExcitationEnergy()) == common->xmimsim_input.end())
+		throw BAM::Exception("BAM::Job::Quant::SimulatePure -> excitation energy not found in xmimsim_input");
+	BAM::File::XMSI input_pure(common->xmimsim_input[single_element.GetExcitationEnergy()]);
 
 	BAM::Data::XMSI::Layer layer_pure1("Air, Dry (near sea level)", 5.0);
 	composition_pure.AddLayer(layer_pure1);
@@ -156,7 +169,7 @@ void Quant::SimulatePure(BAM::Data::RXI::SingleElement single_element) {
 	//input_pure.SetOutputFile(Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<ostringstream*>( &(ostringstream() << getpid()))->str() +  single_element.GetElement()+ ".xmso");
 
 	if (options.verbose)
-		std::cout << std::endl << "Simulating " << single_element.GetElement() << std::endl;
+		std::cout << std::endl << "Simulating " << single_element.GetElement() << " at " << single_element.GetExcitationEnergy() << " keV" << std::endl;
 
 	BAM::Job::XMSI job(input_pure, options);
 	job.Start();
@@ -171,7 +184,7 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 	 */
 
 	std::vector<std::string> sample_elements(sample.GetElements());
-	BAM::File::XMSI input_sample(initial_input);
+	std::map<double, BAM::File::XMSI> input_sample(common->xmimsim_input);
 
 	// start preparing for the simulations of the sample
 	BAM::Data::XMSI::Composition composition;
@@ -212,7 +225,11 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 	}
 	composition.AddLayer(layer2);
 	composition.SetReferenceLayer(2);
-	input_sample.ReplaceComposition(composition);
+	for (std::map<double,BAM::File::XMSI>::iterator iter = input_sample.begin() ; 
+	     iter != input_sample.end() ;
+	     ++iter) {
+		iter->second.ReplaceComposition(composition);     
+	}
 
 	int iteration = 0;
 
@@ -235,7 +252,8 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 		rxi_rel[*it] = BAM_QUANT_CONV_THRESHOLD*10.0;
 	}
 
-	BAM::Job::XMSI *job(0);
+	//BAM::Job::XMSI *job(0);
+	std::map<double, BAM::Job::XMSI *> jobs;
 	int counted = 0;
 
 	int layer_trouble = 0;
@@ -243,24 +261,45 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 	do {
 		//the big do while loop
 		if (iteration++ > BAM_QUANT_MAX_ITERATIONS) {
-			if (job)
-				delete job;
+			for (std::map<double, BAM::Job::XMSI *>::iterator iter = jobs.begin() ;
+			     iter != jobs.end() ;
+			     ++iter) {
+			     	if (iter->second) {
+					delete iter->second;
+					iter->second = 0;
+				}
+			}
 			throw BAM::ExceptionLocal("BAM::File::XMSO Quant::SimulateSample -> No convergence after 100 iterations");
 		}
 		if (options.verbose)
 			std::cout << "Iteration: " << iteration << std::endl << std::endl;
 		//create job
-		if (job)
-			delete job;
+		for (std::map<double, BAM::Job::XMSI *>::iterator iter = jobs.begin() ;
+		     iter != jobs.end() ;
+		     ++iter) {
+		     	if (iter->second) {
+				delete iter->second;
+				iter->second = 0;
+			}
+		}
 
-		job = new BAM::Job::XMSI(input_sample, options);
-		job->Start();
+		std::map<double,BAM::File::XMSO> output;
+
+		for (std::map<double, BAM::File::XMSI>::iterator iter = input_sample.begin() ;
+		     iter != input_sample.end() ;
+		     ++iter) {
+			BAM::Job::XMSI *job = new BAM::Job::XMSI(iter->second, options);
+			if (options.verbose)
+				std::cout << std::endl << "Simulating sample at " << iter->first << " keV" << std::endl;
+			job->Start();
 	
-		//get FileXMSO 
-		BAM::File::XMSO output(job->GetFileXMSO());
+			//get FileXMSO 
+			output[iter->first] = job->GetFileXMSO();
+			jobs[iter->first] = job;
+		}
 
 		//first get the composition back
-		BAM::Data::XMSI::Composition composition_old(input_sample.GetComposition());
+		BAM::Data::XMSI::Composition composition_old(input_sample.begin()->second.GetComposition());
 		BAM::Data::XMSI::Layer layer_old(composition_old.GetLayer(2));
 		std::map<std::string, double> layer_old_map(layer_old.GetZandWeightMap());
 
@@ -316,9 +355,11 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 					max_scale = 1.025;
 				else 
 					max_scale = 1.01;
-
 				double new_weight = layer_old_map[*it]*std::min(rxi_scale, max_scale);
 				layer_new.AddElement(*it, new_weight);
+				//std::cout << "old weight: " << layer_old_map[*it] << std::endl;
+				//std::cout << "new weight: " << new_weight << std::endl;
+				//std::cout << "rxi_scale: " << rxi_scale << std::endl;
 			}
 			
 			if (options.verbose)
@@ -343,7 +384,9 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 			BAM::Data::RXI::SingleElement single_element = sample.GetSingleElement(it_max_xrf_energy);
 			//calculate Acorr to see what kind of sample we are dealing with
 			BAM::Data::XMSI::Layer::AcorrCases a_corr_case;
-			double a_corr = layer_new.Acorr(input_sample.GetExcitation().GetDiscreteEnergy(0).GetEnergy(), single_element.GetLineEnergy(), &a_corr_case, input_sample.GetGeometry().GetAlpha(), input_sample.GetGeometry().GetBeta()); 
+			double excitation_energy = single_element.GetExcitationEnergy();
+			double a_corr = layer_new.Acorr(excitation_energy, single_element.GetLineEnergy(), &a_corr_case, input_sample[excitation_energy].GetGeometry().GetAlpha(), input_sample[excitation_energy].GetGeometry().GetBeta()); 
+
 			if (options.verbose) {
 				std::cout << "Current Acorr: " << a_corr << std::endl;
 				std::cout << "Current Acorr case : " << a_corr_case << std::endl;
@@ -354,7 +397,7 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 			}
 
 			//calculate Chi
-			double chi = layer_new.Chi(input_sample.GetExcitation().GetDiscreteEnergy(0).GetEnergy(), single_element.GetLineEnergy(), input_sample.GetGeometry().GetAlpha(), input_sample.GetGeometry().GetBeta());
+			double chi = layer_new.Chi(excitation_energy, single_element.GetLineEnergy(), input_sample[excitation_energy].GetGeometry().GetAlpha(), input_sample[excitation_energy].GetGeometry().GetBeta());
 
 			double thickness_density_old = layer_new.GetDensity() * layer_new.GetThickness();
 			double thickness_density_new = a_corr *  thickness_density_old * max_xrf_energy_rxi_scale * chi;
@@ -389,14 +432,25 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 		}
 
 		composition_old.ReplaceLayer(layer_new, 2);
-		input_sample.ReplaceComposition(composition_old);
+		for (std::map<double,BAM::File::XMSI>::iterator iter = input_sample.begin() ; 
+		     iter != input_sample.end() ;
+		     ++iter) {
+			iter->second.ReplaceComposition(composition_old);
+		}
 
 
 	}
 	while (1);
 
-	BAM::File::XMSO rv = job->GetFileXMSO();
-	delete job;
+	BAM::File::XMSO rv = jobs.begin()->second->GetFileXMSO();
+	for (std::map<double, BAM::Job::XMSI *>::iterator iter = jobs.begin() ;
+	     iter != jobs.end() ;
+	     ++iter) {
+	     	if (iter->second) {
+			delete iter->second;
+			iter->second = 0;
+		}
+	}
 
 	return rv;
 }
