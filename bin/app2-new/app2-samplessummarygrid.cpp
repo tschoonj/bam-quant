@@ -294,8 +294,8 @@ void App2::SamplesSummaryGrid::on_open_matrix_clicked() {
 	}
 }
 
-void App2::SamplesSummaryGrid::prepare() {
-	std::cout << "Entering App2::SamplesSummaryGrid::prepare" << std::endl;
+void App2::SamplesSummaryGrid::Prepare() {
+	std::cout << "Entering App2::SamplesSummaryGrid::Prepare" << std::endl;
 	/* check if there is already data in the model
 	 *	-> if true
 	 *		-> check if number of rows still corresponds to number of samples

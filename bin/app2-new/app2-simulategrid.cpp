@@ -80,7 +80,7 @@ App2::SimulateGrid::SimulateGrid(App2::Assistant *assistant_arg) :
 
 
 
-void App2::SimulateGrid::prepare() {
+void App2::SimulateGrid::Prepare() {
 	//no way back! although I could probably with some work remove this constraint...
 	assistant->commit();
 

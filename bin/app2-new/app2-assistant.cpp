@@ -7,6 +7,7 @@ App2::Assistant::Assistant() :  intro_page("Welcome!\n\nIn this wizard you will 
 				energies_grid(this),
 				samples_summary_grid(this),
 				simulate_grid(this),
+				output_file_grid(this),
 				confirm_page("Just one more thing to do!\n\nClick the apply button and the file will be saved...") {
 
 	//initialize assistant
@@ -34,6 +35,10 @@ App2::Assistant::Assistant() :  intro_page("Welcome!\n\nIn this wizard you will 
 	set_page_title(simulate_grid, "Simulate missing elements");
 	set_page_complete(simulate_grid, false);
 
+	append_page(output_file_grid);
+	set_page_type(output_file_grid, Gtk::ASSISTANT_PAGE_CONTENT);
+	set_page_title(output_file_grid, "Save the results");
+	set_page_complete(output_file_grid, false);
 
 
 	append_page(confirm_page);
@@ -50,7 +55,9 @@ App2::Assistant::Assistant() :  intro_page("Welcome!\n\nIn this wizard you will 
 
 void App2::Assistant::on_prepare(Gtk::Widget *page) {
 	if (page == &samples_summary_grid)
-		samples_summary_grid.prepare();	
+		samples_summary_grid.Prepare();	
 	else if (page == &simulate_grid)
-		simulate_grid.prepare();	
+		simulate_grid.Prepare();	
+	else if (page == &output_file_grid)
+		commit();
 }

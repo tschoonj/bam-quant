@@ -18,7 +18,7 @@ namespace App2 {
 	public:
 		SamplesSummaryGrid(Assistant *assistant);
 		virtual ~SamplesSummaryGrid() {}
-		void prepare();
+		void Prepare();
 	private:
 		Assistant *assistant;
 		Glib::RefPtr<Gtk::ListStore> model;

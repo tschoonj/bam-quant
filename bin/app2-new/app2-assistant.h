@@ -8,6 +8,7 @@
 #include "app2-samplesgrid.h"
 #include "app2-samplessummarygrid.h"
 #include "app2-simulategrid.h"
+#include "app2-outputfilegrid.h"
 #include <vector>
 
 
@@ -31,6 +32,9 @@ namespace App2 {
 
 		//simulate page: perform the Monte Carlo simulations necessary to approximate RXI's, if necessary
 		SimulateGrid simulate_grid;
+
+		//outputfile page: select a filename for the outputfile with RXI values
+		OutputFileGrid output_file_grid;
 
 		//last page: confirmation
 		Gtk::Label confirm_page;

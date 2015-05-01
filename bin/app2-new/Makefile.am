@@ -16,7 +16,9 @@ app2_new_SOURCES = main.cpp \
 		   app2-samplessummarygrid.h \
 		   app2-samplessummarygrid.cpp \
 		   app2-simulategrid.h \
-		   app2-simulategrid.cpp
+		   app2-simulategrid.cpp \
+		   app2-outputfilegrid.h \
+		   app2-outputfilegrid.cpp
 
 
 

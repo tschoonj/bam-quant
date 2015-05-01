@@ -33,7 +33,7 @@ namespace App2 {
 			if (union_elements)
 				delete[] union_elements;
 		};
-		void prepare();
+		void Prepare();
 
 	private:
 		Assistant *assistant;
