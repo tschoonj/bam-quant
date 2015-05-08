@@ -2,7 +2,7 @@
 #include "app2-assistant.h"
 #include "app2-samplesgrid.h"
 #include "bam_file_rxi.h"
-#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_multifit.h>
 #include <set>
 #include <gtkmm/messagedialog.h>
 
@@ -28,8 +28,6 @@ void App2::ConfirmationLabel::WriteRXIs() {
 		
 		for (unsigned int index = 0 ; index < assistant->pures_grid_vec.size() ; index++) {
 			std::string message;
-			gsl_multifit_fdfsolver *s = 0;
-			struct phi_lqfit_data pld;
 
 			//ignore if no simulations were available to start with
 			if (assistant->simulate_grid.diff_elements[index].size() == 0) 
@@ -37,6 +35,8 @@ void App2::ConfirmationLabel::WriteRXIs() {
 		
 			//run over all elements
 			App2::SimulateGrid::Columns *columns = assistant->simulate_grid.columns;	
+			std::vector<double> fit_x;
+			std::vector<double> fit_y;
 			for (Gtk::TreeModel::Children::iterator iter = assistant->simulate_grid.model->children().begin() ;
 			     iter != assistant->simulate_grid.model->children().end() ;
 			     ++iter) {
@@ -63,80 +63,44 @@ void App2::ConfirmationLabel::WriteRXIs() {
 					throw BAM::Exception(std::string("Mismatch found: counts in ASR file and corresponding simulation result must both be positive values! Problem detected for element:")+row[columns->col_element]);
 				}
 				std::cout << "local_phi: " << local_phi << std::endl;
-				pld.x.push_back(LineEnergy(col_bam_file_asr.GetData(0).GetZ(), col_bam_file_asr.GetData(0).GetLine()));
-				pld.y.push_back(local_phi);
+				fit_x.push_back(LineEnergy(col_bam_file_asr.GetData(0).GetZ(), col_bam_file_asr.GetData(0).GetLine()));
+				fit_y.push_back(local_phi);
 			}
 			//simple phi -> calculate mean
-			phi[index] = std::accumulate(pld.y.begin(), pld.y.end(), 0)/pld.y.size();
+			phi[index] = std::accumulate(fit_y.begin(), fit_y.end(), 0)/fit_y.size();
 			std::cout << "average phi simple: " << phi[index] << std::endl;
-			//pld_size[index] = pld.x.size();
-			pld_size[index] = 0;
+			pld_size[index] = fit_x.size();
+			//pld_size[index] = 0;
 
-			/*if (pld.x.size() > 3) {
-				//get starting values
-				gsl_matrix *square_mat = gsl_matrix_alloc(3, 3);
-				gsl_matrix_set(square_mat, 0, 0, pld.x[0]*pld.x[0]);
-				gsl_matrix_set(square_mat, 0, 1, pld.x[0]);
-				gsl_matrix_set(square_mat, 0, 2, 1);
-				gsl_matrix_set(square_mat, 1, 0, pld.x[pld.x.size()/2]*pld.x[pld.x.size()/2]);
-				gsl_matrix_set(square_mat, 1, 1, pld.x[pld.x.size()/2]);
-				gsl_matrix_set(square_mat, 1, 2, 1);
-				gsl_matrix_set(square_mat, 2, 0, pld.x[pld.x.size()-1]*pld.x[pld.x.size()-1]);
-				gsl_matrix_set(square_mat, 2, 1, pld.x[pld.x.size()-1]);
-				gsl_matrix_set(square_mat, 2, 2, 1);
+			if (fit_x.size() > 3) {
+				gsl_matrix *X_fit, *cov_fit;
+				gsl_vector *y_fit, *c_fit;
 
-				gsl_vector *y_vec = gsl_vector_alloc(3);
-				gsl_vector_set(y_vec, 0, pld.y[0]);
-				gsl_vector_set(y_vec, 1, pld.y[pld.x.size()/2]);
-				gsl_vector_set(y_vec, 2, pld.y[pld.x.size()-1]);
+				X_fit = gsl_matrix_alloc(fit_x.size(), 3);
+				y_fit = gsl_vector_alloc(fit_x.size());
+				c_fit = gsl_vector_alloc(3);
+				cov_fit = gsl_matrix_alloc(3, 3);
 
-				gsl_permutation *p = gsl_permutation_alloc(3);
-				gsl_vector *x_vec = gsl_vector_alloc(3);
-				int res;
+				for (unsigned int i = 0 ; i < fit_x.size() ; i++) {
+					gsl_matrix_set(X_fit, i, 0, 1.0);
+					gsl_matrix_set(X_fit, i, 1, fit_x[i]);
+					gsl_matrix_set(X_fit, i, 2, fit_x[i]*fit_x[i]);
+					gsl_vector_set(y_fit, i, fit_y[i]);
+				}
+				gsl_multifit_linear_workspace *work = gsl_multifit_linear_alloc(fit_x.size(), 3);
+				double chisq_fit;
+				gsl_multifit_linear(X_fit, y_fit, c_fit, cov_fit, &chisq_fit, work);
+				gsl_multifit_linear_free(work);
 
-				gsl_linalg_LU_decomp(square_mat, p, &res);
-				gsl_linalg_LU_solve(square_mat, p, y_vec, x_vec);
-				
 
-				gsl_matrix_free(square_mat);
-				gsl_permutation_free (p);
-				gsl_vector_free(y_vec);
-				double x_init[3] = {gsl_vector_get(x_vec, 0), gsl_vector_get(x_vec, 1), gsl_vector_get(x_vec, 2)};
-				std::cout << "Initial values: " << x_init[0] << "  " << x_init[1] << "  " << x_init[2] << std::endl;
-				gsl_vector_free(x_vec);
-
-				//complicated phi using non-linear least-squares fit
-				const gsl_multifit_fdfsolver_type *T = gsl_multifit_fdfsolver_lmsder;
-				gsl_multifit_function_fdf f;
-				pld.sigma.assign(pld.x.size(), 0.1);
-				gsl_vector_view x = gsl_vector_view_array(x_init, 3);
-				f.f = &App2::ConfirmationLabel::phi_lqfit_f;
-				f.df = &App2::ConfirmationLabel::phi_lqfit_df;
-				f.fdf = &App2::ConfirmationLabel::phi_lqfit_fdf;
-				f.n = pld.x.size();
-				f.p = 3;
-				f.params = &pld;
-
-				s = gsl_multifit_fdfsolver_alloc(T, pld.x.size(), 3);
-				gsl_multifit_fdfsolver_set(s, &f, &x.vector);
-				int status = gsl_multifit_fdfsolver_driver(s, 50000, 10000, 1E-1);
-
-				if (status != GSL_SUCCESS) {
-					message += "No convergence while calculating scaling factor phi using GSL non-linear least squares fitting. ";
-					message += gsl_strerror(status);
-					std::cout << "Exception message: " << message << std::endl;
-					throw BAM::Exception(message.c_str());
-				}	
 				std::cout << "fit results: " << std::endl;
-				std::cout << "a: " << gsl_vector_get(s->x, 0) << std::endl;
-				std::cout << "b: " << gsl_vector_get(s->x, 1) << std::endl;
-				std::cout << "c: " << gsl_vector_get(s->x, 2) << std::endl;
-				a[index] = gsl_vector_get(s->x, 0);
-				b[index] = gsl_vector_get(s->x, 1);
-				c[index] = gsl_vector_get(s->x, 2);
-				gsl_multifit_fdfsolver_free(s);	
+				std::cout << "a: " << gsl_vector_get(c_fit, 2) << std::endl;
+				std::cout << "b: " << gsl_vector_get(c_fit, 1) << std::endl;
+				std::cout << "c: " << gsl_vector_get(c_fit, 0) << std::endl;
+				a[index] = gsl_vector_get(c_fit, 2);
+				b[index] = gsl_vector_get(c_fit, 1);
+				c[index] = gsl_vector_get(c_fit, 0);
 			} //for loop over all MC simulated elements
-			*/
 		} // for loop over all energies
 
 		//create object that will be written to file	
@@ -366,39 +330,4 @@ void App2::ConfirmationLabel::WriteRXIs() {
 	}
 
 	assistant->get_application()->remove_window(*assistant);
-}
-
-/*
- *
- * Remember: y(x) = a * x^2 + b * x + c
- *
- */
-
-int App2::ConfirmationLabel::phi_lqfit_f(const gsl_vector *x, void *data, gsl_vector *f) {
-	struct phi_lqfit_data *pld = (struct phi_lqfit_data *) data;
-	double a = gsl_vector_get(x, 0);
-	double b = gsl_vector_get(x, 1);
-	double c = gsl_vector_get(x, 2);
-
-	for (unsigned int i = 0 ; i < pld->x.size() ; i++) {
-		double t = pld->x[i];
-		double Yi = a * t * t + b * t + c;
-		gsl_vector_set(f, i, (Yi - pld->y[i]) / pld->sigma[i]);
-	}
-	return GSL_SUCCESS;
-}
-
-int App2::ConfirmationLabel::phi_lqfit_df(const gsl_vector *x, void *data, gsl_matrix *J) {
-	struct phi_lqfit_data *pld = (struct phi_lqfit_data *) data;
-	//double a = gsl_vector_get(x, 0);
-	//double b = gsl_vector_get(x, 1);
-	//double c = gsl_vector_get(x, 2);
-
-	for (unsigned int i = 0 ; i < pld->x.size() ; i++) {
-		double t = pld->x[i];
-		gsl_matrix_set(J, i, 0, t * t / pld->sigma[i]);	
-		gsl_matrix_set(J, i, 1, t / pld->sigma[i]);	
-		gsl_matrix_set(J, i, 2, 1 / pld->sigma[i]);	
-	}
-	return GSL_SUCCESS;
 }
