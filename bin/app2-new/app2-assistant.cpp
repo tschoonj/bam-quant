@@ -8,7 +8,8 @@ App2::Assistant::Assistant() :  intro_page("Welcome!\n\nIn this wizard you will 
 				samples_summary_grid(this),
 				simulate_grid(this),
 				output_file_grid(this),
-				confirm_page("Just one more thing to do!\n\nClick the apply button and the file will be saved...") {
+				confirmation_label(this)
+				{
 
 	//initialize assistant
 	set_border_width(12);
@@ -41,10 +42,10 @@ App2::Assistant::Assistant() :  intro_page("Welcome!\n\nIn this wizard you will 
 	set_page_complete(output_file_grid, false);
 
 
-	append_page(confirm_page);
-	set_page_type(confirm_page, Gtk::ASSISTANT_PAGE_CONFIRM);
-	set_page_title(confirm_page, "The end...");
-	set_page_complete(confirm_page, true);
+	append_page(confirmation_label);
+	set_page_type(confirmation_label, Gtk::ASSISTANT_PAGE_CONFIRM);
+	set_page_title(confirmation_label, "The end...");
+	set_page_complete(confirmation_label, true);
 
 	//these two signals do not need to be connected since I have implemented my own methods of these virtual functions
 	//signal_delete_event().connect(sigc::mem_fun(*this, &App2::Assistant::on_delete_event));

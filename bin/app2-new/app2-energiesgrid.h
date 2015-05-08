@@ -7,6 +7,7 @@
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/button.h>
 #include <string>
+#include <map>
 #include "bam_file_xmsi.h"
 
 namespace App2 {
@@ -19,7 +20,7 @@ namespace App2 {
 	public:
 		EnergiesGrid(Assistant *assistant);
 		virtual ~EnergiesGrid() {};
-
+		std::map<double,BAM::File::XMSI> GetMap();
 	private:
 		Assistant *assistant;
 		Glib::RefPtr<Gtk::ListStore> model;

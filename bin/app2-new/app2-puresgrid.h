@@ -16,6 +16,7 @@ namespace App2 {
 	class Assistant;
 	class EnergiesGrid;
 	class SimulateGrid;
+	class ConfirmationLabel;
 
 	class PuresGrid: public Gtk::Grid {
 	public:
@@ -59,6 +60,7 @@ namespace App2 {
 
 		Glib::RefPtr<Gtk::TreeModel> model_ref_energy;
 		friend class SimulateGrid;
+		friend class ConfirmationLabel;
 	};
 }
 #endif

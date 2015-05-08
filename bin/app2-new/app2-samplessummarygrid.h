@@ -13,6 +13,7 @@
 namespace App2 {
 	//forward class declaration
 	class Assistant;
+	class ConfirmationLabel;
 
 	class SamplesSummaryGrid: public Gtk::Grid {
 	public:
@@ -55,6 +56,7 @@ namespace App2 {
 		void on_open_matrix_clicked();
 		void on_selection_changed();
 		void on_fix_thickness_density_toggled(const Glib::ustring &path);
+		friend class ConfirmationLabel;
 	};
 }
 #endif

@@ -250,3 +250,15 @@ bool App2::EnergiesGrid::on_backspace_clicked(GdkEventKey *event) {
 
         return false;
 }
+
+std::map<double,BAM::File::XMSI> App2::EnergiesGrid::GetMap() {
+	std::map<double,BAM::File::XMSI> rv;
+
+	for (Gtk::TreeModel::Children::iterator iter = model->children().begin() ;
+	     iter != model->children().end() ;
+             ++iter) {
+		Gtk::TreeModel::Row row = *iter;
+		rv[row[columns.col_bam_file_xmsi_energy]] = row[columns.col_bam_file_xmsi];
+	}	
+	return rv;
+}

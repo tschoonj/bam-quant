@@ -35,6 +35,9 @@ namespace BAM {
 					SetFilename(xmso.filename);
 				return *this;
 			}
+			bool operator!() {
+				return output == 0;
+			}
 			~XMSO();
 			void Open();
 			void Close();

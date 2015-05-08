@@ -21,6 +21,7 @@
 namespace App2 {
 	//forward class declaration
 	class Assistant;
+	class ConfirmationLabel;
 
 	class SimulateGrid: public Gtk::Grid {
 	public:
@@ -132,6 +133,7 @@ namespace App2 {
 		void on_stop_clicked();
 		void on_simulate_active_toggled(const Glib::ustring &path, unsigned int energy_index);
 		bool on_query_tooltip(int x, int y, bool keyboard_tooltip, const Glib::RefPtr<Gtk::Tooltip>& tooltip);
+		friend class ConfirmationLabel;
 	};
 }
 #endif

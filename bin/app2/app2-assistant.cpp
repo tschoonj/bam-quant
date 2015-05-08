@@ -452,7 +452,7 @@ void App2Assistant::on_assistant_close() {
 				std::cout << "b: " << gsl_vector_get(s->x, 1) << std::endl;
 				std::cout << "c: " << gsl_vector_get(s->x, 2) << std::endl;
 			}
-		}	
+		}
 
 		BAM::File::RXI::Multi rxi_multi(*fourth_page_xmsi_file);
 

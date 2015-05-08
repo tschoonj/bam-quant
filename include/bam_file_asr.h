@@ -31,11 +31,23 @@ namespace BAM {
 				filename = asr.filename;
 				return *this;
 			}
-			Data::ASR GetData(int i) {
-				if (i < 0 || i >= (int) data_asr.size()) {
-					throw BAM::Exception("Index out of bounds in BAM::File::GetData");
+			operator unsigned int() {
+				return data_asr.size();
+			}
+			Data::ASR GetData(unsigned int i) {
+				if (i >= data_asr.size()) {
+					throw BAM::Exception("BAM::File::GetData -> Index out of bounds");
 				}			
 				return data_asr[i];
+			}
+			Data::ASR operator()(int element, int line_type) {
+				for (std::vector<BAM::Data::ASR>::iterator iter = data_asr.begin() ;
+				     iter != data_asr.end() ;
+				     ++iter) {
+					if (iter->GetZ() == element && iter->GetLine() == line_type)
+						return *iter;
+				}
+				throw BAM::Exception("BAM::File::operator()(a,b)-> No match found");
 			}
 			double GetNormfactor() {
 				return normfactor;
