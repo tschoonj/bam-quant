@@ -17,9 +17,9 @@ int main(int argc, char **argv) {
 #endif
         gtk_disable_setlocale();
         setbuf(stdout,NULL);
-	Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc, argv, "de.bam.app2");
+	Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc, argv, "de.bam.app2-new");
 
-	App2Assistant window;
+	App2::Assistant window;
 
 	if (xmi_xmlLoadCatalog() == 0) {
 		return 1;
