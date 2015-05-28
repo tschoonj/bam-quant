@@ -37,6 +37,7 @@ void App2::ConfirmationLabel::WriteRXIs() {
 			App2::SimulateGrid::Columns *columns = assistant->simulate_grid.columns;	
 			std::vector<double> fit_x;
 			std::vector<double> fit_y;
+			double norm_scale_factor = assistant->pures_grid_vec[index]->GetNormScaleFactor();
 			for (Gtk::TreeModel::Children::iterator iter = assistant->simulate_grid.model->children().begin() ;
 			     iter != assistant->simulate_grid.model->children().end() ;
 			     ++iter) {
@@ -54,10 +55,10 @@ void App2::ConfirmationLabel::WriteRXIs() {
 
 
 				if (col_bam_file_asr.GetData(0).GetLine() == KA_LINE && row[columns->col_xmso_counts_KA[index]] > 0.0) {
-					local_phi = col_bam_file_asr.GetData(0).GetCounts() * col_bam_file_asr.GetNormfactor() / row[columns->col_xmso_counts_KA[index]]; 
+					local_phi = col_bam_file_asr.GetData(0).GetCounts() * col_bam_file_asr.GetNormfactor() * norm_scale_factor / row[columns->col_xmso_counts_KA[index]]; 
 				}
 				else if (col_bam_file_asr.GetData(0).GetLine() == LA_LINE && row[columns->col_xmso_counts_LA[index]] > 0.0) {
-					local_phi = col_bam_file_asr.GetData(0).GetCounts() * col_bam_file_asr.GetNormfactor() / row[columns->col_xmso_counts_LA[index]];
+					local_phi = col_bam_file_asr.GetData(0).GetCounts() * col_bam_file_asr.GetNormfactor() * norm_scale_factor / row[columns->col_xmso_counts_LA[index]];
 				}
 				else {
 					throw BAM::Exception(std::string("Mismatch found: counts in ASR file and corresponding simulation result must both be positive values! Problem detected for element:")+row[columns->col_element]);
@@ -224,7 +225,7 @@ void App2::ConfirmationLabel::WriteRXIs() {
 					//strictly speaking one could add both KA_LINE and LA_LINE to the axfit model. If so this needs to be corrected
 					if (data_asr_pure.GetLine() != line)
 						throw BAM::Exception("Linetype in sample and pure not matching!");
-					double norm_factor_pure = file_asr_pure.GetNormfactor();
+					double norm_factor_pure = file_asr_pure.GetNormfactor() * assistant->pures_grid_vec[energy_index]->GetNormScaleFactor();
 					rxi = data_asr_sample.GetCounts() * norm_factor_sample /
 					(data_asr_pure.GetCounts() * norm_factor_pure);
 

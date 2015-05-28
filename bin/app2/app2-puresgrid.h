@@ -8,6 +8,8 @@
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/button.h>
 #include <gtkmm/treerowreference.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/cssprovider.h>
 #include <string>
 #include "bam_file_asr.h"
 //
@@ -28,6 +30,7 @@ namespace App2 {
 		double GetEnergy() {
 			return energy;
 		}
+		double GetNormScaleFactor();
 	private:
 		Assistant *assistant;
 		App2::EnergiesGrid *energies_grid;
@@ -58,7 +61,12 @@ namespace App2 {
 		void on_open_button_clicked();
 		bool on_backspace_clicked(GdkEventKey *key);
 
-		Glib::RefPtr<Gtk::TreeModel> model_ref_energy;
+		Glib::RefPtr<Gtk::CssProvider> cssprovider_red;
+                Glib::RefPtr<Gtk::CssProvider> cssprovider_current;
+		Gtk::Entry norm_scale_factor;
+		void on_text_changed();
+		bool check_norm_scale_factor();
+
 		friend class SimulateGrid;
 		friend class ConfirmationLabel;
 	};

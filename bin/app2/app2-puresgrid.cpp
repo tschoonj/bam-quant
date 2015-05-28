@@ -14,6 +14,7 @@ App2::PuresGrid::PuresGrid(App2::Assistant *assistant_arg, App2::EnergiesGrid *g
 	if (!ref_energy)
 		throw BAM::Exception("Invalid TreeRowReference passed to PuresGrid constructor");
 
+	Glib::RefPtr<Gtk::TreeModel> model_ref_energy;
 	model_ref_energy = ref_energy.get_model();
 	Gtk::TreeModel::Row row = *(model_ref_energy->get_iter(ref_energy.get_path()));
 	energy = row[energies_grid->columns.col_bam_file_xmsi_energy];
@@ -58,7 +59,81 @@ App2::PuresGrid::PuresGrid(App2::Assistant *assistant_arg, App2::EnergiesGrid *g
 	tv.signal_key_press_event().connect(sigc::mem_fun(*this, &App2::PuresGrid::on_backspace_clicked));
 	tv.get_selection()->set_mode(Gtk::SELECTION_MULTIPLE);
 
+	label = Gtk::manage(new Gtk::Label("Scale normalization factor with"));
+	Gtk::Grid *norm_scale_factor_grid = Gtk::manage(new Gtk::Grid());
+	attach(*norm_scale_factor_grid, 0, 2, 2, 1);
+	norm_scale_factor_grid->set_column_spacing(5);
+	norm_scale_factor_grid->set_row_spacing(5);
+	norm_scale_factor_grid->set_row_homogeneous(false);
+	norm_scale_factor_grid->set_column_homogeneous(false);
+	label->set_hexpand();
+	label->set_justify(Gtk::JUSTIFY_RIGHT);
+	norm_scale_factor_grid->attach(*label, 0, 0, 1, 1);
+	norm_scale_factor_grid->attach(norm_scale_factor, 1, 0, 1, 1);
+	norm_scale_factor_grid->set_hexpand();
+	norm_scale_factor.set_text("1");
+	norm_scale_factor.signal_changed().connect(sigc::mem_fun(*this, &App2::PuresGrid::on_text_changed));
+
+	cssprovider_current = Glib::RefPtr<Gtk::CssProvider>();
+	cssprovider_red = Gtk::CssProvider::create();
+        Glib::ustring cssdata = "GtkEntry { background: red; }";
+        if (not cssprovider_red->load_from_data(cssdata)) {
+                std::cerr << "Failed to load css" << std::endl;
+        }
+
+
 	show_all_children();
+}
+
+double App2::PuresGrid::GetNormScaleFactor() {
+	Glib::ustring text = norm_scale_factor.get_text();
+	std::stringstream ss(text);
+	double rv;
+
+	ss >> rv;
+
+	return rv;
+}
+
+bool App2::PuresGrid::check_norm_scale_factor() {
+	Glib::ustring text = norm_scale_factor.get_text();
+	std::stringstream ss(text);
+
+        double val;
+        if ((ss >> val).fail() || !(ss >> std::ws).eof() || val <= 0.0) {
+		return false;
+	}
+	return true;
+}
+
+void App2::PuresGrid::on_text_changed() {
+	//get the text and try to convert it to a real number
+	//afterwards check if it's positive and greater than zero
+	std::cout << "Entering on_text_changed" << std::endl;
+	if (check_norm_scale_factor()) {
+		std::cout << "check_norm_scale_factor true" << std::endl;
+		//norm_scale_factor.unset_background_color();
+		if (cssprovider_current) {
+                	Glib::RefPtr<Gtk::StyleContext> csscontext = norm_scale_factor.get_style_context();
+                	csscontext->remove_provider(cssprovider_current);
+        		cssprovider_current = Glib::RefPtr<Gtk::CssProvider>();
+        	}
+		if (model->children().size() >= 2) {
+			assistant->set_page_complete(*this, true);	
+		}
+	}
+	else {
+		std::cout << "check_norm_scale_factor false" << std::endl;
+		//norm_scale_factor.override_background_color(Gdk::RGBA("Red"));
+		if (cssprovider_current != cssprovider_red) {
+			std::cout << "changing to red" << std::endl;
+			Glib::RefPtr<Gtk::StyleContext> csscontext = norm_scale_factor.get_style_context();
+                	csscontext->add_provider(cssprovider_red, 600);
+                	cssprovider_current = cssprovider_red;
+		}
+		assistant->set_page_complete(*this, false);	
+	}
+	
 }
 
 void App2::PuresGrid::on_open_button_clicked() {
@@ -153,7 +228,7 @@ void App2::PuresGrid::on_open_button_clicked() {
 			row[columns.col_linetype] = Glib::ustring("Lα");
 		}
 	}
-	if (model->children().size() >= 2) {
+	if (model->children().size() >= 2 && check_norm_scale_factor()) {
 		assistant->set_page_complete(*this, true);
 	}
 	else {
@@ -170,7 +245,7 @@ bool App2::PuresGrid::on_backspace_clicked(GdkEventKey *event) {
 			Gtk::TreeModel::Row row = *(model->get_iter(*rit));
 			model->erase(row);
 		}
-		if (model->children().size() >= 2) {
+		if (model->children().size() >= 2 && check_norm_scale_factor()) {
 			assistant->set_page_complete(*this, true);	
 		}
 		else {
