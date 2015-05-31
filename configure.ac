@@ -80,10 +80,16 @@ PKG_PROG_PKG_CONFIG
 #search for xraylib and other modules
 PKG_CHECK_MODULES([xraylib],libxrl >= 3.1.0)
 PKG_CHECK_MODULES([xmimsim],libxmimsim >= 5.1)
-PKG_CHECK_MODULES([gtkmm],gtkmm-3.0 >= 3.12.0)
 PKG_CHECK_MODULES([glibmm],glibmm-2.4)
-PKG_CHECK_MODULES([libxmlmm], libxml++-2.6 >= 2.30.0)
+PKG_CHECK_MODULES([libxmlmm], libxml++-2.6 >= 2.36.0)
 PKG_CHECK_MODULES([gsl], gsl)
+ENABLE_GUI=
+PKG_CHECK_MODULES([gtkmm],gtkmm-3.0 >= 3.12.0, [ENABLE_GUI=1], 
+	[ENABLE_GUI=0]
+	AC_MSG_WARN([Building without graphical user interface!!!]))
+AM_CONDITIONAL([ENABLE_GUI],[test "x$ENABLE_GUI" = x1])
+
+
 
 #search for xmlcatalog
 AC_CHECK_PROG([XMLCATALOG],[xmlcatalog],[xmlcatalog],[fail])
