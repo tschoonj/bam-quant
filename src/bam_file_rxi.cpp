@@ -14,10 +14,15 @@ using namespace BAM::File::RXI;
 using namespace BAM::Data::RXI;
 
 static Sample ConvertXMLToSample(xmlpp::Element *element) {
-	Glib::ustring density_str = dynamic_cast<xmlpp::Element*>(element->get_first_child("density"))->get_child_text()->get_content();
-	Glib::ustring thickness_str = dynamic_cast<xmlpp::Element*>(element->get_first_child("thickness"))->get_child_text()->get_content();
+	Glib::ustring density_str = dynamic_cast<xmlpp::Element*>(*(element->get_children("density").begin()))->get_child_text()->get_content();
+	Glib::ustring thickness_str = dynamic_cast<xmlpp::Element*>(*(element->get_children("thickness").begin()))->get_child_text()->get_content();
  	Glib::ustring density_thickness_str = element->get_attribute_value("density_thickness");
  	Glib::ustring matrix_str = element->get_attribute_value("matrix");
+
+	//the following is necessary to circumvent a bug in libxml++ versions before 2.36.0 regarding the handling of default attribute values	
+	if (matrix_str == "") {
+		matrix_str = "none";
+	}
 
 	xmlpp::Node::NodeList asrfile_nodes = element->get_children("asrfile");
 	std::map<std::string,double> asrfiles;
@@ -143,7 +148,7 @@ void Single::Parse() {
 	if (root->get_name() != "bam-quant-rxi-single") {
 		throw BAM::Exception("BAM::File::RXI::Single::Parse -> root element must be bam-quant-rxi-single");
 	}
-	xmlpp::Element *samples = dynamic_cast<xmlpp::Element*>(root->get_first_child("samples"));
+	xmlpp::Element *samples = dynamic_cast<xmlpp::Element*>(*(root->get_children("samples").begin()));
 	if (samples == 0) {
 		throw BAM::Exception("BAM::File::RXI::Single::Parse -> root element does not contain the samples element");
 	}

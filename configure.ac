@@ -81,7 +81,7 @@ PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([xraylib],libxrl >= 3.1.0)
 PKG_CHECK_MODULES([xmimsim],libxmimsim >= 5.1)
 PKG_CHECK_MODULES([glibmm],glibmm-2.4)
-PKG_CHECK_MODULES([libxmlmm], libxml++-2.6 >= 2.36.0)
+PKG_CHECK_MODULES([libxmlmm], libxml++-2.6 >= 2.30.0)
 PKG_CHECK_MODULES([gsl], gsl)
 ENABLE_GUI=
 PKG_CHECK_MODULES([gtkmm],gtkmm-3.0 >= 3.12.0, [ENABLE_GUI=1], 
