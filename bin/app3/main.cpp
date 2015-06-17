@@ -41,13 +41,14 @@ int main(int argc, char **argv) {
 	static std::string hdf5_file;
         static std::string xmimsim_hdf5_solid_angles;
         static std::string xmimsim_hdf5_escape_ratios;
+	static double conv_threshold(BAM_QUANT_CONV_THRESHOLD_DEFAULT*100.0);
         bool version = false;
 	std::vector<std::string> argv_files;
 
 
 	Glib::OptionContext option_context("inputfile XMSO-file");
 	option_context.set_help_enabled();
-	Glib::OptionGroup option_group("Options", "Options");
+	Glib::OptionGroup option_group("XMI-MSIM Options", "XMI-MSIM Options");
 
 	//option_group.add_entry(App3OptionEntry( "enable-M-lines", 0, "Enable M lines (default)"), (bool&) options.use_M_lines);
 	option_group.add_entry(App3OptionEntry( "disable-M-lines", 0, "Disable M lines", "", Glib::OptionEntry::FLAG_REVERSE), (bool&) options.use_M_lines);
@@ -83,12 +84,37 @@ int main(int argc, char **argv) {
 	option_group.add_entry(App3OptionEntry( "verbose", 'v', "Verbose mode"), (bool&) options.verbose);
 	option_group.add_entry(App3OptionEntry( "very-verbose", 'V', "Even more verbose mode"), (bool&) options.extra_verbose);
 	option_group.add_entry(App3OptionEntry( "version", 0, "Display version information"), version);
-	option_group.add_entry_filename(App3OptionEntry( G_OPTION_REMAINING), argv_files);
 
-	option_context.set_main_group(option_group);
+
+	Glib::OptionGroup option_group2("BAM-quant options", "BAM-quant options");
+	option_group2.add_entry(App3OptionEntry( "convergence-threshold", 0, "Convergence threshold for each of the relative X-ray intensities (default = 1%)", "VAL"), conv_threshold);
+	option_group2.add_entry_filename(App3OptionEntry( G_OPTION_REMAINING), argv_files);
+
+
+	option_context.set_main_group(option_group2);
+	option_context.add_group(option_group);
 	option_context.set_ignore_unknown_options();
 
-	option_context.parse(argc, argv);
+
+	try {
+		if (option_context.parse(argc, argv) == false) {
+			std::cerr << option_context.get_help(true) << std::endl;
+			return 1;
+		}
+	}
+	catch (Glib::OptionError &e) {
+		std::cerr << "Exception caught: " << e.what() << std::endl;
+		std::cerr << option_context.get_help(true) << std::endl;
+		return 1;
+	}
+
+	if (conv_threshold < 0) {
+		std::cerr << "convergence-threshold must be greater than 0!" << std::endl;
+		return 1;
+	}
+
+	//convert to fraction
+	conv_threshold /= 100.0;
 
         if (version) {
                 std::cout << xmi_version_string() << std::endl;
@@ -124,7 +150,7 @@ int main(int argc, char **argv) {
 		//start by reading in the inputfile
 		BAM::File::RXI::Common *common = BAM::File::RXI::Parse(argv_files[0]);
 		
-		BAM::Job::Quant job(common, argv_files[1], options);
+		BAM::Job::Quant job(common, argv_files[1], options, conv_threshold);
 
 		BAM::Job::XMSI::RandomNumberAcquisitionStop();
 	}

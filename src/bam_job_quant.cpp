@@ -56,7 +56,14 @@ double Quant::calculate_rxi(std::string element, std::map<double,BAM::File::XMSO
 	return rxi;
 }
 
-Quant::Quant(BAM::File::RXI::Common *common_arg, std::string outputfile, struct xmi_main_options options) : pure_map(element_comp), options(options), common(common_arg) {
+Quant::Quant(BAM::File::RXI::Common *common_arg, std::string outputfile, struct xmi_main_options options, double conv_threshold) : pure_map(element_comp), options(options), common(common_arg), conv_threshold(conv_threshold) {
+
+	if (options.verbose) {
+		std::cout << "BAM::Job::Quant started" << std::endl;
+		std::cout << "=======================" << std::endl;
+
+		std::cout << "RXI convergence threshold: " << conv_threshold << std::endl << std::endl;
+	}
 
 	//only constructor in the class
 	//check if we are dealing with single or multi
@@ -249,7 +256,7 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 
 	std::map<std::string, double, bool(*)(std::string,std::string)> rxi_rel(element_comp);
 	for (std::vector<std::string>::iterator it = sample_elements.begin() ; it != sample_elements.end() ; ++it) {
-		rxi_rel[*it] = BAM_QUANT_CONV_THRESHOLD*10.0;
+		rxi_rel[*it] = conv_threshold*10.0;
 	}
 
 	//BAM::Job::XMSI *job(0);
@@ -367,7 +374,7 @@ BAM::File::XMSO Quant::SimulateSample(BAM::Data::RXI::Sample &sample) {
 
 		}
 
-		counted = std::count_if(rxi_rel.begin(), rxi_rel.end(), rxi_match);
+		counted = std::count_if(rxi_rel.begin(), rxi_rel.end(), rxi_match(conv_threshold));
 
 		if (options.verbose) {
 			std::cout << "Composition matched: " << counted << "/" << rxi_rel.size() << std::endl;
