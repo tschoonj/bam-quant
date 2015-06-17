@@ -20,11 +20,16 @@ void App2::ConfirmationLabel::WriteRXIs() {
 	try {
 
 		//start by calculating phi for every energy
-		std::vector<double> phi(assistant->pures_grid_vec.size(), 0.0);
-		std::vector<double> a(assistant->pures_grid_vec.size(), 0.0);
-		std::vector<double> b(assistant->pures_grid_vec.size(), 0.0);
-		std::vector<double> c(assistant->pures_grid_vec.size(), 0.0);
-		std::vector<unsigned int> pld_size(assistant->pures_grid_vec.size(), 0);
+		std::vector<double> phi_KA(assistant->pures_grid_vec.size(), 0.0);
+		std::vector<double> a_KA(assistant->pures_grid_vec.size(), 0.0);
+		std::vector<double> b_KA(assistant->pures_grid_vec.size(), 0.0);
+		std::vector<double> c_KA(assistant->pures_grid_vec.size(), 0.0);
+		std::vector<unsigned int> pld_size_KA(assistant->pures_grid_vec.size(), 0);
+		std::vector<double> phi_LA(assistant->pures_grid_vec.size(), 0.0);
+		std::vector<double> a_LA(assistant->pures_grid_vec.size(), 0.0);
+		std::vector<double> b_LA(assistant->pures_grid_vec.size(), 0.0);
+		std::vector<double> c_LA(assistant->pures_grid_vec.size(), 0.0);
+		std::vector<unsigned int> pld_size_LA(assistant->pures_grid_vec.size(), 0);
 		
 		for (unsigned int index = 0 ; index < assistant->pures_grid_vec.size() ; index++) {
 			std::string message;
@@ -35,8 +40,10 @@ void App2::ConfirmationLabel::WriteRXIs() {
 		
 			//run over all elements
 			App2::SimulateGrid::Columns *columns = assistant->simulate_grid.columns;	
-			std::vector<double> fit_x;
-			std::vector<double> fit_y;
+			std::vector<double> fit_x_KA;
+			std::vector<double> fit_y_KA;
+			std::vector<double> fit_x_LA;
+			std::vector<double> fit_y_LA;
 			double norm_scale_factor = assistant->pures_grid_vec[index]->GetNormScaleFactor();
 			for (Gtk::TreeModel::Children::iterator iter = assistant->simulate_grid.model->children().begin() ;
 			     iter != assistant->simulate_grid.model->children().end() ;
@@ -56,52 +63,89 @@ void App2::ConfirmationLabel::WriteRXIs() {
 
 				if (col_bam_file_asr.GetData(0).GetLine() == KA_LINE && row[columns->col_xmso_counts_KA[index]] > 0.0) {
 					local_phi = col_bam_file_asr.GetData(0).GetCounts() * col_bam_file_asr.GetNormfactor() * norm_scale_factor / row[columns->col_xmso_counts_KA[index]]; 
+					fit_x_KA.push_back(LineEnergy(col_bam_file_asr.GetData(0).GetZ(), KA_LINE));
+					fit_y_KA.push_back(local_phi);
 				}
 				else if (col_bam_file_asr.GetData(0).GetLine() == LA_LINE && row[columns->col_xmso_counts_LA[index]] > 0.0) {
 					local_phi = col_bam_file_asr.GetData(0).GetCounts() * col_bam_file_asr.GetNormfactor() * norm_scale_factor / row[columns->col_xmso_counts_LA[index]];
+					fit_x_LA.push_back(LineEnergy(col_bam_file_asr.GetData(0).GetZ(), LA_LINE));
+					fit_y_LA.push_back(local_phi);
 				}
 				else {
 					throw BAM::Exception(std::string("Mismatch found: counts in ASR file and corresponding simulation result must both be positive values! Problem detected for element:")+row[columns->col_element]);
 				}
 				std::cout << "local_phi: " << local_phi << std::endl;
-				fit_x.push_back(LineEnergy(col_bam_file_asr.GetData(0).GetZ(), col_bam_file_asr.GetData(0).GetLine()));
-				fit_y.push_back(local_phi);
 			}
 			//simple phi -> calculate mean
-			phi[index] = std::accumulate(fit_y.begin(), fit_y.end(), 0)/fit_y.size();
-			std::cout << "average phi simple: " << phi[index] << std::endl;
-			pld_size[index] = fit_x.size();
-			//pld_size[index] = 0;
+			if (fit_x_KA.size())
+				phi_KA[index] = std::accumulate(fit_y_KA.begin(), fit_y_KA.end(), 0)/fit_y_KA.size();
+			std::cout << "average phi_KA simple: " << phi_KA[index] << std::endl;
+			pld_size_KA[index] = fit_x_KA.size();
 
-			if (fit_x.size() > 3) {
+			if (fit_x_LA.size())
+				phi_LA[index] = std::accumulate(fit_y_LA.begin(), fit_y_LA.end(), 0)/fit_y_LA.size();
+			std::cout << "average phi_LA simple: " << phi_LA[index] << std::endl;
+			pld_size_LA[index] = fit_x_LA.size();
+
+			if (fit_x_KA.size() > 3) {
 				gsl_matrix *X_fit, *cov_fit;
 				gsl_vector *y_fit, *c_fit;
 
-				X_fit = gsl_matrix_alloc(fit_x.size(), 3);
-				y_fit = gsl_vector_alloc(fit_x.size());
+				X_fit = gsl_matrix_alloc(fit_x_KA.size(), 3);
+				y_fit = gsl_vector_alloc(fit_x_KA.size());
 				c_fit = gsl_vector_alloc(3);
 				cov_fit = gsl_matrix_alloc(3, 3);
 
-				for (unsigned int i = 0 ; i < fit_x.size() ; i++) {
+				for (unsigned int i = 0 ; i < fit_x_KA.size() ; i++) {
 					gsl_matrix_set(X_fit, i, 0, 1.0);
-					gsl_matrix_set(X_fit, i, 1, fit_x[i]);
-					gsl_matrix_set(X_fit, i, 2, fit_x[i]*fit_x[i]);
-					gsl_vector_set(y_fit, i, fit_y[i]);
+					gsl_matrix_set(X_fit, i, 1, fit_x_KA[i]);
+					gsl_matrix_set(X_fit, i, 2, fit_x_KA[i]*fit_x_KA[i]);
+					gsl_vector_set(y_fit, i, fit_y_KA[i]);
 				}
-				gsl_multifit_linear_workspace *work = gsl_multifit_linear_alloc(fit_x.size(), 3);
+				gsl_multifit_linear_workspace *work = gsl_multifit_linear_alloc(fit_x_KA.size(), 3);
 				double chisq_fit;
 				gsl_multifit_linear(X_fit, y_fit, c_fit, cov_fit, &chisq_fit, work);
 				gsl_multifit_linear_free(work);
 
 
 				std::cout << "fit results: " << std::endl;
-				std::cout << "a: " << gsl_vector_get(c_fit, 2) << std::endl;
-				std::cout << "b: " << gsl_vector_get(c_fit, 1) << std::endl;
-				std::cout << "c: " << gsl_vector_get(c_fit, 0) << std::endl;
-				a[index] = gsl_vector_get(c_fit, 2);
-				b[index] = gsl_vector_get(c_fit, 1);
-				c[index] = gsl_vector_get(c_fit, 0);
-			} //for loop over all MC simulated elements
+				std::cout << "a_KA: " << gsl_vector_get(c_fit, 2) << std::endl;
+				std::cout << "b_KA: " << gsl_vector_get(c_fit, 1) << std::endl;
+				std::cout << "c_KA: " << gsl_vector_get(c_fit, 0) << std::endl;
+				a_KA[index] = gsl_vector_get(c_fit, 2);
+				b_KA[index] = gsl_vector_get(c_fit, 1);
+				c_KA[index] = gsl_vector_get(c_fit, 0);
+			} //for loop over all MC simulated elements with KA lines
+
+			if (fit_x_LA.size() > 3) {
+				gsl_matrix *X_fit, *cov_fit;
+				gsl_vector *y_fit, *c_fit;
+
+				X_fit = gsl_matrix_alloc(fit_x_LA.size(), 3);
+				y_fit = gsl_vector_alloc(fit_x_LA.size());
+				c_fit = gsl_vector_alloc(3);
+				cov_fit = gsl_matrix_alloc(3, 3);
+
+				for (unsigned int i = 0 ; i < fit_x_LA.size() ; i++) {
+					gsl_matrix_set(X_fit, i, 0, 1.0);
+					gsl_matrix_set(X_fit, i, 1, fit_x_LA[i]);
+					gsl_matrix_set(X_fit, i, 2, fit_x_LA[i]*fit_x_LA[i]);
+					gsl_vector_set(y_fit, i, fit_y_LA[i]);
+				}
+				gsl_multifit_linear_workspace *work = gsl_multifit_linear_alloc(fit_x_LA.size(), 3);
+				double chisq_fit;
+				gsl_multifit_linear(X_fit, y_fit, c_fit, cov_fit, &chisq_fit, work);
+				gsl_multifit_linear_free(work);
+
+
+				std::cout << "fit results: " << std::endl;
+				std::cout << "a_LA: " << gsl_vector_get(c_fit, 2) << std::endl;
+				std::cout << "b_LA: " << gsl_vector_get(c_fit, 1) << std::endl;
+				std::cout << "c_LA: " << gsl_vector_get(c_fit, 0) << std::endl;
+				a_LA[index] = gsl_vector_get(c_fit, 2);
+				b_LA[index] = gsl_vector_get(c_fit, 1);
+				c_LA[index] = gsl_vector_get(c_fit, 0);
+			} //for loop over all MC simulated elements with LA lines
 		} // for loop over all energies
 
 		//create object that will be written to file	
@@ -261,15 +305,15 @@ void App2::ConfirmationLabel::WriteRXIs() {
 
 					if (simulate_row[columns->col_xmso_counts_KA[energy_index]] > 0) {
 						double phi_local;
-						if (pld_size[energy_index] > 3) {
+						if (pld_size_KA[energy_index] > 3) {
 							double lE = LineEnergy(Z, KA_LINE);
-							phi_local = a[energy_index]*lE*lE + 
-							      	    b[energy_index]*lE+
-							      	    c[energy_index];
+							phi_local = a_KA[energy_index]*lE*lE + 
+							      	    b_KA[energy_index]*lE+
+							      	    c_KA[energy_index];
 							std::cout << "average phi fit: " << phi_local << " for " << Z << std::endl;
 						}
 						else {
-							phi_local = phi[energy_index];
+							phi_local = phi_KA[energy_index];
 						}
 						rxi = data_asr_sample.GetCounts() * norm_factor_sample /
 						(simulate_row[columns->col_xmso_counts_KA[energy_index]]*phi_local);
@@ -277,15 +321,15 @@ void App2::ConfirmationLabel::WriteRXIs() {
 					}
 					else if (simulate_row[columns->col_xmso_counts_LA[energy_index]] > 0) {
 						double phi_local;
-						if (pld_size[energy_index] > 3) {
+						if (pld_size_LA[energy_index] > 3) {
 							double lE = LineEnergy(Z, LA_LINE);
-							phi_local = a[energy_index]*lE*lE + 
-							      	    b[energy_index]*lE+
-							      	    c[energy_index];
+							phi_local = a_LA[energy_index]*lE*lE + 
+							      	    b_LA[energy_index]*lE+
+							      	    c_LA[energy_index];
 							std::cout << "average phi fit: " << phi_local << " for " << Z << std::endl;
 						}
 						else {
-							phi_local = phi[energy_index];
+							phi_local = phi_LA[energy_index];
 						}
 						rxi = data_asr_sample.GetCounts() * norm_factor_sample /
 						(simulate_row[columns->col_xmso_counts_LA[energy_index]]*phi_local);
