@@ -212,7 +212,7 @@ void App2::SimulateGrid::Prepare() {
 			else if (pures_grid->GetEnergy() > EdgeEnergy(row[columns->col_atomic_number], L3_SHELL))
 				row[columns->col_linetype[i]] = Glib::ustring("Lα");
 			else
-				throw BAM::Exception("Excitation energy lower than L3 edge!");
+				throw BAM::Exception(std::string("Excitation energy lower than L3 edge for element ") + row[columns->col_element]);
 
 			//check if present in pure_elements
 			it = std::find(pure_elements.begin(), pure_elements.end(), row[columns->col_atomic_number]);

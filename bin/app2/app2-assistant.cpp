@@ -1,4 +1,5 @@
 #include "app2-assistant.h"
+#include <gtkmm/messagedialog.h>
 
 
 App2::Assistant::Assistant() :  intro_page("Welcome!\n\nIn this wizard you will produce a file containing\n"
@@ -55,10 +56,19 @@ App2::Assistant::Assistant() :  intro_page("Welcome!\n\nIn this wizard you will 
 }
 
 void App2::Assistant::on_prepare(Gtk::Widget *page) {
-	if (page == &samples_summary_grid)
-		samples_summary_grid.Prepare();	
-	else if (page == &simulate_grid)
-		simulate_grid.Prepare();	
-	else if (page == &output_file_grid)
-		commit();
+	//these functions may throw exceptions
+	try {
+		if (page == &samples_summary_grid)
+			samples_summary_grid.Prepare();	
+		else if (page == &simulate_grid)
+			simulate_grid.Prepare();	
+		else if (page == &output_file_grid)
+			commit();
+	}
+	catch (BAM::Exception &e) {
+		Gtk::MessageDialog dialog(*this, "BAM::Exception caught!", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+  		dialog.set_secondary_text(Glib::ustring("error message: ")+e.what());
+  		dialog.run();
+		get_application()->remove_window(*this);
+	}
 }
