@@ -332,8 +332,8 @@ void XmiMsimDialog::xmimsim_child_watcher(GPid pid, int status) {
 	}
 
 #elif defined(G_OS_WIN32)
+	stringstream ss;
 	if (status == 0) {
-		stringstream ss;
 		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited normally without errors" << endl;
 		update_console(ss.str(), "success");
 		success = 1;

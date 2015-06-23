@@ -558,8 +558,8 @@ void App2::SimulateGrid::xmimsim_child_watcher(GPid pid, int status, unsigned in
 	}
 
 #elif defined(G_OS_WIN32)
+	std::stringstream ss;
 	if (status == 0) {
-		std::stringstream ss;
 		ss << get_elapsed_time() << "xmimsim with process id " << real_xmimsim_pid << " exited normally without errors" << std::endl;
 		update_console(ss.str(), "success");
 		success = 1;

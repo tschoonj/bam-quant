@@ -108,13 +108,14 @@ Quant::Quant(BAM::File::RXI::Common *common_arg, std::string outputfile, struct 
 				if (options.verbose)
 					std::cout << "Now processing Sample " << i << std::endl << std::endl;				
 
-				BAM::File::XMSO *xmso_file;
+				BAM::File::XMSO *xmso_file(0);
 				try {
 					xmso_file = new BAM::File::XMSO(SimulateSample(sample));
 				}
 				catch (BAM::ExceptionLocal &e) {
 					//no convergence for our threshold
-					delete xmso_file;
+					if (xmso_file)
+						delete xmso_file;
 					exit_message << "Sample " << i << ": no convergence" << std::endl;
 					continue;
 				}

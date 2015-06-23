@@ -356,7 +356,7 @@ void App2::SamplesSummaryGrid::Prepare() {
 	}
 	else {
 		bool no_match_found = false;
-		unsigned int size;
+		unsigned int size(0);
 		for (std::vector<SamplesGrid*>::iterator iter = assistant->samples_grid_vec.begin() ;
 		     iter != assistant->samples_grid_vec.end() ; 
 		     ++iter) {
