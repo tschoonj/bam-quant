@@ -11,8 +11,6 @@
 #include <libxml++/libxml++.h>
 #include <bam_catalog.h>
 
-using namespace std;
-
 Window::Window() : big_box(Gtk::ORIENTATION_VERTICAL, 5) {
 	xmi_msim_dialog = 0;
 	phi = 0;
@@ -105,7 +103,7 @@ void Window::new_project() {
 	dialog->add_filter(filter_asr);
 	dialog->add_button("_Cancel", Gtk::RESPONSE_CANCEL);
 	dialog->add_button("Select", Gtk::RESPONSE_OK);
-	
+
 	int result = dialog->run();
 	std::vector<std::string> filenames;
 
@@ -131,7 +129,7 @@ void Window::new_project() {
 		try {
 			asr_file = new BAM::File::ASR(*it);
 		}
-		catch (ifstream::failure &e) {
+		catch (std::ifstream::failure &e) {
 			Gtk::MessageDialog dialog(*this, "Error reading in "+*it, false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   			dialog.set_secondary_text(Glib::ustring("I/O error: ")+e.what());
   			dialog.run();
@@ -180,7 +178,7 @@ void Window::new_project() {
 		//change color of element
 		//buttonMap[Z]->override_background_color(Gdk::RGBA("Chartreuse"));
 		buttonMap[Z]->SetRed();
-			
+
 		/*if (it == filenames.begin())
 			refButton = buttonMap[Z];*/
 
@@ -196,9 +194,9 @@ void Window::new_project() {
 	dialog->add_filter(filter_xmsi);
 	dialog->add_button("_Cancel", Gtk::RESPONSE_CANCEL);
 	dialog->add_button("Select", Gtk::RESPONSE_OK);
-	
+
 	result = dialog->run();
-	string filename;
+	std::string filename;
 	switch(result) {
 		case(Gtk::RESPONSE_OK):
 			filename = dialog->get_filename();
@@ -227,14 +225,14 @@ void Window::new_project() {
 		//reset everything in window!
 		reset_project();
 		return;
-	
+
 	}
 
 	//for all elements -> establish XMSI files with the correct composition
 	for (int i = 1 ; i <= 94 ; i++) {
-		buttonMap[i]->temp_xmsi_filename = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<ostringstream*>( &(ostringstream() << getpid()))->str() + buttonMap[i]->GetElement()+ ".xmsi");
+		buttonMap[i]->temp_xmsi_filename = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + (std::ostringstream() << getpid()).str() + buttonMap[i]->GetElement()+ ".xmsi");
 		buttonMap[i]->xmsi_file = new BAM::File::XMSI(*xmsi_file);
-		
+
 		//now change its composition
 		BAM::Data::XMSI::Composition composition;
 
@@ -247,7 +245,7 @@ void Window::new_project() {
 
 		composition.SetReferenceLayer(2);
 		buttonMap[i]->xmsi_file->ReplaceComposition(composition);
-		string temp_xmso_filename = buttonMap[i]->temp_xmsi_filename;
+		std::string temp_xmso_filename = buttonMap[i]->temp_xmsi_filename;
 		temp_xmso_filename.replace(temp_xmso_filename.end()-1,temp_xmso_filename.end(), "o");
 		buttonMap[i]->xmsi_file->SetOutputFile(temp_xmso_filename);
 		buttonMap[i]->xmsi_file->SetFilename(buttonMap[i]->temp_xmsi_filename);
@@ -296,16 +294,16 @@ void Window::new_project() {
 	//settings_action->set_enabled();
 	save_action->set_enabled();
 	multiple_add_action->set_enabled();
-	
+
 }
 
 void Window::update_phis() {
 	//let's calculate the normalization factor
 	for (std::vector<MendeleevButton *>::iterator it = buttonVectorASR.begin() ; it != buttonVectorASR.end(); ++it) {
-		cout << "asr_counts_KA: " << (*it)->asr_counts_KA << endl;
-		cout << "asr_counts_LA: " << (*it)->asr_counts_LA << endl;
-		cout << "xmso_counts_KA: " << (*it)->xmso_counts_KA << endl;
-		cout << "xmso_counts_LA: " << (*it)->xmso_counts_LA << endl;
+		std::cout << "asr_counts_KA: " << (*it)->asr_counts_KA << std::endl;
+		std::cout << "asr_counts_LA: " << (*it)->asr_counts_LA << std::endl;
+		std::cout << "xmso_counts_KA: " << (*it)->xmso_counts_KA << std::endl;
+		std::cout << "xmso_counts_LA: " << (*it)->xmso_counts_LA << std::endl;
 		if ((*it)->asr_counts_KA > 0 && (*it)->xmso_counts_KA > 0) {
 			(*it)->phi = (*it)->asr_counts_KA * (*it)->asr_file->GetNormfactor() / ASR_SCALE_FACTOR / (*it)->xmso_counts_KA;
 		}
@@ -313,7 +311,7 @@ void Window::update_phis() {
 			(*it)->phi = (*it)->asr_counts_LA * (*it)->asr_file->GetNormfactor() / ASR_SCALE_FACTOR / (*it)->xmso_counts_LA;
 		}
 		else {
-			Gtk::MessageDialog dialog(*this, string("Error detected while calculating phi for ")+(*it)->GetElement(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
+			Gtk::MessageDialog dialog(*this, std::string("Error detected while calculating phi for ")+(*it)->GetElement(), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE, true);
   			dialog.run();
 			dialog.hide();
 			//reset everything in window!
@@ -321,10 +319,10 @@ void Window::update_phis() {
 			return;
 		}
 		phi += (*it)->phi;
-		cout << "Phi for element " << (*it)->GetElement() << ": " << (*it)->phi << endl;
+		std::cout << "Phi for element " << (*it)->GetElement() << ": " << (*it)->phi << std::endl;
 	}
 	phi /= buttonVectorASR.size();
-	cout << "Average phi: " << phi << endl;
+	std::cout << "Average phi: " << phi << std::endl;
 
 }
 
@@ -353,7 +351,7 @@ void Window::settings() {
 	Gtk::Label label("Reference element");
 	hbox.pack_start(label, false, false, 3);
 	Gtk::ComboBoxText combo;
-	
+
 	int counter = 0;
 	for (int Z = 1 ; Z <= 94 ; Z++) {
 		if (buttonMap[Z]->asr_file) {
@@ -395,13 +393,13 @@ void Window::save_project() {
 	dialog->add_filter(filter_bqp1);
 	dialog->add_button("_Cancel", Gtk::RESPONSE_CANCEL);
 	dialog->add_button("Select", Gtk::RESPONSE_OK);
-	
+
 	int result = dialog->run();
-	string filename;
+	std::string filename;
 	switch(result) {
 		case(Gtk::RESPONSE_OK):
 			filename = dialog->get_filename();
-			if (filename.compare(filename.length()-5, string::npos, ".bqp1") != 0)
+			if (filename.compare(filename.length()-5, std::string::npos, ".bqp1") != 0)
 				filename += ".bqp1";
 			std::cout << "Open clicked: " << filename << std::endl;
       			break;
@@ -411,7 +409,7 @@ void Window::save_project() {
 			return;
 	}
 	delete dialog;
-	
+
 	try {
 		xmlpp::Document document;
 
@@ -431,7 +429,7 @@ void Window::save_project() {
 				element_data->set_attribute("element", it->second->GetElement());
 				element_data->set_attribute("linetype", it->second->asr_counts_KA > 0.0 ? "KA_LINE": "LA_LINE");
 				xmlpp::Element *asrfile = element_data->add_child("asrfile");
-				stringstream ss;
+				std::stringstream ss;
 				if (it->second->asr_counts_KA > 0.0)
 					ss << it->second->asr_counts_KA;
 				else
@@ -444,7 +442,7 @@ void Window::save_project() {
 				xmlpp::Element *normfactor = asrfile->add_child("normfactor");
 				normfactor->add_child_text(ss.str());
 				xmlpp::Element *xmimsim = element_data->add_child("xmimsim-results");
-				
+
 				//xmlpp::Node *nodepp = dynamic_cast<xmlpp::Node *>(element_data);
 				xmlNodePtr node = xmimsim->cobj();
 				struct xmi_output *xmso_raw = it->second->xmso_file->GetInternalCopy();
@@ -479,7 +477,7 @@ void Window::save_project() {
 	catch (...) {
 		std::cerr << "some other exception occurred" << std::endl;
 	}
-	cout << "end of save_project reached" << endl;
+	std::cout << "end of save_project reached" << std::endl;
 	return;
 }
 
@@ -493,9 +491,9 @@ void Window::open_project() {
 	dialog->add_filter(filter_bqp1);
 	dialog->add_button("_Cancel", Gtk::RESPONSE_CANCEL);
 	dialog->add_button("Select", Gtk::RESPONSE_OK);
-	
+
 	int result = dialog->run();
-	string filename;
+	std::string filename;
 	switch(result) {
 		case(Gtk::RESPONSE_OK):
 			filename = dialog->get_filename();
@@ -541,7 +539,7 @@ void Window::open_project() {
 				Glib::ustring axil_counts_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("axil_counts"))->get_child_text()->get_content();
 				Glib::ustring normfactor_str = dynamic_cast<xmlpp::Element *>(asrfile->get_first_child("normfactor"))->get_child_text()->get_content();
 				buttonMap[Z]->SetRed();
-				stringstream ss;
+				std::stringstream ss;
 				if (linetype == "KA_LINE") {
 					ss << axil_counts_str;
 					ss >> buttonMap[Z]->asr_counts_KA;
@@ -569,7 +567,7 @@ void Window::open_project() {
 				buttonMap[Z]->SetGreen();
 				buttonVectorXMSO.push_back(buttonMap[Z]);
 			}
-			
+
 			xmlpp::Node *xmimsim_results = (*it)->get_first_child("xmimsim-results");
 			struct xmi_output *output = (struct xmi_output*) malloc(sizeof(struct xmi_output));
 			if (xmi_read_output_xml_body(document->cobj(), xmimsim_results->cobj(), output, 0, 0) == 0) {
@@ -578,9 +576,9 @@ void Window::open_project() {
 			}
 			if (it == list.begin()) {
 				//first file only
-				cout << "Before constructing xmsi_file" << endl;
+				std::cout << "Before constructing xmsi_file" << std::endl;
 				xmsi_file = new BAM::File::XMSI(output->input);
-				cout << "After constructing xmsi_file" << endl;
+				std::cout << "After constructing xmsi_file" << std::endl;
 			}
 
 
@@ -606,14 +604,14 @@ void Window::open_project() {
 			catch (BAM::Exception &e) { /*ignore*/}
 
 
-			
+
 		}
 		delete parser;
 
 		for (int i = 1 ; i <= 94 ; i++) {
-			buttonMap[i]->temp_xmsi_filename = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<ostringstream*>( &(ostringstream() << getpid()))->str() + buttonMap[i]->GetElement()+ ".xmsi");
+			buttonMap[i]->temp_xmsi_filename = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + (std::ostringstream() << getpid()).str() + buttonMap[i]->GetElement()+ ".xmsi");
 			buttonMap[i]->xmsi_file = new BAM::File::XMSI(*xmsi_file);
-			
+
 			//now change its composition
 			BAM::Data::XMSI::Composition composition;
 
@@ -626,7 +624,7 @@ void Window::open_project() {
 
 			composition.SetReferenceLayer(2);
 			buttonMap[i]->xmsi_file->ReplaceComposition(composition);
-			string temp_xmso_filename = buttonMap[i]->temp_xmsi_filename;
+			std::string temp_xmso_filename = buttonMap[i]->temp_xmsi_filename;
 			temp_xmso_filename.replace(temp_xmso_filename.end()-1,temp_xmso_filename.end(), "o");
 			buttonMap[i]->xmsi_file->SetOutputFile(temp_xmso_filename);
 			buttonMap[i]->xmsi_file->SetFilename(buttonMap[i]->temp_xmsi_filename);
@@ -636,15 +634,15 @@ void Window::open_project() {
 		delete xmsi_file;
 	}
 	catch (xmlpp::validity_error &e) {
-		std::cerr << "Error message while checking document validity: " << e.what() << endl;
+		std::cerr << "Error message while checking document validity: " << e.what() << std::endl;
 		return;
-	} 
+	}
 	catch (const std::exception &e) {
-		std::cerr << "Error message while parsing: " << e.what() << endl;
+		std::cerr << "Error message while parsing: " << e.what() << std::endl;
 		return;
-	} 
+	}
 	catch (...) {
-		std::cerr << "Some other exception caught" << endl;
+		std::cerr << "Some other exception caught" << std::endl;
 		return;
 	}
 	//ok, so now everything is processed, add it to the view
@@ -652,7 +650,7 @@ void Window::open_project() {
 
 	save_action->set_enabled();
 	multiple_add_action->set_enabled(true);
-	
+
 }
 
 void Window::multiple_add() {
@@ -662,7 +660,7 @@ void Window::multiple_add() {
 	dialog->add_button("Ok", Gtk::RESPONSE_OK);
 	dialog->add_button("Cancel", Gtk::RESPONSE_CANCEL);
 	Gtk::Box *vbox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_VERTICAL));
-	Gtk::Box *hbox; 
+	Gtk::Box *hbox;
 	Gtk::Label *label;
 
 	hbox = Gtk::manage(new Gtk::Box(Gtk::ORIENTATION_HORIZONTAL));
@@ -729,7 +727,7 @@ void Window::multiple_add() {
 
 void Window::launch_simulations() {
 	std::vector<MendeleevButton*> buttonVectorXMSO_added;
-	
+
 	for (std::vector<MendeleevButton*>::iterator it = buttonVectorXMSO.begin() ; it != buttonVectorXMSO.end() ; ++it) {
 		if (!(*it)->xmso_file)
 			buttonVectorXMSO_added.push_back(*it);
@@ -777,7 +775,7 @@ void Window::launch_simulations() {
 }
 
 void Window::on_combo_from_changed() {
-	cout << "on_combo_from_changed" << endl;
+	std::cout << "on_combo_from_changed" << std::endl;
 	//when combo_from is changed, combo_to may need to be updated
 	const char *element_from = combo_from->get_active_text().c_str();
 	int Z_from = SymbolToAtomicNumber((char *) element_from);

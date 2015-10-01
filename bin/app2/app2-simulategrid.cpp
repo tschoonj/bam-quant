@@ -30,7 +30,7 @@
 
 
 
-App2::SimulateGrid::SimulateGrid(App2::Assistant *assistant_arg) : 
+App2::SimulateGrid::SimulateGrid(App2::Assistant *assistant_arg) :
 	assistant(assistant_arg),
 	buttons(Gtk::ORIENTATION_VERTICAL),
 	columns(0),
@@ -39,10 +39,10 @@ App2::SimulateGrid::SimulateGrid(App2::Assistant *assistant_arg) :
 	xmimsim_paused(false),
 	xmimsim_pid(0),
 	timer(0) {
-	
-	pause_button.set_image_from_icon_name("media-playback-pause", Gtk::ICON_SIZE_DIALOG);	
-	stop_button.set_image_from_icon_name("media-playback-stop", Gtk::ICON_SIZE_DIALOG);	
-	play_button.set_image_from_icon_name("media-playback-start", Gtk::ICON_SIZE_DIALOG);	
+
+	pause_button.set_image_from_icon_name("media-playback-pause", Gtk::ICON_SIZE_DIALOG);
+	stop_button.set_image_from_icon_name("media-playback-stop", Gtk::ICON_SIZE_DIALOG);
+	play_button.set_image_from_icon_name("media-playback-start", Gtk::ICON_SIZE_DIALOG);
 	buttons.pack_start(play_button);
 	buttons.pack_start(pause_button);
 	buttons.pack_start(stop_button);
@@ -84,7 +84,7 @@ void App2::SimulateGrid::Prepare() {
 	//no way back! although I could probably with some work remove this constraint...
 	assistant->commit();
 
-	//first thing to do: set up the columns!	
+	//first thing to do: set up the columns!
 	unsigned int n_energies = assistant->pures_grid_vec.size();
 	columns = new Columns(n_energies);
 	model = Gtk::ListStore::create(*columns);
@@ -112,7 +112,7 @@ void App2::SimulateGrid::Prepare() {
 		temp_column->pack_end(*cell2);
 		temp_column->add_attribute(cell2->property_value(), columns->col_progress[i]);
 		temp_column->add_attribute(cell2->property_text(), columns->col_status[i]);
-	} 
+	}
 
 	//next: throw the data into the model
 	//start with the zero-th column: all elements
@@ -120,20 +120,20 @@ void App2::SimulateGrid::Prepare() {
 
 	for (unsigned int i = 0 ; i < n_energies ; i++) {
 		PuresGrid *pures_grid = assistant->pures_grid_vec[i];
-		for (Gtk::TreeModel::Children::iterator iter = pures_grid->model->children().begin() ; 
+		for (Gtk::TreeModel::Children::iterator iter = pures_grid->model->children().begin() ;
 		     iter != pures_grid->model->children().end() ;
 		     ++iter) {
 			Gtk::TreeModel::Row row = *iter;
-			elements_int.push_back(row[pures_grid->columns.col_atomic_number]);	
-		}		
+			elements_int.push_back(row[pures_grid->columns.col_atomic_number]);
+		}
 		SamplesGrid *samples_grid = assistant->samples_grid_vec[i];
-		for (Gtk::TreeModel::Children::iterator iter = samples_grid->model->children().begin() ; 
+		for (Gtk::TreeModel::Children::iterator iter = samples_grid->model->children().begin() ;
 		     iter != samples_grid->model->children().end() ;
 		     ++iter) {
 			Gtk::TreeModel::Row row = *iter;
 			std::vector<int> elements_int_local = row[samples_grid->columns.col_elements_int];
 			elements_int.insert(elements_int.end(), elements_int_local.begin(), elements_int_local.end());
-		}		
+		}
 	}
 	std::sort(elements_int.begin(), elements_int.end() );
 	elements_int.erase(std::unique(elements_int.begin(), elements_int.end()), elements_int.end());
@@ -150,8 +150,8 @@ void App2::SimulateGrid::Prepare() {
 
 	unsigned int diff_elements_sum = 0;
 
-	diff_elements = new std::vector<int>[n_energies]; 
-	union_elements = new std::vector<int>[n_energies]; 
+	diff_elements = new std::vector<int>[n_energies];
+	union_elements = new std::vector<int>[n_energies];
 
 	for (unsigned int i = 0 ; i < n_energies ; i++) {
 		PuresGrid *pures_grid = assistant->pures_grid_vec[i];
@@ -177,7 +177,7 @@ void App2::SimulateGrid::Prepare() {
 		sample_elements.resize(it - sample_elements.begin());
 
 		diff_elements[i].resize(pure_elements.size()+sample_elements.size());
-	
+
 		it = std::set_difference(sample_elements.begin(), sample_elements.end(), pure_elements.begin(), pure_elements.end(), diff_elements[i].begin());
 		diff_elements[i].resize(it - diff_elements[i].begin());
 
@@ -187,9 +187,9 @@ void App2::SimulateGrid::Prepare() {
 
 		diff_elements_sum += diff_elements[i].size();
 
-		
-		for (Gtk::TreeModel::Children::iterator iter = model->children().begin() ; 
-		     iter != model->children().end(); 
+
+		for (Gtk::TreeModel::Children::iterator iter = model->children().begin() ;
+		     iter != model->children().end();
 		     ++iter) {
 			//default is to assume that the element is not used at all
 			Gtk::TreeModel::Row row = *iter;
@@ -221,14 +221,14 @@ void App2::SimulateGrid::Prepare() {
 				row[columns->col_simulate_sensitive[i]] = true;
 				row[columns->col_bam_file_asr[i]] = BAM::File::ASR(pure_row[pures_grid->columns.col_bam_file_asr]);
 			}
-		
+
 			//create xmsi files
-			row[columns->col_xmsi_filename[i]] = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + static_cast<std::ostringstream*>( &(std::ostringstream() << getpid()))->str() + "-" + row[columns->col_element] + "-" + static_cast<std::ostringstream*>( &(std::ostringstream() << pures_grid->GetEnergy()))->str() + "keV.xmsi");
+			row[columns->col_xmsi_filename[i]] = Glib::build_filename(Glib::get_tmp_dir(), "bam-quant-" + Glib::get_user_name() + "-" + (std::ostringstream() << getpid()).str() + "-" + row[columns->col_element] + "-" + (std::ostringstream() << pures_grid->GetEnergy()).str() + "keV.xmsi");
 			//row[columns->col_xmso_file[i]] = 0;
 			row[columns->col_xmso_counts_KA[i]] = 0.0;
 			row[columns->col_xmso_counts_LA[i]] = 0.0;
 			std::string temp_xmsi_filename(row[columns->col_xmsi_filename[i]]);
-		
+
 			Gtk::TreeModel::Row energies_row = assistant->energies_grid.model->children()[i];
 			BAM::File::XMSI temp_xmsi_file = energies_row[assistant->energies_grid.columns.col_bam_file_xmsi];
 
@@ -258,7 +258,7 @@ void App2::SimulateGrid::Prepare() {
 		play_button.set_sensitive(false);
 		pause_button.set_sensitive(false);
 		stop_button.set_sensitive(false);
-		assistant->set_page_complete(*this, true);	
+		assistant->set_page_complete(*this, true);
 		return;
 	}
 
@@ -305,7 +305,7 @@ void App2::SimulateGrid::on_play_clicked() {
 		/* Simulations have been paused! */
 		int kill_rv;
 
-		play_button.set_sensitive(false);	
+		play_button.set_sensitive(false);
 
 		//glibmm doesn't have the continue method so let's use glib for this
 		g_timer_continue(timer->gobj());
@@ -337,7 +337,7 @@ void App2::SimulateGrid::on_play_clicked() {
 
 	//normal case -> check if input is valid
 	unsigned int n_energies = assistant->pures_grid_vec.size();
-	
+
 	std::stringstream ss;
 
 	for (unsigned int i = 0 ; i < n_energies ; i++) {
@@ -356,7 +356,7 @@ void App2::SimulateGrid::on_play_clicked() {
 			else
 				n_to_be_interpolated++;
 		}
-		if (n_to_be_interpolated > 0 && n_used_for_interpolation < 2) 
+		if (n_to_be_interpolated > 0 && n_used_for_interpolation < 2)
 			ss << tv.get_column(i+1)->get_title() << std::endl;
 	}
 	if (ss.str().length() > 0) {
@@ -385,7 +385,7 @@ void App2::SimulateGrid::on_play_clicked() {
 				row[columns->col_status[i]] = Glib::ustring("Ignored");
 		}
 	}
-	
+
 	tv.queue_draw();
 
 	//let's start the clock!
@@ -474,7 +474,7 @@ void App2::SimulateGrid::xmimsim_start_recursive(unsigned int &current_row, unsi
 	//write inputfile
 	BAM::File::XMSI temp_xmsi_file = row[columns->col_xmsi_file[current_column]];
 	temp_xmsi_file.Write();
-	
+
 
 	//std::cout << "Processing " << temp_xmsi_file->GetFilename() << std::endl;
 	//std::cout << "Outputfile will be " << temp_xmsi_file->GetOutputFile() << std::endl;
@@ -483,7 +483,7 @@ void App2::SimulateGrid::xmimsim_start_recursive(unsigned int &current_row, unsi
 
 	//spawn process
 	try {
-		Glib::spawn_async_with_pipes(std::string(""), argv, Glib::SPAWN_SEARCH_PATH | Glib::SPAWN_DO_NOT_REAP_CHILD, sigc::slot<void>(), &xmimsim_pid, 0, &out_fh, &err_fh);	
+		Glib::spawn_async_with_pipes(std::string(""), argv, Glib::SPAWN_SEARCH_PATH | Glib::SPAWN_DO_NOT_REAP_CHILD, sigc::slot<void>(), &xmimsim_pid, 0, &out_fh, &err_fh);
 	}
 	catch (Glib::SpawnError &e) {
 		throw BAM::Exception(std::string("App2::SimulateGrid::xmimsim_start_recursive -> ") + e.what());
@@ -491,7 +491,7 @@ void App2::SimulateGrid::xmimsim_start_recursive(unsigned int &current_row, unsi
 
 	//update treemodel
 	row[columns->col_status[current_column]] = Glib::ustring("0 %");
-	
+
 
 	std::stringstream ss;
 	ss << get_elapsed_time() << argv.back() << " was started with process id " << real_xmimsim_pid << std::endl;
@@ -500,7 +500,7 @@ void App2::SimulateGrid::xmimsim_start_recursive(unsigned int &current_row, unsi
 	xmimsim_paused = false;
 	pause_button.set_sensitive(true);
 	stop_button.set_sensitive(true);
-		
+
 	xmimsim_stderr = Glib::IOChannel::create_from_fd(err_fh);
 	xmimsim_stdout = Glib::IOChannel::create_from_fd(out_fh);
 
@@ -509,9 +509,9 @@ void App2::SimulateGrid::xmimsim_start_recursive(unsigned int &current_row, unsi
 
 	//add watchers
 	Glib::signal_child_watch().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_child_watcher), current_row, current_column), xmimsim_pid);
-	Glib::signal_io().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stdout_watcher), current_row, current_column), xmimsim_stdout, Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
-	Glib::signal_io().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stderr_watcher), current_row, current_column), xmimsim_stderr, Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
-	//Glib::signal_io().connect(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stderr_watcher), xmimsim_stderr,Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH); 
+	Glib::signal_io().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stdout_watcher), current_row, current_column), xmimsim_stdout, Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH);
+	Glib::signal_io().connect(sigc::bind(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stderr_watcher), current_row, current_column), xmimsim_stderr, Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH);
+	//Glib::signal_io().connect(sigc::mem_fun(*this, &App2::SimulateGrid::xmimsim_stderr_watcher), xmimsim_stderr,Glib::IO_IN | Glib::IO_PRI | Glib::IO_ERR | Glib::IO_HUP | Glib::IO_NVAL, Glib::PRIORITY_HIGH);
 
 	//remove xmsi file from argv
 	argv.pop_back();
@@ -573,7 +573,7 @@ void App2::SimulateGrid::xmimsim_child_watcher(GPid pid, int status, unsigned in
 #endif
 
 	Glib::spawn_close_pid(xmimsim_pid);
-	
+
 	if (success == 0) {
 		//something went badly wrong
 		Gtk::TreeModel::Row row = model->children()[current_row];
@@ -587,7 +587,7 @@ void App2::SimulateGrid::xmimsim_child_watcher(GPid pid, int status, unsigned in
 	Gtk::TreeModel::Row row = model->children()[current_row];
 	BAM::File::XMSO *xmso_file;
 	std::string xmso_filename = row[columns->col_xmso_filename[current_column]];
-	
+
 	try {
 		xmso_file = new BAM::File::XMSO(xmso_filename);
 	}
@@ -601,7 +601,7 @@ void App2::SimulateGrid::xmimsim_child_watcher(GPid pid, int status, unsigned in
 
 	if (Z == 0)
 		throw BAM::Exception("App2::SimulateGrid::xmimsim_start_recursive -> Invalid col_element");
-			
+
 	try {
 		col_xmso_counts_KA += xmso_file->GetCountsForElementForLine(Z, "KL2");
 	}
@@ -627,7 +627,7 @@ void App2::SimulateGrid::xmimsim_child_watcher(GPid pid, int status, unsigned in
 	row[columns->col_xmso_counts_LA[current_column]] = col_xmso_counts_LA;
 
 	delete xmso_file;
-	
+
 	row[columns->col_status[current_column]] = Glib::ustring("Completed");
 
 	//delete temparary XMI-MSIM files
@@ -669,7 +669,7 @@ bool App2::SimulateGrid::xmimsim_iochannel_watcher(Glib::IOCondition condition, 
 
 	if (condition & (Glib::IO_IN | Glib::IO_PRI)) {
 		try {
-			pipe_status = iochannel->read_line(pipe_string);	
+			pipe_status = iochannel->read_line(pipe_string);
 			if (pipe_status == Glib::IO_STATUS_NORMAL) {
 				if (sscanf(pipe_string.c_str(), "Simulating interactions at %i",&progress) == 1) {
 					Gtk::TreeModel::Row row = model->children()[current_row];
@@ -677,7 +677,7 @@ bool App2::SimulateGrid::xmimsim_iochannel_watcher(Glib::IOCondition condition, 
 					ss << progress << " %";
 					row[columns->col_status[current_column]] = ss.str();
 					row[columns->col_progress[current_column]] = progress;
-					
+
 				}
 				else {
 					std::stringstream ss;
@@ -722,7 +722,7 @@ void App2::SimulateGrid::on_stop_clicked() {
 
 #ifdef G_OS_UNIX
 	int kill_rv;
-	
+
 	kill_rv = kill((pid_t) xmimsim_pid, SIGTERM);
 #if !GLIB_CHECK_VERSION (2, 35, 0)
 	//starting with 2.36.0 (and some unstable versions before),
@@ -783,4 +783,3 @@ void App2::SimulateGrid::on_pause_clicked() {
 		play_button.set_sensitive(true);
 	}
 }
-
