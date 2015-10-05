@@ -5,8 +5,8 @@
 #include <xmi_msim.h>
 #include <iostream>
 #include "bam_catalog.h"
-#include "bam_file_rxi.h" 
-#include "bam_job_quant.h" 
+#include "bam_file_rxi.h"
+#include "bam_job_quant.h"
 
 
 
@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 
 	Glib::OptionContext option_context("inputfile XMSO-file");
 	option_context.set_help_enabled();
-	Glib::OptionGroup option_group("XMI-MSIM Options", "XMI-MSIM Options");
+	Glib::OptionGroup option_group("XMI-MSIM", "XMI-MSIM options", "Show all XMI-MSIM options");
 
 	//option_group.add_entry(App3OptionEntry( "enable-M-lines", 0, "Enable M lines (default)"), (bool&) options.use_M_lines);
 	option_group.add_entry(App3OptionEntry( "disable-M-lines", 0, "Disable M lines", "", Glib::OptionEntry::FLAG_REVERSE), (bool&) options.use_M_lines);
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
         if (argv_files.size() != 2) {
 		std::cerr << option_context.get_help(true) << std::endl;
                 return 1;
-        }		
+        }
 
 	if (options.extra_verbose) {
                 options.verbose = 1;
@@ -144,12 +144,12 @@ int main(int argc, char **argv) {
 	try {
 		BAM::Job::XMSI::RandomNumberAcquisitionStart();
 
-		//disable xraylib's error messages	
-		SetErrorMessages(0);		
+		//disable xraylib's error messages
+		SetErrorMessages(0);
 
 		//start by reading in the inputfile
 		BAM::File::RXI::Common *common = BAM::File::RXI::Parse(argv_files[0]);
-		
+
 		BAM::Job::Quant job(common, argv_files[1], options, conv_threshold);
 
 		BAM::Job::XMSI::RandomNumberAcquisitionStop();
@@ -174,4 +174,3 @@ int main(int argc, char **argv) {
 
 	return 0;
 }
-
